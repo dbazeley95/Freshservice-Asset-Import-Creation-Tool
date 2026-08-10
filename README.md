@@ -47,16 +47,23 @@ becomes a fully working tab like the other five.
    Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). These
    values get copied onto new rows as you add them.
-5. Paste one serial number per line into **Bulk Add from Serial Numbers**
-   and a **Name Pattern** (e.g. `ICTSUITE Monitor {n}` or `MAR-{n2}` for
-   zero-padded numbers), then click **Add Rows from Serials**. One row is
-   created per serial number, with the Name built from the pattern. Name
-   pattern tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded), `{serial}`,
-   `{company}`, `{location}`, `{product}`. Asset Tag is never typed by
-   hand — it's generated automatically as `<Short Code>-<serial>` from the
-   current Company's Short Code (see `SITE_PRESETS` in `js/catalog.js`);
-   if that Company has no Short Code set yet, Asset Tag is left blank for
-   you to fill in per row.
+5. Paste into **Bulk Add from Serial Numbers**, one asset per line, then
+   click **Add Rows from Serials**. Each line can be either:
+   - a bare serial number, in which case its Name comes from the **Name
+     Pattern** below (e.g. `ICTSUITE Monitor {n}` or `MAR-{n2}` for
+     zero-padded numbers) — tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded),
+     `{serial}`, `{company}`, `{location}`, `{product}`; or
+   - a `Name, Serial` pair (or paste two columns straight from a
+     spreadsheet — tab-separated works too), when names were assigned
+     before serials were recorded and don't line up with a generated
+     sequence. The Name Pattern is only used as a fallback for lines that
+     don't supply their own name.
+
+   Asset Tag is never typed by hand either way — it's generated
+   automatically as `<Short Code>-<serial>` from the current Company's
+   Short Code (see `SITE_PRESETS` in `js/catalog.js`); if that Company has
+   no Short Code set yet, Asset Tag is left blank for you to fill in per
+   row.
 6. Every generated row is independently editable in the table — tweak any
    cell by hand, or use **Add Blank Row** for one-off manual entries.
    Required fields with no value are outlined in red.

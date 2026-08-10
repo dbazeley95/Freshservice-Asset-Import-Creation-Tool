@@ -373,16 +373,30 @@ function refreshAssetTagHint(state) {
   if (assetTagHintEl) assetTagHintEl.textContent = assetTagHintText(state);
 }
 
+// One line can be a bare serial (Name comes from the Name Pattern below)
+// or a "Name, Serial" / "Name<TAB>Serial" pair, so names assigned before
+// serials were recorded don't have to match a generated sequence. Tab is
+// what you get pasting two columns straight from a spreadsheet; comma
+// works too for hand-typed lines.
+function splitNameSerial(line) {
+  const delim = line.includes('\t') ? '\t' : line.includes(',') ? ',' : null;
+  if (!delim) return { name: '', serial: line.trim() };
+  const idx = line.indexOf(delim);
+  return { name: line.slice(0, idx).trim(), serial: line.slice(idx + 1).trim() };
+}
+
 function renderBulkForm(assetType, state) {
   els.bulkForm.innerHTML = '';
 
   const serialsField = document.createElement('div');
   serialsField.className = 'field field-wide';
-  serialsField.innerHTML = `<label for="bulk-serials">Serial Numbers (one per line)</label>`;
+  serialsField.innerHTML = `<label for="bulk-serials">Assets (one per line)</label>`;
   const textarea = document.createElement('textarea');
   textarea.id = 'bulk-serials';
   textarea.rows = 6;
-  textarea.placeholder = 'Paste one serial number per line\ne.g.\nLL7QX4MQ9N\nLXQL7XR217\n...';
+  textarea.placeholder =
+    'Paste one per line — a bare serial to use the Name Pattern below, or "Name, Serial" ' +
+    '(or paste two columns from a spreadsheet) to set the name yourself\ne.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...';
   serialsField.appendChild(textarea);
   const serialsHint = document.createElement('p');
   serialsHint.className = 'hint';
@@ -393,7 +407,7 @@ function renderBulkForm(assetType, state) {
 
   const patternField = document.createElement('div');
   patternField.className = 'field';
-  patternField.innerHTML = `<label for="bulk-name-pattern">Name Pattern</label>`;
+  patternField.innerHTML = `<label for="bulk-name-pattern">Name Pattern (fallback)</label>`;
   const patternInput = document.createElement('input');
   patternInput.type = 'text';
   patternInput.id = 'bulk-name-pattern';
@@ -406,7 +420,9 @@ function renderBulkForm(assetType, state) {
   patternField.appendChild(patternInput);
   const hint = document.createElement('p');
   hint.className = 'hint';
-  hint.textContent = '{n} = sequence number, {n2}/{n3} = zero-padded, {serial}/{company}/{location}/{product} also available.';
+  hint.textContent =
+    'Only used for lines above that are a bare serial with no name given. ' +
+    '{n} = sequence number, {n2}/{n3} = zero-padded, {serial}/{company}/{location}/{product} also available.';
   patternField.appendChild(hint);
   els.bulkForm.appendChild(patternField);
 
@@ -425,29 +441,32 @@ function renderBulkForm(assetType, state) {
   addBtn.className = 'primary';
   addBtn.textContent = 'Add Rows from Serials';
   addBtn.addEventListener('click', () => {
-    const serials = textarea.value
+    const entries = textarea.value
       .split(/\r?\n/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (serials.length === 0) return;
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map(splitNameSerial);
+    if (entries.length === 0) return;
 
     const shortCode = shortCodeForCompany(state.defaults.company);
     let n = Number(startInput.value) || 1;
-    for (const serial of serials) {
+    for (const { name: manualName, serial } of entries) {
       const row = { id: newRowId() };
       for (const col of defaultColumns(assetType)) {
         row[col.key] = state.defaults[col.key] ?? '';
       }
       row.serialNumber = serial;
       row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
-      row.name = state.namePattern
-        ? applyNamePattern(state.namePattern, n, {
-            serial,
-            company: state.defaults.company,
-            location: state.defaults.location,
-            product: state.defaults.product,
-          })
-        : '';
+      row.name =
+        manualName ||
+        (state.namePattern
+          ? applyNamePattern(state.namePattern, n, {
+              serial,
+              company: state.defaults.company,
+              location: state.defaults.location,
+              product: state.defaults.product,
+            })
+          : '');
       state.rows.push(row);
       n += 1;
     }
