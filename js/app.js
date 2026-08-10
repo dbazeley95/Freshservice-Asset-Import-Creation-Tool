@@ -85,11 +85,6 @@ function buildPresetField(labelText, id, options, onChange) {
   const select = document.createElement('select');
   select.id = id;
 
-  const blank = document.createElement('option');
-  blank.value = '';
-  blank.textContent = '— Custom —';
-  select.appendChild(blank);
-
   const sortedOptions = [...options].sort((a, b) => a.label.localeCompare(b.label));
   for (const opt of sortedOptions) {
     const o = document.createElement('option');
@@ -97,6 +92,10 @@ function buildPresetField(labelText, id, options, onChange) {
     o.textContent = opt.label;
     select.appendChild(o);
   }
+  // No blank/"Custom" placeholder option — leave the dropdown showing
+  // nothing selected instead, so it never looks like a preset was already
+  // applied when it wasn't.
+  select.selectedIndex = -1;
 
   select.addEventListener('change', () => onChange(select.value));
   wrap.appendChild(select);
