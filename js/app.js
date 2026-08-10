@@ -1,8 +1,14 @@
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js';
-import { buildCsv, downloadCsv } from './csv.js';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js';
-import { iconSvg } from './icons.js';
+// The ?v= query strings below exist purely to bust GitHub Pages' CDN cache
+// (Cache-Control: max-age=600) — without them, a browser that already has
+// an old copy of one of these files cached will keep using it silently for
+// up to 10 minutes after a new version deploys, even though index.html
+// itself (and its own ?v=) came through fresh. Bump every ?v= here to match
+// the version badge whenever any of these files change.
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.7.2';
+import { buildCsv, downloadCsv } from './csv.js?v=0.7.2';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.7.2';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.7.2';
+import { iconSvg } from './icons.js?v=0.7.2';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
