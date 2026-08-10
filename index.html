@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.9.3" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.4" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.3 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.4 beta</button>
       </div>
     </div>
 
@@ -107,12 +107,12 @@
                 <span id="clear-rows-icon" class="tab-icon" aria-hidden="true"></span>
                 Clear All Rows
               </button>
-              <button id="download-btn" type="button" class="success">
-                <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
-                Download CSV
-              </button>
             </div>
             <div id="table-wrap" class="table-wrap"></div>
+            <button id="download-btn" type="button" class="success">
+              <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
+              Download CSV
+            </button>
           </section>
         </div>
       </main>
@@ -180,6 +180,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.4</span><h3 class="changelog-title">Download CSV Moved Below Rows</h3></div>
+        <p>Moved out of the Rows toolbar to its own full-width button below the table, so it reads as the final step after reviewing your rows rather than one option among several.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.9.3</span><h3 class="changelog-title">Consistent Button Colours</h3></div>
         <p>Down to three fills, used consistently everywhere: blue for the default action (Leave Feedback, What's New, Help, Add Assets of Another Product, both CSV imports, Download Template CSV), red for anything destructive (Clear All Rows, deleting a row), and green just for Download CSV &mdash; the one "you're done" button.</p>
@@ -271,6 +275,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.9.3"></script>
+  <script type="module" src="js/app.js?v=0.9.4"></script>
 </body>
 </html>

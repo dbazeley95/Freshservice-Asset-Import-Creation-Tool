@@ -399,6 +399,17 @@ main {
   margin-top: 0.5rem;
 }
 
+/* The final action of the whole page — full width and set apart below
+   the table it exports, rather than sitting in the toolbar alongside
+   Clear All Rows/Import, so it reads as the last step, not one option
+   among several. */
+#download-btn {
+  width: 100%;
+  margin-top: 1rem;
+  font-size: 1rem;
+  padding: 0.7rem 1rem;
+}
+
 .field {
   display: flex;
   flex-direction: column;
