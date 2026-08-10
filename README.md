@@ -47,13 +47,16 @@ becomes a fully working tab like the other five.
    Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). These
    values get copied onto new rows as you add them.
-5. Paste one serial number per line into **Bulk Add from Serial Numbers**,
-   set an **Asset Tag Prefix** (e.g. `SCL-`) and a **Name Pattern** (e.g.
-   `ICTSUITE Monitor {n}` or `MAR-{n2}` for zero-padded numbers), then click
-   **Add Rows from Serials**. One row is created per serial number, with the
-   Asset Tag set to `prefix + serial` and the Name built from the pattern.
-   Name pattern tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded), `{serial}`,
-   `{company}`, `{location}`, `{product}`.
+5. Paste one serial number per line into **Bulk Add from Serial Numbers**
+   and a **Name Pattern** (e.g. `ICTSUITE Monitor {n}` or `MAR-{n2}` for
+   zero-padded numbers), then click **Add Rows from Serials**. One row is
+   created per serial number, with the Name built from the pattern. Name
+   pattern tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded), `{serial}`,
+   `{company}`, `{location}`, `{product}`. Asset Tag is never typed by
+   hand — it's generated automatically as `<Short Code>-<serial>` from the
+   current Company's Short Code (see `SITE_PRESETS` in `js/catalog.js`);
+   if that Company has no Short Code set yet, Asset Tag is left blank for
+   you to fill in per row.
 6. Every generated row is independently editable in the table — tweak any
    cell by hand, or use **Add Blank Row** for one-off manual entries.
    Required fields with no value are outlined in red.
@@ -120,4 +123,7 @@ preset's `manufacturer` field is metadata only (never written to the CSV) —
 it drives the Manufacturer filter and nothing else, so it's fine to leave
 off if you don't know it. A `SITE_PRESETS` entry sets Company and Location
 to the same value by default; add an explicit `location` to an entry if a
-site's Location ever needs to differ from its Company name.
+site's Location ever needs to differ from its Company name. Its
+`shortCode` (e.g. `SCL`, `MAR`) is what Asset Tag gets built from for that
+site — leave it `''` until you have the real code, and Asset Tag just
+stays blank in the meantime instead of guessing.

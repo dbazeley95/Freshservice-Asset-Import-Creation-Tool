@@ -11,31 +11,37 @@
 // original import templates, where those two columns were always
 // identical). If a site's Location ever needs to differ from its Company
 // name, add a `location` field to that entry to override it.
+//
+// `shortCode` drives Asset Tag: every asset's Asset Tag is generated as
+// `${shortCode}-${serial number}` (e.g. "SCL-MMLY7EE05514019418851M"),
+// never typed by hand. Fill these in below as you get the real list — a
+// site with no shortCode yet just leaves Asset Tag blank for you to fill
+// in manually until then.
 export const SITE_PRESETS = [
-  { id: 'cardinal-newman', label: 'Cardinal Newman' },
-  { id: 'holy-family', label: 'Holy Family' },
-  { id: 'st-albans', label: 'St Albans' },
-  { id: 'st-annes', label: 'St Annes' },
-  { id: 'st-augustines', label: 'St Augustines' },
-  { id: 'st-charles-borromeo', label: 'St Charles Borromeo' },
-  { id: 'st-cuthbert-mayne', label: 'St Cuthbert Mayne' },
-  { id: 'st-cuthberts', label: 'St Cuthberts' },
-  { id: 'st-edmunds', label: 'St Edmunds' },
-  { id: 'st-hugh-of-lincoln', label: 'St Hugh of Lincoln' },
-  { id: 'st-josephs-guildford', label: 'St Josephs (Guildford)' },
-  { id: 'st-polycarps', label: 'St Polycarps' },
-  { id: 'st-thomas-of-canterbury', label: 'St Thomas of Canterbury' },
-  { id: 'the-marist', label: 'The Marist' },
-  { id: 'sjb', label: 'SJB' },
-  { id: 'salesian-school', label: 'Salesian School' },
-  { id: 'xavier-cet', label: 'Xavier CET' },
-  { id: 'sjb-safe', label: 'SJB - SAfE' },
-  { id: 'sjb-mathshub', label: 'SJB - Mathshub' },
-  { id: 'st-francis', label: 'St Francis' },
-  { id: 'st-clements', label: 'St Clements' },
-  { id: 'st-josephs-redhill', label: 'St Josephs (Redhill)' },
-  { id: 'st-peters-leatherhead', label: 'St Peters (Leatherhead)' },
-  { id: 'st-josephs-dorking', label: 'St Josephs (Dorking)' },
+  { id: 'cardinal-newman', label: 'Cardinal Newman', shortCode: '' },
+  { id: 'holy-family', label: 'Holy Family', shortCode: '' },
+  { id: 'st-albans', label: 'St Albans', shortCode: '' },
+  { id: 'st-annes', label: 'St Annes', shortCode: '' },
+  { id: 'st-augustines', label: 'St Augustines', shortCode: '' },
+  { id: 'st-charles-borromeo', label: 'St Charles Borromeo', shortCode: '' },
+  { id: 'st-cuthbert-mayne', label: 'St Cuthbert Mayne', shortCode: '' },
+  { id: 'st-cuthberts', label: 'St Cuthberts', shortCode: '' },
+  { id: 'st-edmunds', label: 'St Edmunds', shortCode: '' },
+  { id: 'st-hugh-of-lincoln', label: 'St Hugh of Lincoln', shortCode: '' },
+  { id: 'st-josephs-guildford', label: 'St Josephs (Guildford)', shortCode: '' },
+  { id: 'st-polycarps', label: 'St Polycarps', shortCode: '' },
+  { id: 'st-thomas-of-canterbury', label: 'St Thomas of Canterbury', shortCode: '' },
+  { id: 'the-marist', label: 'The Marist', shortCode: 'MAR' },
+  { id: 'sjb', label: 'SJB', shortCode: '' },
+  { id: 'salesian-school', label: 'Salesian School', shortCode: '' },
+  { id: 'xavier-cet', label: 'Xavier CET', shortCode: '' },
+  { id: 'sjb-safe', label: 'SJB - SAfE', shortCode: '' },
+  { id: 'sjb-mathshub', label: 'SJB - Mathshub', shortCode: '' },
+  { id: 'st-francis', label: 'St Francis', shortCode: '' },
+  { id: 'st-clements', label: 'St Clements', shortCode: 'SCL' },
+  { id: 'st-josephs-redhill', label: 'St Josephs (Redhill)', shortCode: '' },
+  { id: 'st-peters-leatherhead', label: 'St Peters (Leatherhead)', shortCode: '' },
+  { id: 'st-josephs-dorking', label: 'St Josephs (Dorking)', shortCode: '' },
 ].map((s) => ({ ...s, company: s.label, location: s.location || s.label }));
 
 // Keyed by asset type id (see js/templates.js). Each entry's `fields` only

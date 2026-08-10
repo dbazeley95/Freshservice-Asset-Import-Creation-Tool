@@ -37,7 +37,6 @@ function emptyState() {
     defaults: {},
     rows: [],
     nextN: 1,
-    tagPrefix: '',
     namePattern: '',
   };
 }
@@ -167,6 +166,16 @@ function applySitePreset(assetType, state, presetId) {
   addSuggestion('location', preset.location);
   persist(activeTypeId, state);
   renderDefaultsForm(assetType, state);
+  refreshAssetTagHint(state);
+}
+
+// Asset Tag is always `${shortCode}-${serial}`, never typed by hand.
+// Returns '' if the current Company doesn't match a Site Preset with a
+// Short Code set yet (js/catalog.js), leaving Asset Tag blank rather than
+// guessing.
+function shortCodeForCompany(company) {
+  const preset = SITE_PRESETS.find((p) => p.company === company);
+  return preset && preset.shortCode ? preset.shortCode : '';
 }
 
 // Applies every field from a Model Preset except `product` itself — the
@@ -302,6 +311,7 @@ function renderDefaultsForm(assetType, state) {
     input.addEventListener('input', () => {
       state.defaults[col.key] = input.value;
       debouncedPersist(activeTypeId, state);
+      if (col.key === 'company') refreshAssetTagHint(state);
     });
     input.addEventListener('change', () => {
       if (col.input !== 'text' || !input.value.trim()) return;
@@ -347,6 +357,22 @@ function buildDatalist(id, options) {
 
 // ---------- Bulk add panel ----------
 
+// Points at the currently-rendered Asset Tag hint <p> so Company changes
+// (via preset or typing) can update its text without rebuilding the whole
+// Bulk Add panel — that would wipe any serials the user already pasted in.
+let assetTagHintEl = null;
+
+function assetTagHintText(state) {
+  const shortCode = shortCodeForCompany(state.defaults.company);
+  return shortCode
+    ? `Asset Tag is generated automatically as ${shortCode}-<serial> from the Company above.`
+    : 'Company above has no Short Code set in js/catalog.js yet, so Asset Tag will be left blank for you to fill in per row.';
+}
+
+function refreshAssetTagHint(state) {
+  if (assetTagHintEl) assetTagHintEl.textContent = assetTagHintText(state);
+}
+
 function renderBulkForm(assetType, state) {
   els.bulkForm.innerHTML = '';
 
@@ -358,22 +384,12 @@ function renderBulkForm(assetType, state) {
   textarea.rows = 6;
   textarea.placeholder = 'Paste one serial number per line\ne.g.\nLL7QX4MQ9N\nLXQL7XR217\n...';
   serialsField.appendChild(textarea);
+  const serialsHint = document.createElement('p');
+  serialsHint.className = 'hint';
+  serialsHint.textContent = assetTagHintText(state);
+  assetTagHintEl = serialsHint;
+  serialsField.appendChild(serialsHint);
   els.bulkForm.appendChild(serialsField);
-
-  const tagField = document.createElement('div');
-  tagField.className = 'field';
-  tagField.innerHTML = `<label for="bulk-tag-prefix">Asset Tag Prefix</label>`;
-  const tagInput = document.createElement('input');
-  tagInput.type = 'text';
-  tagInput.id = 'bulk-tag-prefix';
-  tagInput.placeholder = 'e.g. SCL-';
-  tagInput.value = state.tagPrefix || '';
-  tagInput.addEventListener('input', () => {
-    state.tagPrefix = tagInput.value;
-    debouncedPersist(activeTypeId, state);
-  });
-  tagField.appendChild(tagInput);
-  els.bulkForm.appendChild(tagField);
 
   const patternField = document.createElement('div');
   patternField.className = 'field';
@@ -415,6 +431,7 @@ function renderBulkForm(assetType, state) {
       .filter(Boolean);
     if (serials.length === 0) return;
 
+    const shortCode = shortCodeForCompany(state.defaults.company);
     let n = Number(startInput.value) || 1;
     for (const serial of serials) {
       const row = { id: newRowId() };
@@ -422,7 +439,7 @@ function renderBulkForm(assetType, state) {
         row[col.key] = state.defaults[col.key] ?? '';
       }
       row.serialNumber = serial;
-      row.assetTag = (state.tagPrefix || '') + serial;
+      row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
       row.name = state.namePattern
         ? applyNamePattern(state.namePattern, n, {
             serial,
