@@ -1,15 +1,22 @@
+/* Xavier Catholic Education Trust brand palette: navy #142146, red
+   #c4232a, yellow #ebd166, beige #cfccbc, purple #953d76, white #ffffff.
+   Tints below are derived from those five, not invented. */
 :root {
-  --bg: #f4f5f7;
+  --bg: #e9e8e1;
   --panel-bg: #ffffff;
-  --text: #1c1f26;
-  --text-muted: #5b6270;
-  --border: #d9dce2;
-  --accent: #2f6fed;
+  --text: #142146;
+  --text-muted: #465991;
+  --border: #cfccbc;
+  --accent: #142146;
   --accent-text: #ffffff;
-  --danger: #d64545;
+  --danger: #c4232a;
   --input-bg: #ffffff;
-  --table-head-bg: #eef1f6;
-  --table-row-alt: #fafbfc;
+  --table-head-bg: #fbf7e4;
+  --table-row-alt: #f3f2ee;
+  --coming-soon: #953d76;
+  --coming-soon-bg: #f2e8ef;
+  --badge-bg: #fbf7e4;
+  --badge-text: #142146;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,12 +26,16 @@
     --text: #e8eaed;
     --text-muted: #9aa1ac;
     --border: #333844;
-    --accent: #5b8dff;
+    --accent: #607ed2;
     --accent-text: #0b0e14;
-    --danger: #ff6b6b;
+    --danger: #e05258;
     --input-bg: #14161a;
     --table-head-bg: #22262f;
     --table-row-alt: #191c22;
+    --coming-soon: #c46ea6;
+    --coming-soon-bg: #3e2f40;
+    --badge-bg: #413f32;
+    --badge-text: #ebd166;
   }
 }
 
@@ -63,8 +74,8 @@ body {
   padding: 0.15rem 0.6rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--panel-bg);
-  color: var(--text-muted);
+  background: var(--badge-bg);
+  color: var(--badge-text);
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
@@ -178,17 +189,21 @@ body {
   border-color: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--danger);
 }
 
 .tab-coming-soon {
-  color: var(--text-muted);
+  color: var(--coming-soon);
+  border-color: var(--coming-soon);
   border-style: dashed;
 }
 
 .tab-coming-soon.active {
-  background: transparent;
-  color: var(--text-muted);
-  border-color: var(--text-muted);
+  background: var(--coming-soon-bg);
+  color: var(--coming-soon);
+  border-color: var(--coming-soon);
+  border-style: solid;
+  box-shadow: inset 3px 0 0 var(--coming-soon);
 }
 
 .app-main {
@@ -419,16 +434,19 @@ tbody td input {
 }
 
 .feedback-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 0.75rem;
-  padding: 0.4rem 0.9rem;
+  font: inherit;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
   border: 1px solid var(--border);
-  border-radius: 999px;
   background: var(--panel-bg);
   color: var(--text);
-  font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .feedback-link:hover {

@@ -632,6 +632,7 @@ if (feedbackLink) {
   const subject = encodeURIComponent('Bug Found/Feature Request');
   const body = encodeURIComponent(`Version: ${version}\n\nDescribe the bug or feature request:\n`);
   feedbackLink.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+  document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
 }
 
 renderAll();

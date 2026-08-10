@@ -93,7 +93,11 @@ python3 -m http.server 8000
 
 ```
 index.html          Page layout/containers
-css/styles.css       Styling (light/dark aware, side nav/drawer)
+css/styles.css       Styling (light/dark aware, side nav/drawer). Colors
+                       are CSS custom properties at the top of the file,
+                       set to the Xavier CET brand palette (navy/red/
+                       yellow/beige/purple) — change the values there to
+                       retheme the whole app.
 js/templates.js       Column definitions for each asset type (edit here to
                        add a new asset type or change a template's columns)
 js/catalog.js          Site Presets (Company + Location together) and

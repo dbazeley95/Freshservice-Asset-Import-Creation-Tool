@@ -100,6 +100,10 @@ export const ICONS = {
     <line x1="6" y1="6" x2="18" y2="18"/>
     <line x1="18" y1="6" x2="6" y2="18"/>
   `,
+  mail: `
+    <rect x="3" y="5" width="18" height="14" rx="1.5"/>
+    <path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>
+  `,
 };
 
 export function iconSvg(key) {
