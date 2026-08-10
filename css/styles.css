@@ -298,6 +298,14 @@ main {
   color: var(--text-muted);
 }
 
+.bulk-serials-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .required-marker {
   color: var(--danger);
   font-weight: 700;
@@ -327,6 +335,9 @@ input.invalid {
 }
 
 button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font: inherit;
   padding: 0.55rem 1rem;
   border-radius: 6px;
@@ -345,6 +356,11 @@ button.primary {
 
 button.secondary {
   background: transparent;
+}
+
+button.small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
 }
 
 button.danger-outline {

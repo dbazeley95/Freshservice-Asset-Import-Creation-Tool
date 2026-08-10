@@ -59,6 +59,13 @@ becomes a fully working tab like the other five.
      sequence. The Name Pattern is only used as a fallback for lines that
      don't supply their own name.
 
+   **Import CSV** (button above the textarea) loads a `.csv` file the same
+   way — a Name column and a Serial column (a header row like "Name,
+   Serial" is detected and skipped automatically; a Serial-only file works
+   too, falling back to the Name Pattern same as a bare pasted serial).
+   It fills the textarea rather than adding rows immediately, so you can
+   review or tweak the list before clicking Add Rows from Serials.
+
    Asset Tag is never typed by hand either way — it's generated
    automatically as `<Short Code>-<serial>` from the current Company's
    Short Code (see `SITE_PRESETS` in `js/catalog.js`); if that Company has

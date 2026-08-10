@@ -385,18 +385,100 @@ function splitNameSerial(line) {
   return { name: line.slice(0, idx).trim(), serial: line.slice(idx + 1).trim() };
 }
 
+// Minimal CSV line parser (handles "quoted, fields" with "" escaping) —
+// real .csv exports from Excel/Google Sheets need this, unlike the naive
+// comma/tab split above which is only for hand-typed or pasted lines.
+function parseCsvLine(line) {
+  const cells = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        cur += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      cells.push(cur.trim());
+      cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  cells.push(cur.trim());
+  return cells;
+}
+
+const CSV_HEADER_WORDS = ['name', 'display name', 'serial', 'serial number', 'asset tag'];
+function looksLikeHeaderRow(cells) {
+  // Every cell must exactly match a known header word — a single-column
+  // "Serial Number" header still counts, while a real data row (e.g. a
+  // bare serial with no header at all) never accidentally does.
+  return cells.length > 0 && cells.every((c) => CSV_HEADER_WORDS.includes(c.trim().toLowerCase()));
+}
+
+// A .csv with a Name column and a Serial column (in that order; a Serial-
+// only file works too, falling back to the Name Pattern same as a bare
+// pasted serial). A leading header row is detected and skipped.
+function parseCsvFile(text) {
+  let rows = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map(parseCsvLine);
+  if (rows.length > 0 && looksLikeHeaderRow(rows[0])) rows = rows.slice(1);
+  return rows.map((cells) => (cells.length >= 2 && cells[1] ? { name: cells[0], serial: cells[1] } : { name: '', serial: cells[0] }));
+}
+
 function renderBulkForm(assetType, state) {
   els.bulkForm.innerHTML = '';
 
   const serialsField = document.createElement('div');
   serialsField.className = 'field field-wide';
-  serialsField.innerHTML = `<label for="bulk-serials">Assets (one per line)</label>`;
+
+  const serialsHeader = document.createElement('div');
+  serialsHeader.className = 'bulk-serials-header';
+  serialsHeader.innerHTML = `<label for="bulk-serials">Assets (one per line)</label>`;
+
+  const importBtn = document.createElement('button');
+  importBtn.type = 'button';
+  importBtn.className = 'secondary small';
+  importBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('upload')}</span> Import CSV`;
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.csv,text/csv';
+  fileInput.hidden = true;
+  importBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    fileInput.value = '';
+    if (!file) return;
+    const entries = parseCsvFile(await file.text());
+    // Join with a tab, not a comma: splitNameSerial prefers tab when
+    // present, so a Name that itself contains a comma (legal in a quoted
+    // CSV field) survives the round-trip through this textarea intact.
+    textarea.value = entries.map(({ name, serial }) => (name ? `${name}\t${serial}` : serial)).join('\n');
+  });
+  serialsHeader.appendChild(importBtn);
+  serialsHeader.appendChild(fileInput);
+  serialsField.appendChild(serialsHeader);
+
   const textarea = document.createElement('textarea');
   textarea.id = 'bulk-serials';
   textarea.rows = 6;
   textarea.placeholder =
     'Paste one per line — a bare serial to use the Name Pattern below, or "Name, Serial" ' +
-    '(or paste two columns from a spreadsheet) to set the name yourself\ne.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...';
+    '(or paste two columns from a spreadsheet) to set the name yourself\ne.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
+    '\n...or use Import CSV above to load a Name,Serial file instead.';
   serialsField.appendChild(textarea);
   const serialsHint = document.createElement('p');
   serialsHint.className = 'hint';
