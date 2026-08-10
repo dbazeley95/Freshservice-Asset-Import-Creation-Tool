@@ -90,7 +90,8 @@ function buildPresetField(labelText, id, options, onChange) {
   blank.textContent = '— Custom —';
   select.appendChild(blank);
 
-  for (const opt of options) {
+  const sortedOptions = [...options].sort((a, b) => a.label.localeCompare(b.label));
+  for (const opt of sortedOptions) {
     const o = document.createElement('option');
     o.value = opt.id;
     o.textContent = opt.label;
