@@ -31,24 +31,24 @@ becomes a fully working tab like the other five.
    "Asset Type" button on narrow screens (closes again once you pick one),
    an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
    PC on first visit.
-2. Optionally pick a **Company / Location Preset** — one dropdown sets both
-   fields at once, since every site in this org is its own Company *and*
-   Location. When a type has models from more than one manufacturer, a
-   **Manufacturer** dropdown appears directly above Product to narrow
-   things down (e.g. Laptop/PC has 100+ models across
-   Dell/HP/Lenovo/Acer/ASUS/Apple/etc.).
-3. Start typing in **Product**, or pick from its suggestions — there's no
+2. Fill in **General** — which site this batch belongs to. Optionally pick
+   a **Company / Location Preset** first; one dropdown sets both fields at
+   once, since every site in this org is its own Company *and* Location.
+3. Fill in **Hardware Specific** — what the hardware itself is (Product,
+   Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
+   type-specific fields like Processor/Memory/Disk or OS/Storage). Start
+   typing in **Product**, or pick from its suggestions — there's no
    separate "Model Preset" control, Product itself is the catalog. Picking
    (or typing an exact match for) a known model auto-fills Warranty, Cost,
-   and any type-specific specs (Memory/Storage/OS/Processor/etc.) for it.
-   All of this is just a starting point — every pre-filled value stays
-   editable.
-4. Fill in the rest of the **Shared Defaults** (Company, Location, Cost,
-   Warranty, Asset State, Acquisition Date, End of Life, and any
-   type-specific fields like Processor/Memory/Disk or OS/Storage). These
-   values get copied onto new rows as you add them.
-5. Paste into **Bulk Add from Serial Numbers**, one asset per line, then
-   click **Add Rows from Serials**. Each line can be either:
+   and any type-specific specs for it. When a type has models from more
+   than one manufacturer, a **Manufacturer** dropdown appears above Product
+   to narrow a long list down (e.g. Laptop/PC has 100+ models across
+   Dell/HP/Lenovo/Acer/ASUS/Apple/etc.). Every field in both panels is
+   required (red `*`) — all of it is just a starting point though, every
+   pre-filled value stays editable, and both panels' values get copied onto
+   new rows as you add them below.
+4. Paste into **Bulk Add from Serial Numbers**, one asset per line. Each
+   line can be either:
    - a bare serial number, in which case Name defaults to the same value
      as Asset Tag (`<Short Code>-<serial>`); or
    - a `Name, Serial` pair (or paste two columns straight from a
@@ -59,19 +59,25 @@ becomes a fully working tab like the other five.
    way — a Name column and a Serial column (a header row like "Name,
    Serial" is detected and skipped automatically; a Serial-only file works
    too, same bare-serial default as above). It fills the textarea rather
-   than adding rows immediately, so you can review or tweak the list
-   before clicking Add Rows from Serials. **Download Template** next to it
-   gives a starter `.csv` (header row plus one example) in that exact
-   format, ready to fill in and re-upload.
+   than adding rows immediately. **Download Template** next to it gives a
+   starter `.csv` (header row plus one example) in that exact format,
+   ready to fill in and re-upload.
 
    Asset Tag is never typed by hand either way — it's generated
    automatically as `<Short Code>-<serial>` from the current Company's
    Short Code (see `SITE_PRESETS` in `js/catalog.js`); if that Company has
    no Short Code set yet, Asset Tag is left blank for you to fill in per
    row.
-6. Every generated row is independently editable in the table — tweak any
-   cell by hand, or use **Add Blank Row** for one-off manual entries.
-   Required fields with no value are outlined in red.
+5. A **live preview** below the Assets box shows exactly what Add Rows from
+   Serials would produce — every column, in export order — so a wrong
+   Company, a missing Short Code, or a typo'd Product is visible (rows
+   missing a required field are marked in red) before anything is
+   committed.
+6. Click **Add Rows from Serials**. Rows accumulate in the **Rows** table
+   below rather than replacing what's there — to mix another model into
+   the same export, change Product/Hardware Specific and click Add Rows
+   from Serials again before downloading. Every row is still individually
+   editable in the table by hand afterwards.
 7. Click **Download CSV** to save a file with headers matching the
    Freshservice import template for that asset type.
 
@@ -111,25 +117,29 @@ css/styles.css       Styling (light/dark aware, side nav/drawer). Colors
                        yellow/beige/purple) — change the values there to
                        retheme the whole app.
 js/templates.js       Column definitions for each asset type (edit here to
-                       add a new asset type or change a template's columns)
+                       add a new asset type or change a template's columns).
+                       Every column is required by default; a 'default'
+                       column's `group` ('general' or 'hardware') decides
+                       which panel it renders in.
 js/catalog.js          Site Presets (Company + Location together) and
-                       Model Presets shown in the Defaults panel — edit
-                       here to add/retire a site or hardware model
+                       Model Presets shown in the General/Hardware Specific
+                       panels — edit here to add/retire a site or hardware
+                       model
 js/icons.js             2D line-icon SVGs for the side nav, keyed by asset
                        type id
-js/csv.js              CSV escaping/formatting, filename/download helper,
-                       name-pattern token substitution
+js/csv.js              CSV escaping/formatting and filename/download helper
 js/storage.js          localStorage read/write helpers
-js/app.js              UI wiring — side nav, defaults form, bulk-add,
-                       table, toolbar
+js/app.js              UI wiring — side nav, General/Hardware Specific
+                       forms, bulk-add + live preview, table, toolbar
 ```
 
 To add a new asset type, add an entry to `ASSET_TYPES` in `js/templates.js`
 with its columns in the same order/wording as the Freshservice template —
-the rest of the app (form rendering, bulk add, table, CSV export) picks it
-up automatically. Add a matching entry to `ICONS` in `js/icons.js` (keyed
-by the same `id`) to give it a glyph in the side menu; it falls back to no
-icon if omitted.
+the rest of the app (form rendering, bulk add, preview, table, CSV export)
+picks it up automatically. Give each 'default' column a `group` of
+`'general'` or `'hardware'` to place it in the right panel. Add a matching
+entry to `ICONS` in `js/icons.js` (keyed by the same `id`) to give it a
+glyph in the side menu; it falls back to no icon if omitted.
 
 To add a new hardware model or site, edit `js/catalog.js` — no other files
 need to change. A `MODEL_PRESETS` entry only needs to set the fields that

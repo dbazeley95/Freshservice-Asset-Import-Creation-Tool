@@ -276,6 +276,10 @@ main {
   align-items: start;
 }
 
+#bulk-preview-wrap:not(:empty) {
+  margin-top: 1.25rem;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -338,6 +342,11 @@ textarea {
 input.invalid {
   border-color: var(--danger);
   outline-color: var(--danger);
+}
+
+td.preview-missing {
+  color: var(--danger);
+  font-style: italic;
 }
 
 button {

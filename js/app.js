@@ -1,4 +1,4 @@
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, rowColumns } from './templates.js';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js';
 import { buildCsv, downloadCsv } from './csv.js';
 import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
 import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js';
@@ -8,12 +8,13 @@ const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
 const els = {
   tabs: document.getElementById('type-tabs'),
-  defaultsForm: document.getElementById('defaults-form'),
+  generalForm: document.getElementById('general-form'),
+  hardwareForm: document.getElementById('hardware-form'),
   bulkForm: document.getElementById('bulk-form'),
+  bulkPreviewWrap: document.getElementById('bulk-preview-wrap'),
   tableWrap: document.getElementById('table-wrap'),
   rowCount: document.getElementById('row-count'),
   downloadBtn: document.getElementById('download-btn'),
-  addRowBtn: document.getElementById('add-row-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
   typeDescription: document.getElementById('type-description'),
   activeSections: document.getElementById('active-sections'),
@@ -124,7 +125,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeMobileNav();
 });
 
-// ---------- Defaults panel ----------
+// ---------- Defaults panels (General + Hardware Specific) ----------
 
 function buildPresetField(labelText, id, options, onChange, formatOptionLabel = (o) => o.label) {
   const wrap = document.createElement('div');
@@ -163,8 +164,9 @@ function applySitePreset(assetType, state, presetId) {
   addSuggestion('company', preset.company);
   addSuggestion('location', preset.location);
   persist(activeTypeId, state);
-  renderDefaultsForm(assetType, state);
+  renderGeneralForm(assetType, state);
   refreshAssetTagHint(state);
+  refreshBulkPreview(assetType, state);
 }
 
 // Asset Tag is always `${shortCode}-${serial}`, never typed by hand.
@@ -189,7 +191,8 @@ function applyModelPresetFields(assetType, state, preset) {
     if (targetCol.input === 'text' && value) addSuggestion(key, String(value));
   }
   persist(activeTypeId, state);
-  renderDefaultsForm(assetType, state);
+  renderHardwareForm(assetType, state);
+  refreshBulkPreview(assetType, state);
 }
 
 const UNKNOWN_MANUFACTURER = '__unknown__';
@@ -208,7 +211,7 @@ function productCatalogOptions(modelPresets, manufacturerFilter) {
 
 // Manufacturer filter narrows the Product field's suggestions below —
 // there's no separate Model Preset control, so this is the only extra
-// field a catalogued asset type adds above Shared Defaults.
+// field a catalogued asset type adds above the ordinary Hardware fields.
 function renderManufacturerFilterField(assetType, state) {
   const modelPresets = MODEL_PRESETS[assetType.id] || [];
   if (modelPresets.length === 0) return null;
@@ -249,7 +252,7 @@ function renderManufacturerFilterField(assetType, state) {
 
   select.addEventListener('change', () => {
     modelFilterState[assetType.id] = select.value;
-    renderDefaultsForm(assetType, state);
+    renderHardwareForm(assetType, state);
   });
 
   const hint = document.createElement('p');
@@ -260,72 +263,88 @@ function renderManufacturerFilterField(assetType, state) {
   return wrap;
 }
 
-function renderDefaultsForm(assetType, state) {
-  els.defaultsForm.innerHTML = '';
+// Builds one labeled field (label + input + any datalist) for a Shared
+// Defaults column. Shared by the General and Hardware Specific panels —
+// which panel a column lands in is decided by col.group in templates.js.
+function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+
+  const label = document.createElement('label');
+  label.textContent = col.header;
+  label.htmlFor = `def-${col.key}`;
+  if (col.required) {
+    const marker = document.createElement('span');
+    marker.className = 'required-marker';
+    marker.textContent = ' *';
+    label.appendChild(marker);
+  }
+  wrap.appendChild(label);
+
+  const input = document.createElement('input');
+  input.id = `def-${col.key}`;
+  input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
+  if (col.input === 'number') input.step = 'any';
+  input.value = state.defaults[col.key] ?? '';
+
+  if (col.key === 'assetState') {
+    input.setAttribute('list', 'dl-asset-state');
+  } else if (col.key === 'product' && modelPresets.length > 0) {
+    const listId = `dl-${assetType.id}-product-catalog`;
+    input.setAttribute('list', listId);
+    const options = productCatalogOptions(modelPresets, modelFilterState[assetType.id] || '');
+    wrap.appendChild(buildDatalist(listId, options));
+  } else if (col.input === 'text') {
+    const listId = `dl-${assetType.id}-${col.key}`;
+    input.setAttribute('list', listId);
+    wrap.appendChild(buildDatalist(listId, suggestions[col.key] || []));
+  }
+
+  input.addEventListener('input', () => {
+    state.defaults[col.key] = input.value;
+    debouncedPersist(activeTypeId, state);
+    if (col.key === 'company') refreshAssetTagHint(state);
+    refreshBulkPreview(assetType, state);
+  });
+  input.addEventListener('change', () => {
+    if (col.input !== 'text' || !input.value.trim()) return;
+    addSuggestion(col.key, input.value.trim());
+    if (col.key === 'product' && modelPresets.length > 0) {
+      const preset = modelPresets.find((p) => p.fields.product === input.value);
+      if (preset) applyModelPresetFields(assetType, state, preset);
+    }
+  });
+
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function renderGeneralForm(assetType, state) {
+  els.generalForm.innerHTML = '';
   const suggestions = loadSuggestions();
 
-  els.defaultsForm.appendChild(
+  els.generalForm.appendChild(
     buildPresetField('Company / Location Preset', 'def-preset-site', SITE_PRESETS, (val) =>
       applySitePreset(assetType, state, val)
     ).wrap
   );
 
+  for (const col of generalColumns(assetType)) {
+    els.generalForm.appendChild(buildDefaultField(col, assetType, state, suggestions, []));
+  }
+}
+
+function renderHardwareForm(assetType, state) {
+  els.hardwareForm.innerHTML = '';
+  const suggestions = loadSuggestions();
   const modelPresets = MODEL_PRESETS[assetType.id] || [];
 
-  for (const col of defaultColumns(assetType)) {
-    const wrap = document.createElement('div');
-    wrap.className = 'field';
-
-    const label = document.createElement('label');
-    label.textContent = col.header;
-    label.htmlFor = `def-${col.key}`;
-    if (col.required) {
-      const marker = document.createElement('span');
-      marker.className = 'required-marker';
-      marker.textContent = ' *';
-      label.appendChild(marker);
-    }
-    wrap.appendChild(label);
-
-    const input = document.createElement('input');
-    input.id = `def-${col.key}`;
-    input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
-    if (col.input === 'number') input.step = 'any';
-    input.value = state.defaults[col.key] ?? '';
-
-    if (col.key === 'assetState') {
-      input.setAttribute('list', 'dl-asset-state');
-    } else if (col.key === 'product' && modelPresets.length > 0) {
-      const listId = `dl-${assetType.id}-product-catalog`;
-      input.setAttribute('list', listId);
-      const options = productCatalogOptions(modelPresets, modelFilterState[assetType.id] || '');
-      wrap.appendChild(buildDatalist(listId, options));
-    } else if (col.input === 'text') {
-      const listId = `dl-${assetType.id}-${col.key}`;
-      input.setAttribute('list', listId);
-      wrap.appendChild(buildDatalist(listId, suggestions[col.key] || []));
-    }
-
-    input.addEventListener('input', () => {
-      state.defaults[col.key] = input.value;
-      debouncedPersist(activeTypeId, state);
-      if (col.key === 'company') refreshAssetTagHint(state);
-    });
-    input.addEventListener('change', () => {
-      if (col.input !== 'text' || !input.value.trim()) return;
-      addSuggestion(col.key, input.value.trim());
-      if (col.key === 'product' && modelPresets.length > 0) {
-        const preset = modelPresets.find((p) => p.fields.product === input.value);
-        if (preset) applyModelPresetFields(assetType, state, preset);
-      }
-    });
-
-    wrap.appendChild(input);
+  for (const col of hardwareColumns(assetType)) {
+    const wrap = buildDefaultField(col, assetType, state, suggestions, modelPresets);
 
     // Manufacturer sits directly above Product, stacked in the same grid
     // cell — it exists purely to narrow Product's suggestions, so the two
-    // stay visually paired rather than Manufacturer living up with the
-    // other presets.
+    // stay visually paired rather than Manufacturer living on its own.
     if (col.key === 'product') {
       const manufacturerField = renderManufacturerFilterField(assetType, state);
       if (manufacturerField) {
@@ -333,12 +352,12 @@ function renderDefaultsForm(assetType, state) {
         group.className = 'field-group';
         group.appendChild(manufacturerField);
         group.appendChild(wrap);
-        els.defaultsForm.appendChild(group);
+        els.hardwareForm.appendChild(group);
         continue;
       }
     }
 
-    els.defaultsForm.appendChild(wrap);
+    els.hardwareForm.appendChild(wrap);
   }
 }
 
@@ -359,12 +378,15 @@ function buildDatalist(id, options) {
 // (via preset or typing) can update its text without rebuilding the whole
 // Bulk Add panel — that would wipe any serials the user already pasted in.
 let assetTagHintEl = null;
+// Points at the live Assets textarea so General/Hardware field changes can
+// refresh the preview below without needing renderBulkForm's own scope.
+let bulkSerialsTextarea = null;
 
 function assetTagHintText(state) {
   const shortCode = shortCodeForCompany(state.defaults.company);
   return shortCode
     ? `Asset Tag is generated automatically as ${shortCode}-<serial> from the Company above.`
-    : 'Company above has no Short Code set in js/catalog.js yet, so Asset Tag will be left blank for you to fill in per row.';
+    : "This company doesn't have a Short Code set up yet, so Asset Tag will be left blank — fill it in per row, or ask whoever maintains this tool to add one.";
 }
 
 function refreshAssetTagHint(state) {
@@ -425,8 +447,8 @@ function looksLikeHeaderRow(cells) {
 }
 
 // A .csv with a Name column and a Serial column (in that order; a Serial-
-// only file works too, falling back to the Name Pattern same as a bare
-// pasted serial). A leading header row is detected and skipped.
+// only file works too, falling back to the same default as a bare pasted
+// serial). A leading header row is detected and skipped.
 function parseCsvFile(text) {
   let rows = text
     .split(/\r?\n/)
@@ -437,8 +459,93 @@ function parseCsvFile(text) {
   return rows.map((cells) => (cells.length >= 2 && cells[1] ? { name: cells[0], serial: cells[1] } : { name: '', serial: cells[0] }));
 }
 
+// Builds full row objects (every column, not just Name/Serial/Asset Tag)
+// from the Assets textarea, using the current Shared Defaults — shared by
+// the live preview and the actual "Add Rows from Serials" commit so the
+// two can never drift apart.
+function buildRowsFromText(assetType, state, text) {
+  const entries = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map(splitNameSerial);
+  const shortCode = shortCodeForCompany(state.defaults.company);
+  return entries.map(({ name: manualName, serial }) => {
+    const row = {};
+    for (const col of defaultColumns(assetType)) {
+      row[col.key] = state.defaults[col.key] ?? '';
+    }
+    row.serialNumber = serial;
+    row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
+    row.name = manualName || row.assetTag;
+    return row;
+  });
+}
+
+let previewDebounceTimer = null;
+function schedulePreviewUpdate(assetType, state, text) {
+  clearTimeout(previewDebounceTimer);
+  previewDebounceTimer = setTimeout(() => renderBulkPreview(assetType, state, text), 200);
+}
+
+function refreshBulkPreview(assetType, state) {
+  if (!bulkSerialsTextarea) return;
+  renderBulkPreview(assetType, state, bulkSerialsTextarea.value);
+}
+
+// Read-only preview of exactly what Add Rows from Serials would produce —
+// same column set and order as the real export — so mistakes (wrong
+// Company, missing Short Code, a typo'd Product) are visible before
+// they're committed to the Rows table below.
+function renderBulkPreview(assetType, state, text) {
+  const wrap = els.bulkPreviewWrap;
+  wrap.innerHTML = '';
+
+  const rows = buildRowsFromText(assetType, state, text);
+  if (rows.length === 0) return;
+
+  const heading = document.createElement('p');
+  heading.className = 'hint';
+  heading.textContent = `Preview — ${rows.length} row${rows.length === 1 ? '' : 's'} will be added, exactly as they'll appear in the export:`;
+  wrap.appendChild(heading);
+
+  const tableWrapDiv = document.createElement('div');
+  tableWrapDiv.className = 'table-wrap';
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const col of assetType.columns) {
+    const th = document.createElement('th');
+    th.textContent = col.header;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    for (const col of assetType.columns) {
+      const td = document.createElement('td');
+      const value = row[col.key];
+      if (!value && col.required) {
+        td.textContent = 'missing';
+        td.className = 'preview-missing';
+      } else {
+        td.textContent = value ?? '';
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  tableWrapDiv.appendChild(table);
+  wrap.appendChild(tableWrapDiv);
+}
+
 function renderBulkForm(assetType, state) {
   els.bulkForm.innerHTML = '';
+  els.bulkPreviewWrap.innerHTML = '';
 
   const serialsField = document.createElement('div');
   serialsField.className = 'field field-wide';
@@ -478,6 +585,7 @@ function renderBulkForm(assetType, state) {
     // present, so a Name that itself contains a comma (legal in a quoted
     // CSV field) survives the round-trip through this textarea intact.
     textarea.value = entries.map(({ name, serial }) => (name ? `${name}\t${serial}` : serial)).join('\n');
+    renderBulkPreview(assetType, state, textarea.value);
   });
   serialsActions.appendChild(importBtn);
   serialsActions.appendChild(fileInput);
@@ -493,6 +601,8 @@ function renderBulkForm(assetType, state) {
     '"Name, Serial" (or paste two columns from a spreadsheet) to set the name yourself\n' +
     'e.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
     '\n...or use Import CSV above to load a Name,Serial file instead.';
+  bulkSerialsTextarea = textarea;
+  textarea.addEventListener('input', () => schedulePreviewUpdate(assetType, state, textarea.value));
   serialsField.appendChild(textarea);
   const serialsHint = document.createElement('p');
   serialsHint.className = 'hint';
@@ -506,30 +616,26 @@ function renderBulkForm(assetType, state) {
   addBtn.className = 'primary';
   addBtn.textContent = 'Add Rows from Serials';
   addBtn.addEventListener('click', () => {
-    const entries = textarea.value
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map(splitNameSerial);
-    if (entries.length === 0) return;
-
-    const shortCode = shortCodeForCompany(state.defaults.company);
-    for (const { name: manualName, serial } of entries) {
-      const row = { id: newRowId() };
-      for (const col of defaultColumns(assetType)) {
-        row[col.key] = state.defaults[col.key] ?? '';
-      }
-      row.serialNumber = serial;
-      row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
-      row.name = manualName || row.assetTag;
+    const rows = buildRowsFromText(assetType, state, textarea.value);
+    if (rows.length === 0) return;
+    for (const row of rows) {
+      row.id = newRowId();
       state.rows.push(row);
     }
     textarea.value = '';
+    els.bulkPreviewWrap.innerHTML = '';
     persist(activeTypeId, state);
     renderTable(assetType, state);
     renderBulkForm(assetType, state);
   });
   els.bulkForm.appendChild(addBtn);
+
+  const addAgainHint = document.createElement('p');
+  addAgainHint.className = 'hint';
+  addAgainHint.textContent =
+    'Rows accumulate in the table below — to include another model in the same export, change Product/Hardware ' +
+    'Specific details above and click Add Rows from Serials again before downloading.';
+  els.bulkForm.appendChild(addAgainHint);
 }
 
 // ---------- Table ----------
@@ -546,7 +652,7 @@ function renderTable(assetType, state) {
   if (state.rows.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'empty-state';
-    empty.textContent = 'No rows yet. Add rows from pasted serial numbers, or add a blank row to enter one manually.';
+    empty.textContent = 'No rows yet. Add rows above from pasted serial numbers or an imported CSV.';
     els.tableWrap.appendChild(empty);
     return;
   }
@@ -622,16 +728,6 @@ function renderTable(assetType, state) {
 // ---------- Toolbar actions ----------
 
 function wireToolbar(assetType, state) {
-  els.addRowBtn.onclick = () => {
-    const row = { id: newRowId() };
-    for (const col of assetType.columns) {
-      row[col.key] = col.source === 'default' ? state.defaults[col.key] ?? '' : '';
-    }
-    state.rows.push(row);
-    persist(activeTypeId, state);
-    renderTable(assetType, state);
-  };
-
   els.clearRowsBtn.onclick = () => {
     if (state.rows.length === 0) return;
     const ok = confirm(`Delete all ${state.rows.length} row(s) for ${assetType.label}? This cannot be undone.`);
@@ -686,8 +782,9 @@ function renderAll() {
   els.comingSoonPanel.hidden = true;
 
   const state = getState(activeTypeId);
-  els.typeDescription.textContent = `Fill in shared defaults, bulk-add rows from pasted serial numbers, then fine-tune and download a CSV matching the Freshservice "${assetType.label}" import template.`;
-  renderDefaultsForm(assetType, state);
+  els.typeDescription.textContent = `Fill in General and Hardware Specific details, bulk-add rows from pasted serial numbers, then fine-tune and download a CSV matching the Freshservice "${assetType.label}" import template.`;
+  renderGeneralForm(assetType, state);
+  renderHardwareForm(assetType, state);
   renderBulkForm(assetType, state);
   renderTable(assetType, state);
   wireToolbar(assetType, state);
