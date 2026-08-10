@@ -35,9 +35,15 @@ export const COMPANY_PRESETS = [
 ];
 
 // One entry per site/building. `location` maps straight onto the Location
-// column. Empty for now — send over the full list and this gets filled in
-// the same way as COMPANY_PRESETS above.
-export const LOCATION_PRESETS = [];
+// column. There's no easy way to export a real locations list from
+// Freshservice yet, so this temporarily mirrors COMPANY_PRESETS. Once a
+// real locations list is available, replace this with its own array (same
+// shape as COMPANY_PRESETS, using `location` instead of `company`).
+export const LOCATION_PRESETS = COMPANY_PRESETS.map((c) => ({
+  id: c.id,
+  label: c.label,
+  location: c.company,
+}));
 
 // Keyed by asset type id (see js/templates.js). Each entry's `fields` only
 // needs to set the keys that are meaningful for that model — anything not
