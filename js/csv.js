@@ -1,5 +1,4 @@
-// CSV generation + small formatting/pattern helpers. No parsing needed since
-// this tool only ever produces import files, never reads them back.
+// CSV generation + small formatting helpers.
 
 export function escapeCsvField(value) {
   const str = value === undefined || value === null ? '' : String(value);
@@ -42,19 +41,4 @@ export function downloadCsv(filename, csvText) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-}
-
-// Applies a naming pattern with tokens:
-//   {n}     sequence number, no padding
-//   {n2} {n3} {n4} ...  sequence number zero-padded to that width
-//   {serial}   the serial number for this row
-//   {company} {location} {product}   current default values
-export function applyNamePattern(pattern, n, ctx) {
-  return pattern
-    .replace(/\{n(\d)\}/g, (_, width) => String(n).padStart(Number(width), '0'))
-    .replace(/\{n\}/g, String(n))
-    .replace(/\{serial\}/g, ctx.serial ?? '')
-    .replace(/\{company\}/g, ctx.company ?? '')
-    .replace(/\{location\}/g, ctx.location ?? '')
-    .replace(/\{product\}/g, ctx.product ?? '');
 }

@@ -49,24 +49,20 @@ becomes a fully working tab like the other five.
    values get copied onto new rows as you add them.
 5. Paste into **Bulk Add from Serial Numbers**, one asset per line, then
    click **Add Rows from Serials**. Each line can be either:
-   - a bare serial number, in which case its Name comes from the **Name
-     Pattern** below (e.g. `ICTSUITE Monitor {n}` or `MAR-{n2}` for
-     zero-padded numbers) — tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded),
-     `{serial}`, `{company}`, `{location}`, `{product}`; or
+   - a bare serial number, in which case Name defaults to the same value
+     as Asset Tag (`<Short Code>-<serial>`); or
    - a `Name, Serial` pair (or paste two columns straight from a
-     spreadsheet — tab-separated works too), when names were assigned
-     before serials were recorded and don't line up with a generated
-     sequence. The Name Pattern is only used as a fallback for lines that
-     don't supply their own name.
+     spreadsheet — tab-separated works too), for when names were assigned
+     before serials were recorded and don't match up device-for-device.
 
    **Import CSV** (button above the textarea) loads a `.csv` file the same
    way — a Name column and a Serial column (a header row like "Name,
    Serial" is detected and skipped automatically; a Serial-only file works
-   too, falling back to the Name Pattern same as a bare pasted serial).
-   It fills the textarea rather than adding rows immediately, so you can
-   review or tweak the list before clicking Add Rows from Serials.
-   **Download Template** next to it gives a starter `.csv` (header row plus
-   one example) in that exact format, ready to fill in and re-upload.
+   too, same bare-serial default as above). It fills the textarea rather
+   than adding rows immediately, so you can review or tweak the list
+   before clicking Add Rows from Serials. **Download Template** next to it
+   gives a starter `.csv` (header row plus one example) in that exact
+   format, ready to fill in and re-upload.
 
    Asset Tag is never typed by hand either way — it's generated
    automatically as `<Short Code>-<serial>` from the current Company's

@@ -1,5 +1,5 @@
 import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, rowColumns } from './templates.js';
-import { buildCsv, downloadCsv, applyNamePattern } from './csv.js';
+import { buildCsv, downloadCsv } from './csv.js';
 import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
 import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js';
 import { iconSvg } from './icons.js';
@@ -36,8 +36,6 @@ function emptyState() {
   return {
     defaults: {},
     rows: [],
-    nextN: 1,
-    namePattern: '',
   };
 }
 
@@ -373,11 +371,11 @@ function refreshAssetTagHint(state) {
   if (assetTagHintEl) assetTagHintEl.textContent = assetTagHintText(state);
 }
 
-// One line can be a bare serial (Name comes from the Name Pattern below)
-// or a "Name, Serial" / "Name<TAB>Serial" pair, so names assigned before
-// serials were recorded don't have to match a generated sequence. Tab is
-// what you get pasting two columns straight from a spreadsheet; comma
-// works too for hand-typed lines.
+// One line can be a bare serial (Name defaults to the same value as Asset
+// Tag) or a "Name, Serial" / "Name<TAB>Serial" pair, so names assigned
+// before serials were recorded don't have to match anything generated.
+// Tab is what you get pasting two columns straight from a spreadsheet;
+// comma works too for hand-typed lines.
 function splitNameSerial(line) {
   const delim = line.includes('\t') ? '\t' : line.includes(',') ? ',' : null;
   if (!delim) return { name: '', serial: line.trim() };
@@ -491,8 +489,9 @@ function renderBulkForm(assetType, state) {
   textarea.id = 'bulk-serials';
   textarea.rows = 6;
   textarea.placeholder =
-    'Paste one per line — a bare serial to use the Name Pattern below, or "Name, Serial" ' +
-    '(or paste two columns from a spreadsheet) to set the name yourself\ne.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
+    'Paste one per line — a bare serial (Name defaults to the same value as Asset Tag), or ' +
+    '"Name, Serial" (or paste two columns from a spreadsheet) to set the name yourself\n' +
+    'e.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
     '\n...or use Import CSV above to load a Name,Serial file instead.';
   serialsField.appendChild(textarea);
   const serialsHint = document.createElement('p');
@@ -501,37 +500,6 @@ function renderBulkForm(assetType, state) {
   assetTagHintEl = serialsHint;
   serialsField.appendChild(serialsHint);
   els.bulkForm.appendChild(serialsField);
-
-  const patternField = document.createElement('div');
-  patternField.className = 'field';
-  patternField.innerHTML = `<label for="bulk-name-pattern">Name Pattern (fallback)</label>`;
-  const patternInput = document.createElement('input');
-  patternInput.type = 'text';
-  patternInput.id = 'bulk-name-pattern';
-  patternInput.placeholder = 'e.g. ICTSUITE Monitor {n} or MAR-{n2}';
-  patternInput.value = state.namePattern || '';
-  patternInput.addEventListener('input', () => {
-    state.namePattern = patternInput.value;
-    debouncedPersist(activeTypeId, state);
-  });
-  patternField.appendChild(patternInput);
-  const hint = document.createElement('p');
-  hint.className = 'hint';
-  hint.textContent =
-    'Only used for lines above that are a bare serial with no name given. ' +
-    '{n} = sequence number, {n2}/{n3} = zero-padded, {serial}/{company}/{location}/{product} also available.';
-  patternField.appendChild(hint);
-  els.bulkForm.appendChild(patternField);
-
-  const startField = document.createElement('div');
-  startField.className = 'field';
-  startField.innerHTML = `<label for="bulk-start-n">Starting Number</label>`;
-  const startInput = document.createElement('input');
-  startInput.type = 'number';
-  startInput.id = 'bulk-start-n';
-  startInput.value = state.nextN;
-  startField.appendChild(startInput);
-  els.bulkForm.appendChild(startField);
 
   const addBtn = document.createElement('button');
   addBtn.type = 'button';
@@ -546,7 +514,6 @@ function renderBulkForm(assetType, state) {
     if (entries.length === 0) return;
 
     const shortCode = shortCodeForCompany(state.defaults.company);
-    let n = Number(startInput.value) || 1;
     for (const { name: manualName, serial } of entries) {
       const row = { id: newRowId() };
       for (const col of defaultColumns(assetType)) {
@@ -554,20 +521,9 @@ function renderBulkForm(assetType, state) {
       }
       row.serialNumber = serial;
       row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
-      row.name =
-        manualName ||
-        (state.namePattern
-          ? applyNamePattern(state.namePattern, n, {
-              serial,
-              company: state.defaults.company,
-              location: state.defaults.location,
-              product: state.defaults.product,
-            })
-          : '');
+      row.name = manualName || row.assetTag;
       state.rows.push(row);
-      n += 1;
     }
-    state.nextN = n;
     textarea.value = '';
     persist(activeTypeId, state);
     renderTable(assetType, state);
