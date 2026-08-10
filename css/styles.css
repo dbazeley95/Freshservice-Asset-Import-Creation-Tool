@@ -306,6 +306,12 @@ main {
   flex-wrap: wrap;
 }
 
+.bulk-serials-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .required-marker {
   color: var(--danger);
   font-weight: 700;

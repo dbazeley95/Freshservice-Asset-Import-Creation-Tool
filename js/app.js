@@ -449,6 +449,19 @@ function renderBulkForm(assetType, state) {
   serialsHeader.className = 'bulk-serials-header';
   serialsHeader.innerHTML = `<label for="bulk-serials">Assets (one per line)</label>`;
 
+  const serialsActions = document.createElement('div');
+  serialsActions.className = 'bulk-serials-actions';
+
+  const templateBtn = document.createElement('button');
+  templateBtn.type = 'button';
+  templateBtn.className = 'secondary small';
+  templateBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('download')}</span> Download Template`;
+  templateBtn.addEventListener('click', () => {
+    const template = 'Name,Serial\r\nMAR-01,LL7QX4MQ9N\r\n';
+    downloadCsv('freshservice-asset-import-name-serial-template.csv', template);
+  });
+  serialsActions.appendChild(templateBtn);
+
   const importBtn = document.createElement('button');
   importBtn.type = 'button';
   importBtn.className = 'secondary small';
@@ -468,8 +481,10 @@ function renderBulkForm(assetType, state) {
     // CSV field) survives the round-trip through this textarea intact.
     textarea.value = entries.map(({ name, serial }) => (name ? `${name}\t${serial}` : serial)).join('\n');
   });
-  serialsHeader.appendChild(importBtn);
-  serialsHeader.appendChild(fileInput);
+  serialsActions.appendChild(importBtn);
+  serialsActions.appendChild(fileInput);
+
+  serialsHeader.appendChild(serialsActions);
   serialsField.appendChild(serialsHeader);
 
   const textarea = document.createElement('textarea');

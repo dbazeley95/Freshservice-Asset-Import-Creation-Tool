@@ -65,6 +65,8 @@ becomes a fully working tab like the other five.
    too, falling back to the Name Pattern same as a bare pasted serial).
    It fills the textarea rather than adding rows immediately, so you can
    review or tweak the list before clicking Add Rows from Serials.
+   **Download Template** next to it gives a starter `.csv` (header row plus
+   one example) in that exact format, ready to fill in and re-upload.
 
    Asset Tag is never typed by hand either way — it's generated
    automatically as `<Short Code>-<serial>` from the current Company's

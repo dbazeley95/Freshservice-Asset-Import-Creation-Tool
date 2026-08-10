@@ -109,6 +109,11 @@ export const ICONS = {
     <path d="M7.5 8.5L12 4l4.5 4.5"/>
     <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
   `,
+  download: `
+    <path d="M12 4v11"/>
+    <path d="M7.5 10.5L12 15l4.5-4.5"/>
+    <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
+  `,
 };
 
 export function iconSvg(key) {
