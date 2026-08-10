@@ -903,4 +903,20 @@ if (feedbackLink) {
   document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
 }
 
+// ---------- Help dialog ----------
+
+const helpBtn = document.getElementById('help-btn');
+const helpDialog = document.getElementById('help-dialog');
+const helpDialogClose = document.getElementById('help-dialog-close');
+if (helpBtn && helpDialog && helpDialogClose) {
+  document.getElementById('help-btn-icon').innerHTML = iconSvg('help');
+  document.getElementById('help-dialog-close-icon').innerHTML = iconSvg('close');
+
+  helpBtn.addEventListener('click', () => helpDialog.showModal());
+  helpDialogClose.addEventListener('click', () => helpDialog.close());
+  helpDialog.addEventListener('click', (e) => {
+    if (e.target === helpDialog) helpDialog.close();
+  });
+}
+
 renderAll();

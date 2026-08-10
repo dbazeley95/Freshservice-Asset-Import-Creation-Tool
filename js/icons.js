@@ -114,6 +114,11 @@ export const ICONS = {
     <path d="M7.5 10.5L12 15l4.5-4.5"/>
     <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
   `,
+  help: `
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M9.2 9.4a2.8 2.8 0 015.4 1c0 1.8-2.6 2-2.6 4"/>
+    <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>
+  `,
 };
 
 export function iconSvg(key) {
