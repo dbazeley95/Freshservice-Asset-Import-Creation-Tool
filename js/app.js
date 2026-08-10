@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.8.2';
-import { buildCsv, downloadCsv } from './csv.js?v=0.8.2';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.8.2';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.8.2';
-import { iconSvg } from './icons.js?v=0.8.2';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.9.0';
+import { buildCsv, downloadCsv } from './csv.js?v=0.9.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.9.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.9.0';
+import { iconSvg } from './icons.js?v=0.9.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -963,7 +963,18 @@ if (feedbackLink) {
   document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
 }
 
-// ---------- Help dialog ----------
+// ---------- Popout dialogs (Help, Release Notes) ----------
+
+function wireInfoDialog(dialog, openers, closeBtn) {
+  if (!dialog) return;
+  for (const opener of openers) {
+    if (opener) opener.addEventListener('click', () => dialog.showModal());
+  }
+  if (closeBtn) closeBtn.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+}
 
 const helpBtn = document.getElementById('help-btn');
 const helpDialog = document.getElementById('help-dialog');
@@ -971,12 +982,17 @@ const helpDialogClose = document.getElementById('help-dialog-close');
 if (helpBtn && helpDialog && helpDialogClose) {
   document.getElementById('help-btn-icon').innerHTML = iconSvg('help');
   document.getElementById('help-dialog-close-icon').innerHTML = iconSvg('close');
+  wireInfoDialog(helpDialog, [helpBtn], helpDialogClose);
+}
 
-  helpBtn.addEventListener('click', () => helpDialog.showModal());
-  helpDialogClose.addEventListener('click', () => helpDialog.close());
-  helpDialog.addEventListener('click', (e) => {
-    if (e.target === helpDialog) helpDialog.close();
-  });
+const releaseNotesBtn = document.getElementById('release-notes-btn');
+const releaseNotesDialog = document.getElementById('release-notes-dialog');
+const releaseNotesClose = document.getElementById('release-notes-close');
+const versionBadgeBtn = document.getElementById('version-badge-btn');
+if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
+  document.getElementById('release-notes-btn-icon').innerHTML = iconSvg('notes');
+  document.getElementById('release-notes-close-icon').innerHTML = iconSvg('close');
+  wireInfoDialog(releaseNotesDialog, [releaseNotesBtn, versionBadgeBtn], releaseNotesClose);
 }
 
 renderAll();

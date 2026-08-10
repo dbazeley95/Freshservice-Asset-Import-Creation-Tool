@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.8.2" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.0" />
 </head>
 <body>
   <header class="app-header">
@@ -19,6 +19,10 @@
         <span id="feedback-link-icon" class="tab-icon" aria-hidden="true"></span>
         Leave Feedback
       </a>
+      <button id="release-notes-btn" type="button" class="header-btn" aria-haspopup="dialog" aria-controls="release-notes-dialog">
+        <span id="release-notes-btn-icon" class="tab-icon" aria-hidden="true"></span>
+        What's New
+      </button>
       <button id="help-btn" type="button" class="header-btn header-btn-primary" aria-haspopup="dialog" aria-controls="help-dialog">
         <span id="help-btn-icon" class="tab-icon" aria-hidden="true"></span>
         Help
@@ -29,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <span class="version-badge">v0.8.2 beta</span>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.0 beta</button>
       </div>
     </div>
 
@@ -116,10 +120,10 @@
     </div>
   </div>
 
-  <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-dialog-title">
-    <div class="help-dialog-header">
+  <dialog id="help-dialog" class="info-dialog" aria-labelledby="help-dialog-title">
+    <div class="info-dialog-header">
       <h2 id="help-dialog-title">Help Guide</h2>
-      <button id="help-dialog-close" type="button" class="help-dialog-close" aria-label="Close help">
+      <button id="help-dialog-close" type="button" class="info-dialog-close" aria-label="Close help">
         <span id="help-dialog-close-icon" class="tab-icon" aria-hidden="true"></span>
       </button>
     </div>
@@ -161,6 +165,89 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.8.2"></script>
+  <dialog id="release-notes-dialog" class="info-dialog" aria-labelledby="release-notes-title">
+    <div class="info-dialog-header">
+      <h2 id="release-notes-title">Release Notes</h2>
+      <button id="release-notes-close" type="button" class="info-dialog-close" aria-label="Close release notes">
+        <span id="release-notes-close-icon" class="tab-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.8.2</span><h3 class="changelog-title">Action Button Icons</h3></div>
+        <p>Add Assets of Another Product, Clear All Rows, and Download CSV each got a matching glyph (+, &times;, and a download arrow).</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.8.1</span><h3 class="changelog-title">Add-Another-Product Polish</h3></div>
+        <p>More breathing room above the Add Assets of Another Product button, matched to the same size as the buttons in Rows, with every button's icon and text centred.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.8.0</span><h3 class="changelog-title">Bigger Workflow Cleanup</h3></div>
+        <p>Desktop PC renamed to Desktop; Windows Servers merged into Servers. Removed the Company / Location Preset dropdown &mdash; Location now fills in automatically from a known Company instead. Download Template and Import CSV for Editing renamed for clarity, and Add Rows from Serials became Add Assets of Another Product, split into its own section with a 10-product-per-export limit.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.7.3</span><h3 class="changelog-title">Clearer Type Names</h3></div>
+        <p>Laptop / PC renamed to Laptop; Tablet renamed to iPads / Tablets.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.7.2</span><h3 class="changelog-title">Reliable Deploys</h3></div>
+        <p>New versions now show up immediately after a normal reload instead of needing a manual hard refresh to clear a cached copy.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.7.1</span><h3 class="changelog-title">Mobile Selection Visibility</h3></div>
+        <p>The mobile Asset Type button now shows which type is currently selected, with a chevron that flips when the menu opens.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.7.0</span><h3 class="changelog-title">New Look</h3></div>
+        <p>Logo and title moved into a bordered box centred at the top of the page, with the first letter of each word in the name bolded.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.6.0</span><h3 class="changelog-title">Rebrand &amp; Full CSV Editing</h3></div>
+        <p>Renamed to Freshservice Asset Import Leverage System. Added Import CSV for Editing, loading a full previous export back into the Rows table for tweaking and re-download.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.5.0</span><h3 class="changelog-title">In-App Help Guide</h3></div>
+        <p>Added the Help button and step-by-step guide popout, and moved Leave Feedback up next to it.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.4.1</span><h3 class="changelog-title">More Reliable Suggestions</h3></div>
+        <p>Replaced the browser's native suggestion dropdown (unreliable on mobile Safari) with a custom one, and made Asset State a proper dropdown instead of free text.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.4.0</span><h3 class="changelog-title">Bulk Add Overhaul</h3></div>
+        <p>Made every field required, added a live preview of exactly what would be added, split Defaults into General and Hardware Specific, and removed Add Blank Row.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.3.0</span><h3 class="changelog-title">Simpler Naming</h3></div>
+        <p>Removed the auto-generated Name pattern &mdash; a bare serial number now just defaults Name to the Asset Tag.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.2.3</span><h3 class="changelog-title">Download Template</h3></div>
+        <p>Added a button to download a starter Name/Serial CSV in the exact format Import CSV expects.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.2.2</span><h3 class="changelog-title">Import CSV</h3></div>
+        <p>Added the ability to load a Name/Serial CSV file straight into Bulk Add instead of pasting.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.2.1</span><h3 class="changelog-title">Manual Name, Serial Pairs</h3></div>
+        <p>Bulk Add now accepts a <code>Name, Serial</code> pair per line, for devices named before their serial was recorded.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.2.0</span><h3 class="changelog-title">Brand Colours &amp; Feedback Button</h3></div>
+        <p>Applied the Xavier CET colour palette throughout, added a proper styled Leave Feedback button, and made the selected asset type tab clearly highlighted.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.1.1</span><h3 class="changelog-title">Automatic Asset Tag</h3></div>
+        <p>Asset Tag is generated automatically from each site's short code plus serial number, instead of being typed by hand.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.1.0</span><h3 class="changelog-title">Initial Release</h3></div>
+        <p>First version of the tool: Monitor, Interactive Touchscreen, Laptop/PC, Desktop PC, and Tablet templates, with Company/Location and Model presets to speed up bulk asset creation.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/app.js?v=0.9.0"></script>
 </body>
 </html>
