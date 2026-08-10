@@ -18,6 +18,7 @@ const els = {
   activeSections: document.getElementById('active-sections'),
   comingSoonPanel: document.getElementById('coming-soon-panel'),
   comingSoonMessage: document.getElementById('coming-soon-message'),
+  navToggle: document.getElementById('nav-toggle'),
 };
 
 // Remembers the chosen Manufacturer filter per asset type for this page
@@ -68,8 +69,20 @@ function renderTabs() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'tab' + (type.id === activeTypeId ? ' active' : '') + (type.comingSoon ? ' tab-coming-soon' : '');
-    btn.textContent = type.comingSoon ? `${type.label} (Coming soon)` : type.label;
+
+    if (type.icon) {
+      const icon = document.createElement('span');
+      icon.className = 'tab-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = type.icon;
+      btn.appendChild(icon);
+    }
+    const text = document.createElement('span');
+    text.textContent = type.comingSoon ? `${type.label} (Coming soon)` : type.label;
+    btn.appendChild(text);
+
     btn.addEventListener('click', () => {
+      closeMobileNav();
       if (type.id === activeTypeId) return;
       activeTypeId = type.id;
       localStorage.setItem(ACTIVE_TYPE_KEY, activeTypeId);
@@ -78,6 +91,16 @@ function renderTabs() {
     els.tabs.appendChild(btn);
   }
 }
+
+function closeMobileNav() {
+  els.tabs.classList.remove('open');
+  els.navToggle.setAttribute('aria-expanded', 'false');
+}
+
+els.navToggle.addEventListener('click', () => {
+  const isOpen = els.tabs.classList.toggle('open');
+  els.navToggle.setAttribute('aria-expanded', String(isOpen));
+});
 
 // ---------- Defaults panel ----------
 
@@ -128,12 +151,13 @@ function applyLocationPreset(assetType, state, presetId) {
   renderDefaultsForm(assetType, state);
 }
 
-function applyModelPreset(assetType, state, presetId) {
-  const modelPresets = MODEL_PRESETS[assetType.id] || [];
-  const preset = modelPresets.find((p) => p.id === presetId);
-  if (!preset) return;
+// Applies every field from a Model Preset except `product` itself — the
+// Product input already holds that value (that's what triggered the
+// lookup), so Model Preset and Product are one field, not two.
+function applyModelPresetFields(assetType, state, preset) {
   const validColumns = new Map(defaultColumns(assetType).map((c) => [c.key, c]));
   for (const [key, value] of Object.entries(preset.fields)) {
+    if (key === 'product') continue;
     const targetCol = validColumns.get(key);
     if (!targetCol) continue;
     state.defaults[key] = value;
@@ -145,85 +169,70 @@ function applyModelPreset(assetType, state, presetId) {
 
 const UNKNOWN_MANUFACTURER = '__unknown__';
 
-function modelPresetLabel(opt) {
-  return opt.manufacturer ? `${opt.label} — ${opt.manufacturer}` : opt.label;
+function filteredModelPresets(modelPresets, manufacturerFilter) {
+  if (!manufacturerFilter) return modelPresets;
+  return modelPresets.filter((p) =>
+    manufacturerFilter === UNKNOWN_MANUFACTURER ? !p.manufacturer : p.manufacturer === manufacturerFilter
+  );
 }
 
-function populateModelSelect(select, presets, manufacturerFilter) {
-  const filtered = !manufacturerFilter
-    ? presets
-    : presets.filter((p) =>
-        manufacturerFilter === UNKNOWN_MANUFACTURER ? !p.manufacturer : p.manufacturer === manufacturerFilter
-      );
-  select.innerHTML = '';
-  const sorted = [...filtered].sort((a, b) => a.label.localeCompare(b.label));
-  for (const opt of sorted) {
-    const o = document.createElement('option');
-    o.value = opt.id;
-    o.textContent = modelPresetLabel(opt);
-    select.appendChild(o);
-  }
-  select.selectedIndex = -1;
+function productCatalogOptions(modelPresets, manufacturerFilter) {
+  const names = filteredModelPresets(modelPresets, manufacturerFilter).map((p) => p.fields.product);
+  return [...new Set(names)].sort((a, b) => a.localeCompare(b));
 }
 
-function renderModelPresetFields(assetType, state) {
+// Manufacturer filter narrows the Product field's suggestions below —
+// there's no separate Model Preset control, so this is the only extra
+// field a catalogued asset type adds above Shared Defaults.
+function renderManufacturerFilterField(assetType, state) {
   const modelPresets = MODEL_PRESETS[assetType.id] || [];
-  if (modelPresets.length === 0) return [];
+  if (modelPresets.length === 0) return null;
 
   const manufacturers = [...new Set(modelPresets.map((p) => p.manufacturer).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b)
   );
+  if (manufacturers.length <= 1) return null;
   const hasUnknown = modelPresets.some((p) => !p.manufacturer);
 
-  const fields = [];
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+  const label = document.createElement('label');
+  label.textContent = 'Manufacturer';
+  label.htmlFor = 'def-model-manufacturer';
+  wrap.appendChild(label);
 
-  if (manufacturers.length > 1) {
-    const wrap = document.createElement('div');
-    wrap.className = 'field';
-    const label = document.createElement('label');
-    label.textContent = 'Manufacturer';
-    label.htmlFor = 'def-model-manufacturer';
-    wrap.appendChild(label);
-
-    const select = document.createElement('select');
-    select.id = 'def-model-manufacturer';
-    const allOpt = document.createElement('option');
-    allOpt.value = '';
-    allOpt.textContent = 'All Manufacturers';
-    select.appendChild(allOpt);
-    for (const m of manufacturers) {
-      const o = document.createElement('option');
-      o.value = m;
-      o.textContent = m;
-      select.appendChild(o);
-    }
-    if (hasUnknown) {
-      const o = document.createElement('option');
-      o.value = UNKNOWN_MANUFACTURER;
-      o.textContent = 'Unknown';
-      select.appendChild(o);
-    }
-    select.value = modelFilterState[assetType.id] || '';
-    wrap.appendChild(select);
-    fields.push(wrap);
-
-    select.addEventListener('change', () => {
-      modelFilterState[assetType.id] = select.value;
-      populateModelSelect(modelSelectField.select, modelPresets, select.value);
-    });
+  const select = document.createElement('select');
+  select.id = 'def-model-manufacturer';
+  const allOpt = document.createElement('option');
+  allOpt.value = '';
+  allOpt.textContent = 'All Manufacturers';
+  select.appendChild(allOpt);
+  for (const m of manufacturers) {
+    const o = document.createElement('option');
+    o.value = m;
+    o.textContent = m;
+    select.appendChild(o);
   }
+  if (hasUnknown) {
+    const o = document.createElement('option');
+    o.value = UNKNOWN_MANUFACTURER;
+    o.textContent = 'Unknown';
+    select.appendChild(o);
+  }
+  select.value = modelFilterState[assetType.id] || '';
+  wrap.appendChild(select);
 
-  const modelSelectField = buildPresetField(
-    'Model Preset',
-    'def-preset-model',
-    [],
-    (val) => applyModelPreset(assetType, state, val),
-    modelPresetLabel
-  );
-  populateModelSelect(modelSelectField.select, modelPresets, modelFilterState[assetType.id] || '');
-  fields.push(modelSelectField.wrap);
+  select.addEventListener('change', () => {
+    modelFilterState[assetType.id] = select.value;
+    renderDefaultsForm(assetType, state);
+  });
 
-  return fields;
+  const hint = document.createElement('p');
+  hint.className = 'hint';
+  hint.textContent = 'Narrows the Product suggestions below. Pick a suggested Product to auto-fill Warranty/Cost/specs for that model.';
+  wrap.appendChild(hint);
+
+  return wrap;
 }
 
 function renderDefaultsForm(assetType, state) {
@@ -244,9 +253,10 @@ function renderDefaultsForm(assetType, state) {
     );
   }
 
-  for (const field of renderModelPresetFields(assetType, state)) {
-    els.defaultsForm.appendChild(field);
-  }
+  const manufacturerField = renderManufacturerFilterField(assetType, state);
+  if (manufacturerField) els.defaultsForm.appendChild(manufacturerField);
+
+  const modelPresets = MODEL_PRESETS[assetType.id] || [];
 
   for (const col of defaultColumns(assetType)) {
     const wrap = document.createElement('div');
@@ -265,6 +275,11 @@ function renderDefaultsForm(assetType, state) {
 
     if (col.key === 'assetState') {
       input.setAttribute('list', 'dl-asset-state');
+    } else if (col.key === 'product' && modelPresets.length > 0) {
+      const listId = `dl-${assetType.id}-product-catalog`;
+      input.setAttribute('list', listId);
+      const options = productCatalogOptions(modelPresets, modelFilterState[assetType.id] || '');
+      wrap.appendChild(buildDatalist(listId, options));
     } else if (col.input === 'text') {
       const listId = `dl-${assetType.id}-${col.key}`;
       input.setAttribute('list', listId);
@@ -276,8 +291,11 @@ function renderDefaultsForm(assetType, state) {
       debouncedPersist(activeTypeId, state);
     });
     input.addEventListener('change', () => {
-      if (col.input === 'text' && input.value.trim()) {
-        addSuggestion(col.key, input.value.trim());
+      if (col.input !== 'text' || !input.value.trim()) return;
+      addSuggestion(col.key, input.value.trim());
+      if (col.key === 'product' && modelPresets.length > 0) {
+        const preset = modelPresets.find((p) => p.fields.product === input.value);
+        if (preset) applyModelPresetFields(assetType, state, preset);
       }
     });
 

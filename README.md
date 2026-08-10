@@ -27,30 +27,34 @@ becomes a fully working tab like the other five.
 
 ## Using it
 
-1. Pick an asset type tab.
-2. Optionally pick a **Company Preset** and/or **Model Preset** to pre-fill
-   the fields below (Company, or Product/Warranty/Cost/Memory/Storage/etc.
-   for that model). A **Location Preset** dropdown will appear too once
-   `LOCATION_PRESETS` in `js/catalog.js` has entries. When a type has models
-   from more than one manufacturer, a **Manufacturer** dropdown appears
-   above Model Preset to narrow a long list down (e.g. Laptop/PC has 100+
-   models across Dell/HP/Lenovo/Acer/ASUS/Apple/etc.). All of these are just
-   a starting point — every pre-filled value stays editable.
-3. Fill in the rest of the **Shared Defaults** (Company, Location, Product,
-   Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
+1. Pick an asset type from the side menu (a collapsible "Asset Type" button
+   on narrow screens, an always-visible sidebar on wider ones).
+2. Optionally pick a **Company Preset** to pre-fill Company. A **Location
+   Preset** dropdown appears too once `LOCATION_PRESETS` in `js/catalog.js`
+   has entries. When a type has models from more than one manufacturer, a
+   **Manufacturer** dropdown also appears to narrow things down (e.g.
+   Laptop/PC has 100+ models across Dell/HP/Lenovo/Acer/ASUS/Apple/etc.).
+3. Start typing in **Product**, or pick from its suggestions — there's no
+   separate "Model Preset" control, Product itself is the catalog. Picking
+   (or typing an exact match for) a known model auto-fills Warranty, Cost,
+   and any type-specific specs (Memory/Storage/OS/Processor/etc.) for it.
+   All of this is just a starting point — every pre-filled value stays
+   editable.
+4. Fill in the rest of the **Shared Defaults** (Company, Location, Cost,
+   Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). These
    values get copied onto new rows as you add them.
-4. Paste one serial number per line into **Bulk Add from Serial Numbers**,
+5. Paste one serial number per line into **Bulk Add from Serial Numbers**,
    set an **Asset Tag Prefix** (e.g. `SCL-`) and a **Name Pattern** (e.g.
    `ICTSUITE Monitor {n}` or `MAR-{n2}` for zero-padded numbers), then click
    **Add Rows from Serials**. One row is created per serial number, with the
    Asset Tag set to `prefix + serial` and the Name built from the pattern.
    Name pattern tokens: `{n}`, `{n2}`/`{n3}`/... (zero-padded), `{serial}`,
    `{company}`, `{location}`, `{product}`.
-5. Every generated row is independently editable in the table — tweak any
+6. Every generated row is independently editable in the table — tweak any
    cell by hand, or use **Add Blank Row** for one-off manual entries.
    Required fields with no value are outlined in red.
-6. Click **Download CSV** to save a file with headers matching the
+7. Click **Download CSV** to save a file with headers matching the
    Freshservice import template for that asset type.
 
 Your defaults, bulk-add settings, and rows are saved per asset type in your
@@ -99,7 +103,8 @@ js/app.js              UI wiring — tabs, defaults form, bulk-add, table,
 To add a new asset type, add an entry to `ASSET_TYPES` in `js/templates.js`
 with its columns in the same order/wording as the Freshservice template —
 the rest of the app (form rendering, bulk add, table, CSV export) picks it
-up automatically.
+up automatically. Set `icon` to a single emoji to give it a glyph in the
+side menu.
 
 To add a new hardware model or site, edit `js/catalog.js` — no other files
 need to change. A `MODEL_PRESETS` entry only needs to set the fields that
