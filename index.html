@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.9.2" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.3" />
 </head>
 <body>
   <header class="app-header">
@@ -23,7 +23,7 @@
         <span id="release-notes-btn-icon" class="tab-icon" aria-hidden="true"></span>
         What's New
       </button>
-      <button id="help-btn" type="button" class="header-btn header-btn-primary" aria-haspopup="dialog" aria-controls="help-dialog">
+      <button id="help-btn" type="button" class="header-btn" aria-haspopup="dialog" aria-controls="help-dialog">
         <span id="help-btn-icon" class="tab-icon" aria-hidden="true"></span>
         Help
       </button>
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.2 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.3 beta</button>
       </div>
     </div>
 
@@ -98,16 +98,16 @@
               <span id="row-count" class="row-count"></span>
               <span id="invalid-row-count" class="row-count-invalid" hidden></span>
               <div class="spacer"></div>
-              <button id="import-edit-btn" type="button" class="secondary">
+              <button id="import-edit-btn" type="button" class="primary">
                 <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
                 Import Populated CSV for Editing
               </button>
               <input id="import-edit-file" type="file" accept=".csv,text/csv" hidden />
-              <button id="clear-rows-btn" type="button" class="danger-outline">
+              <button id="clear-rows-btn" type="button" class="danger">
                 <span id="clear-rows-icon" class="tab-icon" aria-hidden="true"></span>
                 Clear All Rows
               </button>
-              <button id="download-btn" type="button" class="primary">
+              <button id="download-btn" type="button" class="success">
                 <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
                 Download CSV
               </button>
@@ -180,6 +180,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.3</span><h3 class="changelog-title">Consistent Button Colours</h3></div>
+        <p>Down to three fills, used consistently everywhere: blue for the default action (Leave Feedback, What's New, Help, Add Assets of Another Product, both CSV imports, Download Template CSV), red for anything destructive (Clear All Rows, deleting a row), and green just for Download CSV &mdash; the one "you're done" button.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.9.2</span><h3 class="changelog-title">Date Field Width Fix</h3></div>
         <p>Acquisition Date and End of Life could render wider than every other field on some phones (an iOS Safari quirk where a date field's native control refuses to shrink below its own minimum width). Fixed for every field, everywhere.</p>
@@ -267,6 +271,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.9.2"></script>
+  <script type="module" src="js/app.js?v=0.9.3"></script>
 </body>
 </html>

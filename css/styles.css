@@ -20,6 +20,8 @@
   --input-border: #958e6a;
   --warning: #8a6d1a;
   --warning-bg: #fbf7e4;
+  --success: #1a7a4c;
+  --success-text: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +44,8 @@
     --input-border: #5f6780;
     --warning: #ebd166;
     --warning-bg: #413f32;
+    --success: #4ade80;
+    --success-text: #0b0e14;
   }
 }
 
@@ -570,6 +574,11 @@ button {
   cursor: pointer;
 }
 
+/* Every button is one of three fills — blue (primary/default action),
+   red (destructive), or green (the one true "you're done" action,
+   Download CSV) — plus the small handful of unstyled utility controls
+   (dialog close, the mobile nav toggle, the version badge) that aren't
+   really "actions" and would look overloaded rendered the same way. */
 button.primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -577,8 +586,18 @@ button.primary {
   font-weight: 600;
 }
 
-button.secondary {
-  background: transparent;
+button.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  font-weight: 600;
+}
+
+button.success {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--success-text);
+  font-weight: 600;
 }
 
 button.small {
@@ -586,30 +605,17 @@ button.small {
   font-size: 0.8rem;
 }
 
-button.danger-outline {
-  color: var(--danger);
-  border-color: var(--danger);
-  background: transparent;
-}
-
 button.icon-btn.danger {
   width: 2rem;
   height: 2rem;
   padding: 0;
   border-radius: 999px;
-  color: var(--danger);
-  border-color: var(--border);
   flex-shrink: 0;
 }
 
 button.icon-btn.danger .tab-icon {
   width: 0.85rem;
   height: 0.85rem;
-}
-
-button.icon-btn.danger:hover {
-  background: var(--table-head-bg);
-  filter: none;
 }
 
 button:hover {
@@ -738,9 +744,9 @@ tbody td input {
   font-size: 0.85rem;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel-bg);
-  color: var(--text);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
@@ -753,12 +759,6 @@ tbody td input {
 .header-btn .tab-icon {
   width: 1rem;
   height: 1rem;
-}
-
-.header-btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
 }
 
 /* Shared chrome for popout <dialog>s (Help, Release Notes) — each dialog

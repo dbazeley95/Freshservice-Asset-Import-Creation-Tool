@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.9.2';
-import { buildCsv, downloadCsv } from './csv.js?v=0.9.2';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.9.2';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.9.2';
-import { iconSvg } from './icons.js?v=0.9.2';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.9.3';
+import { buildCsv, downloadCsv } from './csv.js?v=0.9.3';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.9.3';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.9.3';
+import { iconSvg } from './icons.js?v=0.9.3';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -689,7 +689,7 @@ function renderBulkForm(assetType, state) {
 
   const templateBtn = document.createElement('button');
   templateBtn.type = 'button';
-  templateBtn.className = 'secondary small';
+  templateBtn.className = 'primary small';
   templateBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('download')}</span> Download Template CSV`;
   templateBtn.addEventListener('click', () => {
     const template = 'Name,Serial\r\nMAR-01,LL7QX4MQ9N\r\n';
@@ -699,7 +699,7 @@ function renderBulkForm(assetType, state) {
 
   const importBtn = document.createElement('button');
   importBtn.type = 'button';
-  importBtn.className = 'secondary small';
+  importBtn.className = 'primary small';
   importBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('upload')}</span> Import CSV`;
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
