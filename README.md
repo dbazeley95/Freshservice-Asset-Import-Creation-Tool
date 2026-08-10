@@ -15,9 +15,9 @@ exactly):
 - iPads / Tablets
 
 There are also tabs for **Printers & Copiers**, **Phones & Telephony**,
-**Wi-Fi Access Points**, **Network Switches**, **Servers**, **Windows
-Servers**, **Docking Stations**, **Computer (Unspecified)**, and **Hardware
-(Uncategorised)** — these are marked "(Coming soon)" because there's no
+**Wi-Fi Access Points**, **Network Switches**, **Servers**, **Docking
+Stations**, **Computer (Unspecified)**, and **Hardware (Uncategorised)** —
+these are marked "(Coming soon)" because there's no
 Freshservice import template for them yet, so the tab just shows a message.
 They mirror the exact Asset Type values from a Freshservice product export
 (not a guessed grouping), and their product catalogs already exist in
@@ -31,9 +31,10 @@ becomes a fully working tab like the other five.
    "Asset Type" button on narrow screens (closes again once you pick one),
    an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
    PC on first visit.
-2. Fill in **General** — which site this batch belongs to. Optionally pick
-   a **Company / Location Preset** first; one dropdown sets both fields at
-   once, since every site in this org is its own Company *and* Location.
+2. Fill in **General** — which site this batch belongs to. Type the
+   **Company**; for a known site, **Location** fills in automatically
+   (since every site in this org is its own Company *and* Location), unless
+   you've already typed one yourself.
 3. Fill in **Hardware Specific** — what the hardware itself is (Product,
    Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). Start
@@ -59,8 +60,8 @@ becomes a fully working tab like the other five.
    way — a Name column and a Serial column (a header row like "Name,
    Serial" is detected and skipped automatically; a Serial-only file works
    too, same bare-serial default as above). It fills the textarea rather
-   than adding rows immediately. **Download Template** next to it gives a
-   starter `.csv` (header row plus one example) in that exact format,
+   than adding rows immediately. **Download Template CSV** next to it gives
+   a starter `.csv` (header row plus one example) in that exact format,
    ready to fill in and re-upload.
 
    Asset Tag is never typed by hand either way — it's generated
@@ -68,16 +69,17 @@ becomes a fully working tab like the other five.
    Short Code (see `SITE_PRESETS` in `js/catalog.js`); if that Company has
    no Short Code set yet, Asset Tag is left blank for you to fill in per
    row.
-5. A **live preview** below the Assets box shows exactly what Add Rows from
-   Serials would produce — every column, in export order — so a wrong
-   Company, a missing Short Code, or a typo'd Product is visible (rows
-   missing a required field are marked in red) before anything is
-   committed.
-6. Click **Add Rows from Serials**. Rows accumulate in the **Rows** table
-   below rather than replacing what's there — to mix another model into
-   the same export, change Product/Hardware Specific and click Add Rows
-   from Serials again before downloading. Every row is still individually
-   editable in the table by hand afterwards.
+5. In **Add Assets of Another Product**, a **live preview** shows exactly
+   what clicking the button below it would produce — every column, in
+   export order — so a wrong Company, a missing Short Code, or a typo'd
+   Product is visible (rows missing a required field are marked in red)
+   before anything is committed.
+6. Click **Add Assets of Another Product**. Rows accumulate in the **Rows**
+   table below rather than replacing what's there — to mix another product
+   into the same export, change Product/Hardware Specific above and click
+   it again before downloading (up to 10 different products per export).
+   Every row is still individually editable in the table by hand
+   afterwards.
 7. Click **Download CSV** to save a file with headers matching the
    Freshservice import template for that asset type.
 
@@ -87,7 +89,7 @@ page won't lose anything. Use **Clear All Rows** to start a fresh batch.
 
 ### Editing an existing export
 
-**Import CSV for Editing**, above the Rows table, loads a full `.csv` file —
+**Import Populated CSV for Editing**, above the Rows table, loads a full `.csv` file —
 every column, not just Name/Serial — straight into the table so you can
 tweak an export you already made (or a matching Freshservice export) and
 re-download it. It matches columns by header text against the current asset

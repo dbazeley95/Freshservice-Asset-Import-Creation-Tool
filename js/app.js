@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.7.3';
-import { buildCsv, downloadCsv } from './csv.js?v=0.7.3';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.7.3';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.7.3';
-import { iconSvg } from './icons.js?v=0.7.3';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.8.0';
+import { buildCsv, downloadCsv } from './csv.js?v=0.8.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.8.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.8.0';
+import { iconSvg } from './icons.js?v=0.8.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -24,6 +24,7 @@ const els = {
   clearRowsBtn: document.getElementById('clear-rows-btn'),
   importEditBtn: document.getElementById('import-edit-btn'),
   importEditFile: document.getElementById('import-edit-file'),
+  addRowsBtn: document.getElementById('add-rows-btn'),
   typeDescription: document.getElementById('type-description'),
   activeSections: document.getElementById('active-sections'),
   comingSoonPanel: document.getElementById('coming-soon-panel'),
@@ -142,45 +143,20 @@ document.addEventListener('keydown', (e) => {
 
 // ---------- Defaults panels (General + Hardware Specific) ----------
 
-function buildPresetField(labelText, id, options, onChange, formatOptionLabel = (o) => o.label) {
-  const wrap = document.createElement('div');
-  wrap.className = 'field';
-
-  const label = document.createElement('label');
-  label.textContent = labelText;
-  label.htmlFor = id;
-  wrap.appendChild(label);
-
-  const select = document.createElement('select');
-  select.id = id;
-
-  const sortedOptions = [...options].sort((a, b) => a.label.localeCompare(b.label));
-  for (const opt of sortedOptions) {
-    const o = document.createElement('option');
-    o.value = opt.id;
-    o.textContent = formatOptionLabel(opt);
-    select.appendChild(o);
-  }
-  // No blank/"Custom" placeholder option — leave the dropdown showing
-  // nothing selected instead, so it never looks like a preset was already
-  // applied when it wasn't.
-  select.selectedIndex = -1;
-
-  select.addEventListener('change', () => onChange(select.value));
-  wrap.appendChild(select);
-  return { wrap, select };
-}
-
-function applySitePreset(assetType, state, presetId) {
-  const preset = SITE_PRESETS.find((p) => p.id === presetId);
+// Fills Location from a matching Site Preset the moment Company is set —
+// but only when Location is still blank, so it never clobbers a value
+// someone already typed by hand (e.g. a site with no Site Preset entry, or
+// a genuinely different Location for that Company).
+function autoFillLocationFromCompany(assetType, state) {
+  if (String(state.defaults.location ?? '').trim()) return;
+  const company = String(state.defaults.company ?? '').trim();
+  if (!company) return;
+  const preset = SITE_PRESETS.find((p) => p.company.toLowerCase() === company.toLowerCase());
   if (!preset) return;
-  state.defaults.company = preset.company;
   state.defaults.location = preset.location;
-  addSuggestion('company', preset.company);
   addSuggestion('location', preset.location);
   persist(activeTypeId, state);
   renderGeneralForm(assetType, state);
-  refreshAssetTagHint(state);
   refreshBulkPreview(assetType, state);
 }
 
@@ -413,6 +389,7 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
       const preset = modelPresets.find((p) => p.fields.product === input.value);
       if (preset) applyModelPresetFields(assetType, state, preset);
     }
+    if (col.key === 'company') autoFillLocationFromCompany(assetType, state);
   });
 
   return wrap;
@@ -421,12 +398,6 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
 function renderGeneralForm(assetType, state) {
   els.generalForm.innerHTML = '';
   const suggestions = loadSuggestions();
-
-  els.generalForm.appendChild(
-    buildPresetField('Company / Location Preset', 'def-preset-site', SITE_PRESETS, (val) =>
-      applySitePreset(assetType, state, val)
-    ).wrap
-  );
 
   for (const col of generalColumns(assetType)) {
     els.generalForm.appendChild(buildDefaultField(col, assetType, state, suggestions, []));
@@ -599,8 +570,8 @@ function parseCsvForEditing(assetType, text) {
 
 // Builds full row objects (every column, not just Name/Serial/Asset Tag)
 // from the Assets textarea, using the current Shared Defaults — shared by
-// the live preview and the actual "Add Rows from Serials" commit so the
-// two can never drift apart.
+// the live preview and the actual "Add Assets of Another Product" commit
+// so the two can never drift apart.
 function buildRowsFromText(assetType, state, text) {
   const entries = text
     .split(/\r?\n/)
@@ -631,7 +602,7 @@ function refreshBulkPreview(assetType, state) {
   renderBulkPreview(assetType, state, bulkSerialsTextarea.value);
 }
 
-// Read-only preview of exactly what Add Rows from Serials would produce —
+// Read-only preview of exactly what Add Assets of Another Product would produce —
 // same column set and order as the real export — so mistakes (wrong
 // Company, missing Short Code, a typo'd Product) are visible before
 // they're committed to the Rows table below.
@@ -698,7 +669,7 @@ function renderBulkForm(assetType, state) {
   const templateBtn = document.createElement('button');
   templateBtn.type = 'button';
   templateBtn.className = 'secondary small';
-  templateBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('download')}</span> Download Template`;
+  templateBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('download')}</span> Download Template CSV`;
   templateBtn.addEventListener('click', () => {
     const template = 'Name,Serial\r\nMAR-01,LL7QX4MQ9N\r\n';
     downloadCsv('freshservice-asset-import-name-serial-template.csv', template);
@@ -748,32 +719,6 @@ function renderBulkForm(assetType, state) {
   assetTagHintEl = serialsHint;
   serialsField.appendChild(serialsHint);
   els.bulkForm.appendChild(serialsField);
-
-  const addBtn = document.createElement('button');
-  addBtn.type = 'button';
-  addBtn.className = 'primary';
-  addBtn.textContent = 'Add Rows from Serials';
-  addBtn.addEventListener('click', () => {
-    const rows = buildRowsFromText(assetType, state, textarea.value);
-    if (rows.length === 0) return;
-    for (const row of rows) {
-      row.id = newRowId();
-      state.rows.push(row);
-    }
-    textarea.value = '';
-    els.bulkPreviewWrap.innerHTML = '';
-    persist(activeTypeId, state);
-    renderTable(assetType, state);
-    renderBulkForm(assetType, state);
-  });
-  els.bulkForm.appendChild(addBtn);
-
-  const addAgainHint = document.createElement('p');
-  addAgainHint.className = 'hint';
-  addAgainHint.textContent =
-    'Rows accumulate in the table below — to include another model in the same export, change Product/Hardware ' +
-    'Specific details above and click Add Rows from Serials again before downloading.';
-  els.bulkForm.appendChild(addAgainHint);
 }
 
 // ---------- Table ----------
@@ -876,7 +821,38 @@ function renderTable(assetType, state) {
 
 // ---------- Toolbar actions ----------
 
+// Hardcoded cap on distinct Product values per export — Add Assets of
+// Another Product is meant for mixing in a handful of extra products, not
+// an unbounded number of them in one file.
+const MAX_PRODUCT_TYPES = 10;
+
 function wireToolbar(assetType, state) {
+  if (els.addRowsBtn) {
+    els.addRowsBtn.onclick = () => {
+      const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
+      const rows = buildRowsFromText(assetType, state, text);
+      if (rows.length === 0) return;
+
+      const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
+      const newProduct = state.defaults.product;
+      if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
+        alert(
+          `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`
+        );
+        return;
+      }
+
+      for (const row of rows) {
+        row.id = newRowId();
+        state.rows.push(row);
+      }
+      if (bulkSerialsTextarea) bulkSerialsTextarea.value = '';
+      els.bulkPreviewWrap.innerHTML = '';
+      persist(activeTypeId, state);
+      renderTable(assetType, state);
+    };
+  }
+
   if (els.importEditBtn && els.importEditFile) {
     els.importEditBtn.onclick = () => els.importEditFile.click();
     els.importEditFile.onchange = async () => {

@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.7.3" />
+  <link rel="stylesheet" href="css/styles.css?v=0.8.0" />
 </head>
 <body>
   <header class="app-header">
@@ -29,7 +29,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <span class="version-badge">v0.7.3 beta</span>
+        <span class="version-badge">v0.8.0 beta</span>
       </div>
     </div>
 
@@ -61,7 +61,7 @@
         <div id="active-sections">
           <section class="panel" aria-labelledby="general-heading">
             <h2 id="general-heading">General</h2>
-            <p class="hint">Which site this batch belongs to. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
+            <p class="hint">Which site this batch belongs to. Type the Company &mdash; Location fills in automatically for known sites, unless you've already typed one yourself. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
             <div id="general-form" class="form-grid"></div>
           </section>
 
@@ -74,7 +74,13 @@
           <section class="panel" aria-labelledby="bulk-heading">
             <h2 id="bulk-heading">Bulk Add from Serial Numbers</h2>
             <div id="bulk-form" class="form-grid"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="add-product-heading">
+            <h2 id="add-product-heading">Add Assets of Another Product</h2>
+            <p class="hint">Adds the assets pasted above into the Rows table below, using the current Hardware Specific details as their Product. Change Product/Hardware Specific and click this again to add another product to the same export &mdash; up to 10 different products per export.</p>
             <div id="bulk-preview-wrap"></div>
+            <button id="add-rows-btn" type="button" class="primary">Add Assets of Another Product</button>
           </section>
 
           <section class="panel" aria-labelledby="table-heading">
@@ -84,7 +90,7 @@
               <div class="spacer"></div>
               <button id="import-edit-btn" type="button" class="secondary">
                 <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
-                Import CSV for Editing
+                Import Populated CSV for Editing
               </button>
               <input id="import-edit-file" type="file" accept=".csv,text/csv" hidden />
               <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
@@ -110,10 +116,10 @@
     </div>
     <div class="help-dialog-body">
       <h3>1. Pick an asset type</h3>
-      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop PC, iPads / Tablets, or Interactive Touchscreen. Types marked "Coming soon" don't have an import template wired up yet.</p>
+      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, or Interactive Touchscreen. Types marked "Coming soon" don't have an import template wired up yet.</p>
 
       <h3>2. Fill in General</h3>
-      <p>Pick a <strong>Company / Location Preset</strong> to fill both fields at once, or type your own. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
+      <p>Type the <strong>Company</strong> &mdash; for a known site, <strong>Location</strong> fills in automatically, unless you've already typed one yourself. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
 
       <h3>3. Fill in Hardware Specific</h3>
       <p>Fields marked with a red <strong>*</strong> are required. Start typing in <strong>Product</strong> to see suggestions, or narrow them first with the <strong>Manufacturer</strong> dropdown above it. Picking a known product auto-fills its Warranty and other specs.</p>
@@ -124,19 +130,19 @@
         <li>A bare serial number &mdash; the Name will default to the Asset Tag</li>
         <li><code>Name, Serial</code> (or paste two columns from a spreadsheet) to set the name yourself</li>
       </ul>
-      <p>Or click <strong>Import CSV</strong> to load a Name/Serial file directly &mdash; use <strong>Download Template</strong> first if you're not sure of the format.</p>
+      <p>Or click <strong>Import CSV</strong> to load a Name/Serial file directly &mdash; use <strong>Download Template CSV</strong> first if you're not sure of the format.</p>
 
       <h3>5. Asset Tag</h3>
       <p>Generated automatically as <code>&lt;site code&gt;-&lt;serial&gt;</code> from the Company you've selected &mdash; you never type it by hand.</p>
 
-      <h3>6. Rows table &amp; multiple models</h3>
-      <p>Added rows accumulate in the table below, where you can fine-tune any field per row. To include another model in the same export, change the Product/Hardware Specific details above and click <strong>Add Rows from Serials</strong> again before downloading.</p>
+      <h3>6. Add Assets of Another Product</h3>
+      <p>Its live preview shows exactly what clicking the button will add to the <strong>Rows</strong> table below. Rows accumulate rather than replacing what's there &mdash; to mix another product into the same export, change the Product/Hardware Specific details above and click <strong>Add Assets of Another Product</strong> again before downloading. Each export can hold up to 10 different products; you can fine-tune any field per row afterwards.</p>
 
       <h3>7. Download CSV</h3>
       <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import.</p>
 
       <h3>Editing an existing export</h3>
-      <p><strong>Import CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
+      <p><strong>Import Populated CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
 
       <h3>Your data</h3>
       <p>Everything stays in this browser's local storage on this device &mdash; nothing is uploaded anywhere. Closing the tab is safe; clearing site data is not.</p>
@@ -146,6 +152,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.7.3"></script>
+  <script type="module" src="js/app.js?v=0.8.0"></script>
 </body>
 </html>

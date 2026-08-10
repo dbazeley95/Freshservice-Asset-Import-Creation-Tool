@@ -72,7 +72,7 @@ export const ASSET_TYPES = [
   },
   {
     id: 'desktop_pc',
-    label: 'Desktop PC',
+    label: 'Desktop',
     columns: [
       col('name', 'Name', 'text', 'row'),
       col('company', 'Company', 'text', 'default', { group: 'general' }),
@@ -124,7 +124,6 @@ export const ASSET_TYPES = [
   { id: 'wifi_access_point', label: 'Wi-Fi Access Points', comingSoon: true, columns: [] },
   { id: 'network_switch', label: 'Network Switches', comingSoon: true, columns: [] },
   { id: 'server', label: 'Servers', comingSoon: true, columns: [] },
-  { id: 'windows_server', label: 'Windows Servers', comingSoon: true, columns: [] },
   { id: 'docking_station', label: 'Docking Stations', comingSoon: true, columns: [] },
   { id: 'computer_generic', label: 'Computer (Unspecified)', comingSoon: true, columns: [] },
   { id: 'hardware_other', label: 'Hardware (Uncategorised)', comingSoon: true, columns: [] },

@@ -57,8 +57,8 @@ export const SITE_PRESETS = [
 //
 // monitor/touchscreen/laptop_pc/desktop_pc/tablet feed the fully working
 // asset templates. Every other key here (printer_copier, phone_telephony,
-// wifi_access_point, network_switch, server, windows_server,
-// docking_station, computer_generic, hardware_other) has no Freshservice
+// wifi_access_point, network_switch, server, docking_station,
+// computer_generic, hardware_other) has no Freshservice
 // import template wired up yet (see ASSET_TYPES in js/templates.js, where
 // they're marked comingSoon) — their presets are captured here now so
 // nothing from a product export gets lost, ready to use the moment a
@@ -1919,17 +1919,15 @@ export const MODEL_PRESETS = {
       fields: { product: "ProLiant DL380 Gen10", warranty: 12 },
     },
     {
-      id: "virtual-machine",
-      label: "Virtual Machine",
-      fields: { product: "Virtual Machine", warranty: 12 },
-    },
-  ],
-  windows_server: [
-    {
       id: "proliant-ml350-gen10",
       label: "ProLiant ML350 Gen10",
       manufacturer: "HP",
       fields: { product: "ProLiant ML350 Gen10", warranty: 12 },
+    },
+    {
+      id: "virtual-machine",
+      label: "Virtual Machine",
+      fields: { product: "Virtual Machine", warranty: 12 },
     },
   ],
   docking_station: [

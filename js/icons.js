@@ -60,13 +60,6 @@ export const ICONS = {
     <circle cx="7.5" cy="7" r="0.7" fill="currentColor" stroke="none"/>
     <circle cx="7.5" cy="17" r="0.7" fill="currentColor" stroke="none"/>
   `,
-  windows_server: `
-    <rect x="4" y="4" width="16" height="6" rx="1"/>
-    <rect x="4" y="14" width="16" height="6" rx="1"/>
-    <line x1="14" y1="5.4" x2="14" y2="8.6"/>
-    <line x1="12.4" y1="7" x2="15.6" y2="7"/>
-    <circle cx="7.5" cy="17" r="0.7" fill="currentColor" stroke="none"/>
-  `,
   docking_station: `
     <path d="M9 2.5v5"/>
     <path d="M15 2.5v5"/>
