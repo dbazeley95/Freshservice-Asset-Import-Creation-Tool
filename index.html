@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Freshservice Asset Import Generator</title>
+  <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%A5%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Freshservice Asset Import Generator</h1>
+    <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
+  </header>
+
+  <nav id="type-tabs" class="tabs" aria-label="Asset type"></nav>
+
+  <main>
+    <p id="type-description" class="type-description"></p>
+
+    <section class="panel" aria-labelledby="defaults-heading">
+      <h2 id="defaults-heading">Shared Defaults</h2>
+      <p class="hint">These values are copied onto new rows when you add them. Each row can still be edited individually afterwards.</p>
+      <div id="defaults-form" class="form-grid"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="bulk-heading">
+      <h2 id="bulk-heading">Bulk Add from Serial Numbers</h2>
+      <div id="bulk-form" class="form-grid"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="table-heading">
+      <div class="table-toolbar">
+        <h2 id="table-heading">Rows</h2>
+        <span id="row-count" class="row-count"></span>
+        <div class="spacer"></div>
+        <button id="add-row-btn" type="button" class="secondary">Add Blank Row</button>
+        <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
+        <button id="download-btn" type="button" class="primary">Download CSV</button>
+      </div>
+      <div id="table-wrap" class="table-wrap"></div>
+    </section>
+  </main>
+
+  <div id="dl-asset-state-holder" hidden></div>
+
+  <footer class="app-footer">
+    <p>All data lives only in this browser's local storage on this device. Closing the tab does not lose your work, but clearing site data will.</p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
