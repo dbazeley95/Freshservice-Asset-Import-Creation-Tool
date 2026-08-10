@@ -119,6 +119,9 @@ export const ICONS = {
     <path d="M9.2 9.4a2.8 2.8 0 015.4 1c0 1.8-2.6 2-2.6 4"/>
     <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>
   `,
+  chevronDown: `
+    <path d="M5.5 8.5L12 15l6.5-6.5"/>
+  `,
 };
 
 export function iconSvg(key) {

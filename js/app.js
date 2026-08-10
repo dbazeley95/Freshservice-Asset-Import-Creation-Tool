@@ -67,6 +67,10 @@ function getAssetType(id) {
 
 function renderTabs() {
   els.tabs.innerHTML = '';
+
+  const activeType = getAssetType(activeTypeId);
+  navToggleValue.textContent = activeType.comingSoon ? `${activeType.label} (Coming soon)` : activeType.label;
+
   for (const type of ASSET_TYPES) {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -101,12 +105,15 @@ function renderTabs() {
 // via a media query and these classes are simply irrelevant there.
 const navToggleIcon = document.getElementById('nav-toggle-icon');
 navToggleIcon.innerHTML = iconSvg('menu');
+const navToggleValue = document.getElementById('nav-toggle-value');
+const navToggleChevron = document.getElementById('nav-toggle-chevron');
+navToggleChevron.innerHTML = iconSvg('chevronDown');
 
 function openMobileNav() {
   els.tabs.classList.add('open');
   els.navBackdrop.classList.add('open');
   els.navToggle.setAttribute('aria-expanded', 'true');
-  navToggleIcon.innerHTML = iconSvg('close');
+  navToggleChevron.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
@@ -114,7 +121,7 @@ function closeMobileNav() {
   els.tabs.classList.remove('open');
   els.navBackdrop.classList.remove('open');
   els.navToggle.setAttribute('aria-expanded', 'false');
-  navToggleIcon.innerHTML = iconSvg('menu');
+  navToggleChevron.classList.remove('open');
   document.body.style.overflow = '';
 }
 
