@@ -1,6 +1,7 @@
 import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, rowColumns } from './templates.js';
 import { buildCsv, downloadCsv, applyNamePattern } from './csv.js';
 import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
+import { LOCATION_PRESETS, MODEL_PRESETS } from './catalog.js';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -72,9 +73,79 @@ function renderTabs() {
 
 // ---------- Defaults panel ----------
 
+function buildPresetField(labelText, id, options, onChange) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+
+  const label = document.createElement('label');
+  label.textContent = labelText;
+  label.htmlFor = id;
+  wrap.appendChild(label);
+
+  const select = document.createElement('select');
+  select.id = id;
+
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '— Custom —';
+  select.appendChild(blank);
+
+  for (const opt of options) {
+    const o = document.createElement('option');
+    o.value = opt.id;
+    o.textContent = opt.label;
+    select.appendChild(o);
+  }
+
+  select.addEventListener('change', () => onChange(select.value));
+  wrap.appendChild(select);
+  return wrap;
+}
+
+function applyLocationPreset(assetType, state, presetId) {
+  const preset = LOCATION_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return;
+  state.defaults.company = preset.company;
+  state.defaults.location = preset.location;
+  addSuggestion('company', preset.company);
+  addSuggestion('location', preset.location);
+  persist(activeTypeId, state);
+  renderDefaultsForm(assetType, state);
+}
+
+function applyModelPreset(assetType, state, presetId) {
+  const modelPresets = MODEL_PRESETS[assetType.id] || [];
+  const preset = modelPresets.find((p) => p.id === presetId);
+  if (!preset) return;
+  const validColumns = new Map(defaultColumns(assetType).map((c) => [c.key, c]));
+  for (const [key, value] of Object.entries(preset.fields)) {
+    const targetCol = validColumns.get(key);
+    if (!targetCol) continue;
+    state.defaults[key] = value;
+    if (targetCol.input === 'text' && value) addSuggestion(key, String(value));
+  }
+  persist(activeTypeId, state);
+  renderDefaultsForm(assetType, state);
+}
+
 function renderDefaultsForm(assetType, state) {
   els.defaultsForm.innerHTML = '';
   const suggestions = loadSuggestions();
+
+  els.defaultsForm.appendChild(
+    buildPresetField('Location Preset', 'def-preset-location', LOCATION_PRESETS, (val) =>
+      applyLocationPreset(assetType, state, val)
+    )
+  );
+
+  const modelPresets = MODEL_PRESETS[assetType.id] || [];
+  if (modelPresets.length > 0) {
+    els.defaultsForm.appendChild(
+      buildPresetField('Model Preset', 'def-preset-model', modelPresets, (val) =>
+        applyModelPreset(assetType, state, val)
+      )
+    );
+  }
 
   for (const col of defaultColumns(assetType)) {
     const wrap = document.createElement('div');
