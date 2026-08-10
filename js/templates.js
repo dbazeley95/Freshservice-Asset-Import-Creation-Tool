@@ -52,7 +52,7 @@ export const ASSET_TYPES = [
   },
   {
     id: 'laptop_pc',
-    label: 'Laptop / PC',
+    label: 'Laptop',
     columns: [
       col('name', 'Name', 'text', 'row'),
       col('company', 'Company', 'text', 'default', { group: 'general' }),
@@ -92,7 +92,7 @@ export const ASSET_TYPES = [
   },
   {
     id: 'tablet',
-    label: 'Tablet',
+    label: 'iPads / Tablets',
     columns: [
       col('name', 'Display Name', 'text', 'row'),
       col('company', 'Company', 'text', 'default', { group: 'general' }),

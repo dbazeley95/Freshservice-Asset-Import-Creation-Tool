@@ -10,9 +10,9 @@ exactly):
 
 - Monitor
 - Interactive Touchscreen
-- Laptop / PC
+- Laptop
 - Desktop PC
-- Tablet
+- iPads / Tablets
 
 There are also tabs for **Printers & Copiers**, **Phones & Telephony**,
 **Wi-Fi Access Points**, **Network Switches**, **Servers**, **Windows
@@ -42,7 +42,7 @@ becomes a fully working tab like the other five.
    (or typing an exact match for) a known model auto-fills Warranty, Cost,
    and any type-specific specs for it. When a type has models from more
    than one manufacturer, a **Manufacturer** dropdown appears above Product
-   to narrow a long list down (e.g. Laptop/PC has 100+ models across
+   to narrow a long list down (e.g. Laptop has 100+ models across
    Dell/HP/Lenovo/Acer/ASUS/Apple/etc.). Every field in both panels is
    required (red `*`) — all of it is just a starting point though, every
    pre-filled value stays editable, and both panels' values get copied onto
