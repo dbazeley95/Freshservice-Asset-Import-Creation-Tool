@@ -119,6 +119,11 @@ export const ICONS = {
     <line x1="12" y1="5" x2="12" y2="19"/>
     <line x1="5" y1="12" x2="19" y2="12"/>
   `,
+  warning: `
+    <path d="M12 4.2l9 15.6a1 1 0 01-.9 1.5H3.9a1 1 0 01-.9-1.5l9-15.6a1 1 0 011.8 0z"/>
+    <line x1="12" y1="9.5" x2="12" y2="14"/>
+    <circle cx="12" cy="16.8" r="0.9" fill="currentColor" stroke="none"/>
+  `,
   notes: `
     <path d="M6 3.5h9l3 3V20a1 1 0 01-1 1H6a1 1 0 01-1-1V4.5a1 1 0 011-1z"/>
     <path d="M15 3.5V7h3.5"/>

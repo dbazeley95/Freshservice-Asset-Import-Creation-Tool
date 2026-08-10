@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.9.0" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.1" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.0 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.1 beta</button>
       </div>
     </div>
 
@@ -63,6 +63,8 @@
         </section>
 
         <div id="active-sections">
+          <p class="required-legend"><span class="required-marker">*</span> marks a required field &mdash; Freshservice needs it to import the row.</p>
+
           <section class="panel" aria-labelledby="general-heading">
             <h2 id="general-heading">General</h2>
             <p class="hint">Which site this batch belongs to. Type the Company &mdash; Location fills in automatically for known sites, unless you've already typed one yourself. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
@@ -94,6 +96,7 @@
             <div class="table-toolbar">
               <h2 id="table-heading">Rows</h2>
               <span id="row-count" class="row-count"></span>
+              <span id="invalid-row-count" class="row-count-invalid" hidden></span>
               <div class="spacer"></div>
               <button id="import-edit-btn" type="button" class="secondary">
                 <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
@@ -144,6 +147,7 @@
         <li><code>Name, Serial</code> (or paste two columns from a spreadsheet) to set the name yourself</li>
       </ul>
       <p>Or click <strong>Import CSV</strong> to load a Name/Serial file directly &mdash; use <strong>Download Template CSV</strong> first if you're not sure of the format.</p>
+      <p>If a bare-serial line shows up alongside <code>Name, Serial</code> lines, it's marked with <span class="ambiguous-icon-inline">&#9888;</span> in the preview and Rows table &mdash; usually a forgotten comma, so double-check the Name before downloading. Editing that row's Name clears the warning.</p>
 
       <h3>5. Asset Tag</h3>
       <p>Generated automatically as <code>&lt;site code&gt;-&lt;serial&gt;</code> from the Company you've selected &mdash; you never type it by hand.</p>
@@ -152,7 +156,7 @@
       <p>Its live preview shows exactly what clicking the button will add to the <strong>Rows</strong> table below. Rows accumulate rather than replacing what's there &mdash; to mix another product into the same export, change the Product/Hardware Specific details above and click <strong>Add Assets of Another Product</strong> again before downloading. Each export can hold up to 10 different products; you can fine-tune any field per row afterwards.</p>
 
       <h3>7. Download CSV</h3>
-      <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import.</p>
+      <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import. If any rows are missing required fields, a red count stays next to the row total in <strong>Rows</strong> until they're fixed &mdash; not just a one-time warning when you click Download.</p>
 
       <h3>Editing an existing export</h3>
       <p><strong>Import Populated CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
@@ -248,6 +252,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.9.0"></script>
+  <script type="module" src="js/app.js?v=0.9.1"></script>
 </body>
 </html>

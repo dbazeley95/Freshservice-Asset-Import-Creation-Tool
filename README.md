@@ -56,6 +56,12 @@ becomes a fully working tab like the other five.
      spreadsheet — tab-separated works too), for when names were assigned
      before serials were recorded and don't match up device-for-device.
 
+   If a bare-serial line shows up in the same paste as `Name, Serial`
+   lines, it's almost always a forgotten comma rather than an intentional
+   bare serial — that line gets a warning icon (⚠) on its Name field, in
+   both the preview and the Rows table, until you either fix it or
+   knowingly edit the Name yourself (which clears the warning).
+
    **Import CSV** (button above the textarea) loads a `.csv` file the same
    way — a Name column and a Serial column (a header row like "Name,
    Serial" is detected and skipped automatically; a Serial-only file works
@@ -81,11 +87,19 @@ becomes a fully working tab like the other five.
    Every row is still individually editable in the table by hand
    afterwards.
 7. Click **Download CSV** to save a file with headers matching the
-   Freshservice import template for that asset type.
+   Freshservice import template for that asset type. If any rows are
+   missing a required field, a red count stays next to the row total in
+   **Rows** until they're fixed — not just a one-time warning when you
+   click Download.
 
 Your defaults, bulk-add settings, and rows are saved per asset type in your
 browser's local storage automatically, so switching tabs or reloading the
 page won't lose anything. Use **Clear All Rows** to start a fresh batch.
+
+On the **Rows** table, the Name column and the Delete button stay pinned to
+the left/right edges while you scroll horizontally through the rest of a
+row's fields — useful on narrower screens, where every row has more columns
+than fit on screen at once.
 
 ### Editing an existing export
 

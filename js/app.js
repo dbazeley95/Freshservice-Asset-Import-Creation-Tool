@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.9.0';
-import { buildCsv, downloadCsv } from './csv.js?v=0.9.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.9.0';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.9.0';
-import { iconSvg } from './icons.js?v=0.9.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.9.1';
+import { buildCsv, downloadCsv } from './csv.js?v=0.9.1';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.9.1';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.9.1';
+import { iconSvg } from './icons.js?v=0.9.1';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -20,6 +20,7 @@ const els = {
   bulkPreviewWrap: document.getElementById('bulk-preview-wrap'),
   tableWrap: document.getElementById('table-wrap'),
   rowCount: document.getElementById('row-count'),
+  invalidRowCount: document.getElementById('invalid-row-count'),
   downloadBtn: document.getElementById('download-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
   importEditBtn: document.getElementById('import-edit-btn'),
@@ -476,6 +477,10 @@ function refreshAssetTagHint(state) {
 // before serials were recorded don't have to match anything generated.
 // Tab is what you get pasting two columns straight from a spreadsheet;
 // comma works too for hand-typed lines.
+function lineHasNameSerialDelimiter(line) {
+  return line.includes('\t') || line.includes(',');
+}
+
 function splitNameSerial(line) {
   const delim = line.includes('\t') ? '\t' : line.includes(',') ? ',' : null;
   if (!delim) return { name: '', serial: line.trim() };
@@ -573,13 +578,17 @@ function parseCsvForEditing(assetType, text) {
 // the live preview and the actual "Add Assets of Another Product" commit
 // so the two can never drift apart.
 function buildRowsFromText(assetType, state, text) {
-  const entries = text
+  const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter(Boolean)
-    .map(splitNameSerial);
+    .filter(Boolean);
+  // A bare line (no comma/tab) sitting alongside other Name,Serial lines is
+  // usually a forgotten comma, not an intentional bare serial — flag it so
+  // it's caught in review instead of silently becoming Name = Asset Tag.
+  const anyLineHasDelimiter = lines.some(lineHasNameSerialDelimiter);
   const shortCode = shortCodeForCompany(state.defaults.company);
-  return entries.map(({ name: manualName, serial }) => {
+  return lines.map((line) => {
+    const { name: manualName, serial } = splitNameSerial(line);
     const row = {};
     for (const col of defaultColumns(assetType)) {
       row[col.key] = state.defaults[col.key] ?? '';
@@ -587,6 +596,7 @@ function buildRowsFromText(assetType, state, text) {
     row.serialNumber = serial;
     row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
     row.name = manualName || row.assetTag;
+    row._ambiguousName = anyLineHasDelimiter && !lineHasNameSerialDelimiter(line);
     return row;
   });
 }
@@ -642,6 +652,17 @@ function renderBulkPreview(assetType, state, text) {
         td.className = 'preview-missing';
       } else {
         td.textContent = value ?? '';
+      }
+      if (col.key === 'name' && row._ambiguousName) {
+        td.classList.add('preview-ambiguous');
+        td.title =
+          "This line had no comma/tab, so Name defaults to the Asset Tag — but other lines in this paste do have one. " +
+          'If this device has a name, add it before the serial (e.g. "Name, Serial").';
+        const warnIcon = document.createElement('span');
+        warnIcon.className = 'tab-icon ambiguous-icon';
+        warnIcon.setAttribute('aria-hidden', 'true');
+        warnIcon.innerHTML = iconSvg('warning');
+        td.appendChild(warnIcon);
       }
       tr.appendChild(td);
     }
@@ -728,9 +749,26 @@ function isRowInvalid(assetType, row, col) {
   return !String(row[col.key] ?? '').trim();
 }
 
+function countRowsMissingFields(assetType, rows) {
+  return rows.reduce((count, row) => {
+    const rowMissing = assetType.columns.some((c) => isRowInvalid(assetType, row, c));
+    return count + (rowMissing ? 1 : 0);
+  }, 0);
+}
+
 function renderTable(assetType, state) {
   els.tableWrap.innerHTML = '';
   els.rowCount.textContent = `${state.rows.length} row${state.rows.length === 1 ? '' : 's'}`;
+
+  // Stays visible after the download-time confirm dialog is dismissed —
+  // the red border on an individual invalid field is easy to lose track
+  // of once you've scrolled (especially on mobile), so this is the
+  // persistent trail back to "which rows still need attention."
+  if (els.invalidRowCount) {
+    const missing = countRowsMissingFields(assetType, state.rows);
+    els.invalidRowCount.hidden = missing === 0;
+    els.invalidRowCount.textContent = missing > 0 ? `${missing} row${missing === 1 ? '' : 's'} missing required fields` : '';
+  }
 
   if (state.rows.length === 0) {
     const empty = document.createElement('p');
@@ -784,9 +822,29 @@ function renderTable(assetType, state) {
       input.dataset.key = col.key;
       if (isRowInvalid(assetType, row, col)) input.classList.add('invalid');
 
+      let ambiguousIcon = null;
+      let nameWrap = null;
+      if (col.key === 'name' && row._ambiguousName) {
+        input.classList.add('ambiguous');
+        input.title =
+          'This row came from a bare-serial line pasted alongside Name,Serial lines — double-check the Name is right.';
+        ambiguousIcon = document.createElement('span');
+        ambiguousIcon.className = 'tab-icon ambiguous-icon';
+        ambiguousIcon.setAttribute('aria-hidden', 'true');
+        ambiguousIcon.innerHTML = iconSvg('warning');
+        nameWrap = document.createElement('div');
+        nameWrap.className = 'name-cell';
+      }
+
       input.addEventListener('input', () => {
         row[col.key] = input.value;
         input.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+        if (col.key === 'name' && row._ambiguousName) {
+          row._ambiguousName = false;
+          input.classList.remove('ambiguous');
+          input.title = '';
+          if (ambiguousIcon) ambiguousIcon.remove();
+        }
         debouncedPersist(activeTypeId, state);
       });
       input.addEventListener('change', () => {
@@ -795,7 +853,13 @@ function renderTable(assetType, state) {
         }
       });
 
-      td.appendChild(input);
+      if (nameWrap) {
+        nameWrap.appendChild(input);
+        nameWrap.appendChild(ambiguousIcon);
+        td.appendChild(nameWrap);
+      } else {
+        td.appendChild(input);
+      }
       tr.appendChild(td);
     }
 
@@ -803,7 +867,9 @@ function renderTable(assetType, state) {
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'icon-btn danger';
-    delBtn.textContent = 'Delete';
+    delBtn.title = `Delete row (${row.name || row.assetTag || 'unnamed'})`;
+    delBtn.setAttribute('aria-label', delBtn.title);
+    delBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('close')}</span>`;
     delBtn.addEventListener('click', () => {
       state.rows = state.rows.filter((r) => r.id !== row.id);
       persist(activeTypeId, state);
@@ -893,10 +959,7 @@ function wireToolbar(assetType, state) {
       alert('Add at least one row before downloading.');
       return;
     }
-    const missing = state.rows.reduce((count, row) => {
-      const rowMissing = assetType.columns.some((c) => isRowInvalid(assetType, row, c));
-      return count + (rowMissing ? 1 : 0);
-    }, 0);
+    const missing = countRowsMissingFields(assetType, state.rows);
     if (missing > 0) {
       const ok = confirm(
         `${missing} row(s) are missing required fields (highlighted in red). Download anyway?`
