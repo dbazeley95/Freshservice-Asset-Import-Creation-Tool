@@ -111,12 +111,19 @@ export const ASSET_TYPES = [
   // Presets already exist in js/catalog.js (MODEL_PRESETS[id]) so nothing
   // from a product export is lost — add the columns here once a real
   // template is available and they'll work like any other asset type.
+  //
+  // These ids/labels mirror the exact "Asset Type" values from a
+  // Freshservice product export, so each one lines up with a real
+  // Freshservice asset type rather than a guessed grouping.
   { id: 'printer_copier', label: 'Printers & Copiers', comingSoon: true, columns: [] },
   { id: 'phone_telephony', label: 'Phones & Telephony', comingSoon: true, columns: [] },
-  { id: 'network_equipment', label: 'Network Equipment', comingSoon: true, columns: [] },
+  { id: 'wifi_access_point', label: 'Wi-Fi Access Points', comingSoon: true, columns: [] },
+  { id: 'network_switch', label: 'Network Switches', comingSoon: true, columns: [] },
   { id: 'server', label: 'Servers', comingSoon: true, columns: [] },
-  { id: 'av_equipment', label: 'AV & Projectors', comingSoon: true, columns: [] },
-  { id: 'other_uncategorised', label: 'Other', comingSoon: true, columns: [] },
+  { id: 'windows_server', label: 'Windows Servers', comingSoon: true, columns: [] },
+  { id: 'docking_station', label: 'Docking Stations', comingSoon: true, columns: [] },
+  { id: 'computer_generic', label: 'Computer (Unspecified)', comingSoon: true, columns: [] },
+  { id: 'hardware_other', label: 'Hardware (Uncategorised)', comingSoon: true, columns: [] },
 ];
 
 export const ASSET_STATE_SUGGESTIONS = [

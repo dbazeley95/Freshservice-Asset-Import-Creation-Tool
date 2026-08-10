@@ -57,18 +57,29 @@ export const LOCATION_PRESETS = COMPANY_PRESETS.map((c) => ({
 // per your stated policy) baked into `fields.warranty` below.
 //
 // monitor/touchscreen/laptop_pc/desktop_pc/tablet feed the fully working
-// asset templates. printer_copier/phone_telephony/network_equipment/
-// server/av_equipment/other_uncategorised have no Freshservice import
-// template wired up yet (see ASSET_TYPES in js/templates.js, where they're
-// marked comingSoon) — their presets are captured here now so nothing from
-// a product export gets lost, ready to use the moment a template exists.
+// asset templates. Every other key here (printer_copier, phone_telephony,
+// wifi_access_point, network_switch, server, windows_server,
+// docking_station, computer_generic, hardware_other) has no Freshservice
+// import template wired up yet (see ASSET_TYPES in js/templates.js, where
+// they're marked comingSoon) — their presets are captured here now so
+// nothing from a product export gets lost, ready to use the moment a
+// template exists for that type.
 //
-// This whole catalog was bulk-generated from a Freshservice product
-// export (326 products). Warranty defaults follow your stated rule; a
-// handful of monitor/touchscreen/laptop/tablet models also carry Cost/
-// Memory/Storage/OS values pulled from your own historical import data.
-// Everything else only sets Product + Warranty — fill in the rest per
-// row as you use it.
+// This whole catalog was rebuilt from an actual Freshservice product
+// export that includes each product's real Asset Type — every entry below
+// is bucketed by that authoritative field, not guessed from the product
+// name. Warranty defaults follow your stated rule; a handful of monitor/
+// touchscreen/laptop/tablet models also carry Cost/Memory/Storage/OS
+// values pulled from your own historical import data. Everything else
+// only sets Product + Warranty — fill in the rest per row as you use it.
+//
+// Note: the export itself has a few internal inconsistencies (e.g. one
+// "ProLiant DL380p Gen8" is typed Desktop while "ProLiant DL380 Gen10" is
+// typed Server; "Pro Dock WD25" is Docking Station but "Pro Dock" is
+// Hardware; "Telephone"/"KX-DT521" are Hardware, not Phone). Each entry
+// here matches its product's Asset Type exactly as exported, even where
+// that looks inconsistent — fix the source data in Freshservice if that's
+// wrong, then regenerate.
 export const MODEL_PRESETS = {
   monitor: [
     {
@@ -76,6 +87,24 @@ export const MODEL_PRESETS = {
       label: "22M37A",
       manufacturer: "LG",
       fields: { product: "22M37A", warranty: 12 },
+    },
+    {
+      id: "2310i",
+      label: "2310i",
+      manufacturer: "HP",
+      fields: { product: "2310i", warranty: 12 },
+    },
+    {
+      id: "ad80hw",
+      label: "AD80HW",
+      manufacturer: "Huawei",
+      fields: { product: "AD80HW", warranty: 12 },
+    },
+    {
+      id: "dell-pro-22",
+      label: "Dell Pro 22",
+      manufacturer: "Dell",
+      fields: { product: "Dell Pro 22", warranty: 48 },
     },
     {
       id: "e1912hc",
@@ -155,15 +184,22 @@ export const MODEL_PRESETS = {
       fields: { product: "HP S2031a", warranty: 12 },
     },
     {
+      id: "lg-tv",
+      label: "LG TV",
+      manufacturer: "LG",
+      fields: { product: "LG TV", warranty: 12 },
+    },
+    {
       id: "ls24d330hsx-en",
       label: "LS24D330HSX/EN",
       manufacturer: "Samsung",
       fields: { product: "LS24D330HSX/EN", warranty: 12 },
     },
     {
-      id: "monitor",
-      label: "Monitor",
-      fields: { product: "Monitor", warranty: 12 },
+      id: "np-um361xg",
+      label: "NP-UM361XG",
+      manufacturer: "NEC",
+      fields: { product: "NP-UM361XG", warranty: 12 },
     },
     {
       id: "p2179h",
@@ -230,6 +266,12 @@ export const MODEL_PRESETS = {
       label: "S2425HS",
       manufacturer: "Dell",
       fields: { product: "S2425HS", warranty: 48 },
+    },
+    {
+      id: "samsung",
+      label: "Samsung",
+      manufacturer: "Samsung",
+      fields: { product: "Samsung", warranty: 12 },
     },
     {
       id: "se2216h",
@@ -423,6 +465,11 @@ export const MODEL_PRESETS = {
       manufacturer: "SMART Technologies",
       fields: { product: "SMARTBoard 6065-V2", warranty: 12 },
     },
+    {
+      id: "t-series",
+      label: "T-Series",
+      fields: { product: "T-Series", warranty: 12 },
+    },
   ],
   laptop_pc: [
     {
@@ -438,22 +485,10 @@ export const MODEL_PRESETS = {
       fields: { product: "14e Chromebook Gen 2", warranty: 12 },
     },
     {
-      id: "20bus01r08",
-      label: "20BUS01R08",
+      id: "2356bq5",
+      label: "2356BQ5",
       manufacturer: "Lenovo",
-      fields: { product: "20BUS01R08", warranty: 12 },
-    },
-    {
-      id: "20bus61r00",
-      label: "20BUS61R00",
-      manufacturer: "Lenovo",
-      fields: { product: "20BUS61R00", warranty: 12 },
-    },
-    {
-      id: "21ab000nuk",
-      label: "21AB000NUK",
-      manufacturer: "Lenovo",
-      fields: { product: "21AB000NUK", warranty: 12 },
+      fields: { product: "2356BQ5", warranty: 12 },
     },
     {
       id: "240-g7",
@@ -474,18 +509,6 @@ export const MODEL_PRESETS = {
       fields: { product: "250 G10", warranty: 12 },
     },
     {
-      id: "250-g4",
-      label: "250 G4",
-      manufacturer: "HP",
-      fields: { product: "250 G4", warranty: 12 },
-    },
-    {
-      id: "250-g5",
-      label: "250 G5",
-      manufacturer: "HP",
-      fields: { product: "250 G5", warranty: 12 },
-    },
-    {
       id: "250-g6",
       label: "250 G6",
       manufacturer: "HP",
@@ -502,12 +525,6 @@ export const MODEL_PRESETS = {
       label: "250 G8",
       manufacturer: "HP",
       fields: { product: "250 G8", warranty: 12 },
-    },
-    {
-      id: "250-g9",
-      label: "250 G9",
-      manufacturer: "HP",
-      fields: { product: "250 G9", warranty: 12 },
     },
     {
       id: "255-g5-notebook-pc",
@@ -630,6 +647,12 @@ export const MODEL_PRESETS = {
       fields: { product: "Chromebook C204", warranty: 12 },
     },
     {
+      id: "chromebox",
+      label: "Chromebox",
+      manufacturer: "Acer",
+      fields: { product: "Chromebox", warranty: 12 },
+    },
+    {
       id: "dell-pro-14-pc14250",
       label: "Dell Pro 14 PC14250",
       manufacturer: "Dell",
@@ -676,12 +699,6 @@ export const MODEL_PRESETS = {
       label: "HP 240",
       manufacturer: "HP",
       fields: { product: "HP 240", warranty: 12 },
-    },
-    {
-      id: "hp-240-g7",
-      label: "HP 240 G7",
-      manufacturer: "HP",
-      fields: { product: "HP 240 G7", warranty: 12 },
     },
     {
       id: "hp-250",
@@ -846,12 +863,6 @@ export const MODEL_PRESETS = {
       fields: { product: "Latitude 5440", warranty: 48 },
     },
     {
-      id: "latitude-5550",
-      label: "Latitude 5550",
-      manufacturer: "Dell",
-      fields: { product: "Latitude 5550", warranty: 48 },
-    },
-    {
       id: "latitude-e6420",
       label: "Latitude E6420",
       manufacturer: "Dell",
@@ -874,6 +885,24 @@ export const MODEL_PRESETS = {
       label: "MacBook Pro (13-inch Mid 2012)",
       manufacturer: "Apple",
       fields: { product: "MacBook Pro (13-inch Mid 2012)", warranty: 12 },
+    },
+    {
+      id: "nblk-wax9x",
+      label: "NBLK-WAX9X",
+      manufacturer: "Honor",
+      fields: { product: "NBLK-WAX9X", warranty: 12 },
+    },
+    {
+      id: "opitplex-3000",
+      label: "OpitPlex 3000",
+      manufacturer: "Dell",
+      fields: { product: "OpitPlex 3000", warranty: 48 },
+    },
+    {
+      id: "optiplex-7010",
+      label: "OptiPlex 7010",
+      manufacturer: "Dell",
+      fields: { product: "OptiPlex 7010", warranty: 48 },
     },
     {
       id: "portege-x40-j",
@@ -1020,12 +1049,6 @@ export const MODEL_PRESETS = {
       fields: { product: "TMP255", warranty: 12 },
     },
     {
-      id: "tmp255-m",
-      label: "TMP255-M",
-      manufacturer: "Acer",
-      fields: { product: "TMP255-M", warranty: 12 },
-    },
-    {
       id: "travelmate-p214-52",
       label: "TravelMate P214-52",
       manufacturer: "Acer",
@@ -1118,10 +1141,22 @@ export const MODEL_PRESETS = {
       fields: { product: "10YS000GUK", warranty: 12 },
     },
     {
-      id: "chromebox",
-      label: "Chromebox",
-      manufacturer: "Acer",
-      fields: { product: "Chromebox", warranty: 12 },
+      id: "11sws0av00",
+      label: "11SWS0AV00",
+      manufacturer: "Lenovo",
+      fields: { product: "11SWS0AV00", warranty: 12 },
+    },
+    {
+      id: "250-g4",
+      label: "250 G4",
+      manufacturer: "HP",
+      fields: { product: "250 G4", warranty: 12 },
+    },
+    {
+      id: "cms-9876",
+      label: "CMS-9876",
+      manufacturer: "CMS",
+      fields: { product: "CMS-9876", warranty: 12 },
     },
     {
       id: "compaq-8000",
@@ -1140,12 +1175,6 @@ export const MODEL_PRESETS = {
       label: "Compaq Elite 8300",
       manufacturer: "HP",
       fields: { product: "Compaq Elite 8300", warranty: 12 },
-    },
-    {
-      id: "dell-pro-22",
-      label: "Dell Pro 22",
-      manufacturer: "Dell",
-      fields: { product: "Dell Pro 22", warranty: 48 },
     },
     {
       id: "eduminipc",
@@ -1206,6 +1235,12 @@ export const MODEL_PRESETS = {
       fields: { product: "H81M-DS2V", warranty: 12 },
     },
     {
+      id: "hp-240-g7",
+      label: "HP 240 G7",
+      manufacturer: "HP",
+      fields: { product: "HP 240 G7", warranty: 12 },
+    },
+    {
       id: "hp-290-g1",
       label: "HP 290 G1",
       manufacturer: "HP",
@@ -1248,10 +1283,14 @@ export const MODEL_PRESETS = {
       fields: { product: "Mac Mini M4", warranty: 12 },
     },
     {
-      id: "opitplex-3000",
-      label: "OpitPlex 3000",
-      manufacturer: "Dell",
-      fields: { product: "OpitPlex 3000", warranty: 48 },
+      id: "n-a",
+      label: "N/A",
+      fields: { product: "N/A", warranty: 12 },
+    },
+    {
+      id: "ns-optimum",
+      label: "NS Optimum",
+      fields: { product: "NS Optimum", warranty: 12 },
     },
     {
       id: "optiplex-3000",
@@ -1330,12 +1369,6 @@ export const MODEL_PRESETS = {
       label: "Optiplex 7000 SFF",
       manufacturer: "Dell",
       fields: { product: "Optiplex 7000 SFF", warranty: 48 },
-    },
-    {
-      id: "optiplex-7010",
-      label: "OptiPlex 7010",
-      manufacturer: "Dell",
-      fields: { product: "OptiPlex 7010", warranty: 48 },
     },
     {
       id: "optiplex-7020",
@@ -1422,6 +1455,12 @@ export const MODEL_PRESETS = {
       fields: { product: "ProDesk 400 G3 SFF", warranty: 12 },
     },
     {
+      id: "proliant-dl380p-gen8",
+      label: "ProLiant DL380p Gen8",
+      manufacturer: "HP",
+      fields: { product: "ProLiant DL380p Gen8", warranty: 12 },
+    },
+    {
       id: "proone-400-g3",
       label: "ProOne 400 G3",
       manufacturer: "HP",
@@ -1450,6 +1489,17 @@ export const MODEL_PRESETS = {
       label: "SFF PC",
       manufacturer: "NS Optimum",
       fields: { product: "SFF PC", warranty: 12 },
+    },
+    {
+      id: "tmp255-m",
+      label: "TMP255-M",
+      manufacturer: "Acer",
+      fields: { product: "TMP255-M", warranty: 12 },
+    },
+    {
+      id: "unbranded",
+      label: "Unbranded",
+      fields: { product: "Unbranded", warranty: 12 },
     },
     {
       id: "veriton-l4620g",
@@ -1510,6 +1560,11 @@ export const MODEL_PRESETS = {
       label: "ZooStorm SFF",
       manufacturer: "Zoostorm",
       fields: { product: "ZooStorm SFF", warranty: 12 },
+    },
+    {
+      id: "zoosuite",
+      label: "Zoosuite",
+      fields: { product: "Zoosuite", warranty: 12 },
     },
   ],
   tablet: [
@@ -1636,6 +1691,12 @@ export const MODEL_PRESETS = {
   ],
   printer_copier: [
     {
+      id: "dna",
+      label: "DNA",
+      manufacturer: "Javelin",
+      fields: { product: "DNA", warranty: 12 },
+    },
+    {
       id: "e-studio2010ac",
       label: "e-STUDIO2010AC",
       manufacturer: "Toshiba",
@@ -1732,6 +1793,17 @@ export const MODEL_PRESETS = {
       fields: { product: "FS-2100DN", warranty: 12 },
     },
     {
+      id: "generic-text-only",
+      label: "Generic / Text Only",
+      fields: { product: "Generic / Text Only", warranty: 12 },
+    },
+    {
+      id: "jack",
+      label: "JACK",
+      manufacturer: "Javelin",
+      fields: { product: "JACK", warranty: 12 },
+    },
+    {
       id: "labelwriter-450",
       label: "LabelWriter 450",
       manufacturer: "Dymo",
@@ -1756,22 +1828,6 @@ export const MODEL_PRESETS = {
       fields: { product: "MP C3503", warranty: 12 },
     },
     {
-      id: "studio305cs",
-      label: "Studio305CS",
-      fields: { product: "Studio305CS", warranty: 12 },
-    },
-    {
-      id: "studio338cs",
-      label: "Studio338CS",
-      fields: { product: "Studio338CS", warranty: 12 },
-    },
-    {
-      id: "studio7516ac",
-      label: "Studio7516AC",
-      manufacturer: "Toshiba",
-      fields: { product: "Studio7516AC", warranty: 12 },
-    },
-    {
       id: "xerox-b205",
       label: "Xerox B205",
       manufacturer: "Xerox",
@@ -1786,42 +1842,13 @@ export const MODEL_PRESETS = {
   ],
   phone_telephony: [
     {
-      id: "dna",
-      label: "DNA",
-      manufacturer: "Javelin",
-      fields: { product: "DNA", warranty: 12 },
-    },
-    {
-      id: "jack",
-      label: "JACK",
-      manufacturer: "Javelin",
-      fields: { product: "JACK", warranty: 12 },
-    },
-    {
-      id: "kx-dt521",
-      label: "KX-DT521",
-      manufacturer: "Panasonic",
-      fields: { product: "KX-DT521", warranty: 12 },
-    },
-    {
       id: "splicecom-pcs-542",
       label: "Splicecom PCS 542",
       manufacturer: "Splicecom",
       fields: { product: "Splicecom PCS 542", warranty: 12 },
     },
-    {
-      id: "telephone",
-      label: "Telephone",
-      fields: { product: "Telephone", warranty: 12 },
-    },
   ],
-  network_equipment: [
-    {
-      id: "2530-48g",
-      label: "2530-48G",
-      manufacturer: "Aruba",
-      fields: { product: "2530-48G", warranty: 12 },
-    },
+  wifi_access_point: [
     {
       id: "r350",
       label: "R350",
@@ -1877,6 +1904,14 @@ export const MODEL_PRESETS = {
       fields: { product: "XV2-2", warranty: 12 },
     },
   ],
+  network_switch: [
+    {
+      id: "2530-48g",
+      label: "2530-48G",
+      manufacturer: "Aruba",
+      fields: { product: "2530-48G", warranty: 12 },
+    },
+  ],
   server: [
     {
       id: "proliant-dl380-gen10",
@@ -1885,11 +1920,12 @@ export const MODEL_PRESETS = {
       fields: { product: "ProLiant DL380 Gen10", warranty: 12 },
     },
     {
-      id: "proliant-dl380p-gen8",
-      label: "ProLiant DL380p Gen8",
-      manufacturer: "HP",
-      fields: { product: "ProLiant DL380p Gen8", warranty: 12 },
+      id: "virtual-machine",
+      label: "Virtual Machine",
+      fields: { product: "Virtual Machine", warranty: 12 },
     },
+  ],
+  windows_server: [
     {
       id: "proliant-ml350-gen10",
       label: "ProLiant ML350 Gen10",
@@ -1897,61 +1933,53 @@ export const MODEL_PRESETS = {
       fields: { product: "ProLiant ML350 Gen10", warranty: 12 },
     },
   ],
-  av_equipment: [
+  docking_station: [
     {
-      id: "lg-tv",
-      label: "LG TV",
-      manufacturer: "LG",
-      fields: { product: "LG TV", warranty: 12 },
-    },
-    {
-      id: "np-um361xg",
-      label: "NP-UM361XG",
-      manufacturer: "NEC",
-      fields: { product: "NP-UM361XG", warranty: 12 },
-    },
-    {
-      id: "power-amplifier",
-      label: "Power Amplifier",
-      fields: { product: "Power Amplifier", warranty: 12 },
-    },
-    {
-      id: "projector",
-      label: "Projector",
-      fields: { product: "Projector", warranty: 12 },
-    },
-    {
-      id: "vpl-ex175",
-      label: "VPL-EX175",
-      manufacturer: "Sony",
-      fields: { product: "VPL-EX175", warranty: 12 },
+      id: "pro-dock-wd25",
+      label: "Pro Dock WD25",
+      manufacturer: "Dell",
+      fields: { product: "Pro Dock WD25", warranty: 48 },
     },
   ],
-  other_uncategorised: [
+  computer_generic: [
     {
-      id: "11sws0av00",
-      label: "11SWS0AV00",
+      id: "20bus01r08",
+      label: "20BUS01R08",
       manufacturer: "Lenovo",
-      fields: { product: "11SWS0AV00", warranty: 12 },
+      fields: { product: "20BUS01R08", warranty: 12 },
     },
     {
-      id: "2310i",
-      label: "2310i",
+      id: "20bus61r00",
+      label: "20BUS61R00",
+      manufacturer: "Lenovo",
+      fields: { product: "20BUS61R00", warranty: 12 },
+    },
+    {
+      id: "21ab000nuk",
+      label: "21AB000NUK",
+      manufacturer: "Lenovo",
+      fields: { product: "21AB000NUK", warranty: 12 },
+    },
+    {
+      id: "250-g5",
+      label: "250 G5",
       manufacturer: "HP",
-      fields: { product: "2310i", warranty: 12 },
+      fields: { product: "250 G5", warranty: 12 },
     },
     {
-      id: "2356bq5",
-      label: "2356BQ5",
-      manufacturer: "Lenovo",
-      fields: { product: "2356BQ5", warranty: 12 },
+      id: "250-g9",
+      label: "250 G9",
+      manufacturer: "HP",
+      fields: { product: "250 G9", warranty: 12 },
     },
     {
-      id: "ad80hw",
-      label: "AD80HW",
-      manufacturer: "Huawei",
-      fields: { product: "AD80HW", warranty: 12 },
+      id: "latitude-5550",
+      label: "Latitude 5550",
+      manufacturer: "Dell",
+      fields: { product: "Latitude 5550", warranty: 48 },
     },
+  ],
+  hardware_other: [
     {
       id: "av1",
       label: "AV1",
@@ -1959,31 +1987,20 @@ export const MODEL_PRESETS = {
       fields: { product: "AV1", warranty: 12 },
     },
     {
-      id: "cms-9876",
-      label: "CMS-9876",
-      manufacturer: "CMS",
-      fields: { product: "CMS-9876", warranty: 12 },
+      id: "kx-dt521",
+      label: "KX-DT521",
+      manufacturer: "Panasonic",
+      fields: { product: "KX-DT521", warranty: 12 },
     },
     {
-      id: "generic-text-only",
-      label: "Generic / Text Only",
-      fields: { product: "Generic / Text Only", warranty: 12 },
+      id: "monitor",
+      label: "Monitor",
+      fields: { product: "Monitor", warranty: 12 },
     },
     {
-      id: "n-a",
-      label: "N/A",
-      fields: { product: "N/A", warranty: 12 },
-    },
-    {
-      id: "nblk-wax9x",
-      label: "NBLK-WAX9X",
-      manufacturer: "Honor",
-      fields: { product: "NBLK-WAX9X", warranty: 12 },
-    },
-    {
-      id: "ns-optimum",
-      label: "NS Optimum",
-      fields: { product: "NS Optimum", warranty: 12 },
+      id: "power-amplifier",
+      label: "Power Amplifier",
+      fields: { product: "Power Amplifier", warranty: 12 },
     },
     {
       id: "pro-dock",
@@ -1992,21 +2009,30 @@ export const MODEL_PRESETS = {
       fields: { product: "Pro Dock", warranty: 48 },
     },
     {
-      id: "pro-dock-wd25",
-      label: "Pro Dock WD25",
-      manufacturer: "Dell",
-      fields: { product: "Pro Dock WD25", warranty: 48 },
+      id: "projector",
+      label: "Projector",
+      fields: { product: "Projector", warranty: 12 },
     },
     {
-      id: "samsung",
-      label: "Samsung",
-      manufacturer: "Samsung",
-      fields: { product: "Samsung", warranty: 12 },
+      id: "studio305cs",
+      label: "Studio305CS",
+      fields: { product: "Studio305CS", warranty: 12 },
     },
     {
-      id: "t-series",
-      label: "T-Series",
-      fields: { product: "T-Series", warranty: 12 },
+      id: "studio338cs",
+      label: "Studio338CS",
+      fields: { product: "Studio338CS", warranty: 12 },
+    },
+    {
+      id: "studio7516ac",
+      label: "Studio7516AC",
+      manufacturer: "Toshiba",
+      fields: { product: "Studio7516AC", warranty: 12 },
+    },
+    {
+      id: "telephone",
+      label: "Telephone",
+      fields: { product: "Telephone", warranty: 12 },
     },
     {
       id: "tou200030",
@@ -2014,19 +2040,10 @@ export const MODEL_PRESETS = {
       fields: { product: "TOU200030", warranty: 12 },
     },
     {
-      id: "unbranded",
-      label: "Unbranded",
-      fields: { product: "Unbranded", warranty: 12 },
-    },
-    {
-      id: "virtual-machine",
-      label: "Virtual Machine",
-      fields: { product: "Virtual Machine", warranty: 12 },
-    },
-    {
-      id: "zoosuite",
-      label: "Zoosuite",
-      fields: { product: "Zoosuite", warranty: 12 },
+      id: "vpl-ex175",
+      label: "VPL-EX175",
+      manufacturer: "Sony",
+      fields: { product: "VPL-EX175", warranty: 12 },
     },
   ],
 };

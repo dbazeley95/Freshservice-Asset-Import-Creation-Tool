@@ -15,13 +15,15 @@ exactly):
 - Tablet
 
 There are also tabs for **Printers & Copiers**, **Phones & Telephony**,
-**Network Equipment**, **Servers**, **AV & Projectors**, and **Other** —
-these are marked "(Coming soon)" because there's no Freshservice import
-template for them yet, so the tab just shows a message. Their product
-catalogs already exist in `js/catalog.js` (`MODEL_PRESETS`), pulled from a
-full product export, so nothing is lost — add columns for one of them in
-`js/templates.js` whenever a real template is available and it becomes a
-fully working tab like the other five.
+**Wi-Fi Access Points**, **Network Switches**, **Servers**, **Windows
+Servers**, **Docking Stations**, **Computer (Unspecified)**, and **Hardware
+(Uncategorised)** — these are marked "(Coming soon)" because there's no
+Freshservice import template for them yet, so the tab just shows a message.
+They mirror the exact Asset Type values from a Freshservice product export
+(not a guessed grouping), and their product catalogs already exist in
+`js/catalog.js` (`MODEL_PRESETS`), so nothing is lost — add columns for one
+of them in `js/templates.js` whenever a real template is available and it
+becomes a fully working tab like the other five.
 
 ## Using it
 
