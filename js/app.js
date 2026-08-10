@@ -625,4 +625,13 @@ document.getElementById('dl-asset-state-holder').appendChild(
   buildDatalist('dl-asset-state', ASSET_STATE_SUGGESTIONS)
 );
 
+const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
+const feedbackLink = document.getElementById('feedback-link');
+if (feedbackLink) {
+  const version = document.querySelector('.version-badge')?.textContent?.trim() || '';
+  const subject = encodeURIComponent('Bug Found/Feature Request');
+  const body = encodeURIComponent(`Version: ${version}\n\nDescribe the bug or feature request:\n`);
+  feedbackLink.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+}
+
 renderAll();

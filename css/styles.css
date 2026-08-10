@@ -418,6 +418,23 @@ tbody td input {
   font-size: 0.8rem;
 }
 
+.feedback-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.feedback-link:hover {
+  filter: brightness(1.05);
+}
+
 @media (max-width: 640px) {
   .table-toolbar {
     flex-direction: column;
