@@ -1,7 +1,8 @@
 import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, rowColumns } from './templates.js';
 import { buildCsv, downloadCsv, applyNamePattern } from './csv.js';
 import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
-import { COMPANY_PRESETS, LOCATION_PRESETS, MODEL_PRESETS } from './catalog.js';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js';
+import { iconSvg } from './icons.js';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -19,6 +20,7 @@ const els = {
   comingSoonPanel: document.getElementById('coming-soon-panel'),
   comingSoonMessage: document.getElementById('coming-soon-message'),
   navToggle: document.getElementById('nav-toggle'),
+  navBackdrop: document.getElementById('nav-backdrop'),
 };
 
 // Remembers the chosen Manufacturer filter per asset type for this page
@@ -26,7 +28,7 @@ const els = {
 // Model Preset list.
 const modelFilterState = {};
 
-let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || ASSET_TYPES[0].id;
+let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || 'desktop_pc';
 let idCounter = 0;
 const newRowId = () => `r${Date.now()}_${idCounter++}`;
 
@@ -70,11 +72,12 @@ function renderTabs() {
     btn.type = 'button';
     btn.className = 'tab' + (type.id === activeTypeId ? ' active' : '') + (type.comingSoon ? ' tab-coming-soon' : '');
 
-    if (type.icon) {
+    const svg = iconSvg(type.id);
+    if (svg) {
       const icon = document.createElement('span');
       icon.className = 'tab-icon';
       icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = type.icon;
+      icon.innerHTML = svg;
       btn.appendChild(icon);
     }
     const text = document.createElement('span');
@@ -92,14 +95,36 @@ function renderTabs() {
   }
 }
 
+// On mobile the side nav is a genuine off-canvas drawer (slides in over a
+// backdrop), not an inline accordion — the .open class is what drives the
+// slide-in transform in CSS. On wide screens the sidebar is always visible
+// via a media query and these classes are simply irrelevant there.
+const navToggleIcon = document.getElementById('nav-toggle-icon');
+navToggleIcon.innerHTML = iconSvg('menu');
+
+function openMobileNav() {
+  els.tabs.classList.add('open');
+  els.navBackdrop.classList.add('open');
+  els.navToggle.setAttribute('aria-expanded', 'true');
+  navToggleIcon.innerHTML = iconSvg('close');
+  document.body.style.overflow = 'hidden';
+}
+
 function closeMobileNav() {
   els.tabs.classList.remove('open');
+  els.navBackdrop.classList.remove('open');
   els.navToggle.setAttribute('aria-expanded', 'false');
+  navToggleIcon.innerHTML = iconSvg('menu');
+  document.body.style.overflow = '';
 }
 
 els.navToggle.addEventListener('click', () => {
-  const isOpen = els.tabs.classList.toggle('open');
-  els.navToggle.setAttribute('aria-expanded', String(isOpen));
+  if (els.tabs.classList.contains('open')) closeMobileNav();
+  else openMobileNav();
+});
+els.navBackdrop.addEventListener('click', closeMobileNav);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMobileNav();
 });
 
 // ---------- Defaults panel ----------
@@ -133,19 +158,12 @@ function buildPresetField(labelText, id, options, onChange, formatOptionLabel = 
   return { wrap, select };
 }
 
-function applyCompanyPreset(assetType, state, presetId) {
-  const preset = COMPANY_PRESETS.find((p) => p.id === presetId);
+function applySitePreset(assetType, state, presetId) {
+  const preset = SITE_PRESETS.find((p) => p.id === presetId);
   if (!preset) return;
   state.defaults.company = preset.company;
-  addSuggestion('company', preset.company);
-  persist(activeTypeId, state);
-  renderDefaultsForm(assetType, state);
-}
-
-function applyLocationPreset(assetType, state, presetId) {
-  const preset = LOCATION_PRESETS.find((p) => p.id === presetId);
-  if (!preset) return;
   state.defaults.location = preset.location;
+  addSuggestion('company', preset.company);
   addSuggestion('location', preset.location);
   persist(activeTypeId, state);
   renderDefaultsForm(assetType, state);
@@ -240,21 +258,10 @@ function renderDefaultsForm(assetType, state) {
   const suggestions = loadSuggestions();
 
   els.defaultsForm.appendChild(
-    buildPresetField('Company Preset', 'def-preset-company', COMPANY_PRESETS, (val) =>
-      applyCompanyPreset(assetType, state, val)
+    buildPresetField('Company / Location Preset', 'def-preset-site', SITE_PRESETS, (val) =>
+      applySitePreset(assetType, state, val)
     ).wrap
   );
-
-  if (LOCATION_PRESETS.length > 0) {
-    els.defaultsForm.appendChild(
-      buildPresetField('Location Preset', 'def-preset-location', LOCATION_PRESETS, (val) =>
-        applyLocationPreset(assetType, state, val)
-      ).wrap
-    );
-  }
-
-  const manufacturerField = renderManufacturerFilterField(assetType, state);
-  if (manufacturerField) els.defaultsForm.appendChild(manufacturerField);
 
   const modelPresets = MODEL_PRESETS[assetType.id] || [];
 
@@ -300,6 +307,23 @@ function renderDefaultsForm(assetType, state) {
     });
 
     wrap.appendChild(input);
+
+    // Manufacturer sits directly above Product, stacked in the same grid
+    // cell — it exists purely to narrow Product's suggestions, so the two
+    // stay visually paired rather than Manufacturer living up with the
+    // other presets.
+    if (col.key === 'product') {
+      const manufacturerField = renderManufacturerFilterField(assetType, state);
+      if (manufacturerField) {
+        const group = document.createElement('div');
+        group.className = 'field-group';
+        group.appendChild(manufacturerField);
+        group.appendChild(wrap);
+        els.defaultsForm.appendChild(group);
+        continue;
+      }
+    }
+
     els.defaultsForm.appendChild(wrap);
   }
 }

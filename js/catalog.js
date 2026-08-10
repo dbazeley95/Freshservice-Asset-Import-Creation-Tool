@@ -6,44 +6,37 @@
 // every field stays freely editable afterwards, so a slightly-wrong preset
 // never blocks you.
 
-// One entry per Company. `company` maps straight onto the Company column.
-export const COMPANY_PRESETS = [
-  { id: 'cardinal-newman', label: 'Cardinal Newman', company: 'Cardinal Newman' },
-  { id: 'holy-family', label: 'Holy Family', company: 'Holy Family' },
-  { id: 'st-albans', label: 'St Albans', company: 'St Albans' },
-  { id: 'st-annes', label: 'St Annes', company: 'St Annes' },
-  { id: 'st-augustines', label: 'St Augustines', company: 'St Augustines' },
-  { id: 'st-charles-borromeo', label: 'St Charles Borromeo', company: 'St Charles Borromeo' },
-  { id: 'st-cuthbert-mayne', label: 'St Cuthbert Mayne', company: 'St Cuthbert Mayne' },
-  { id: 'st-cuthberts', label: 'St Cuthberts', company: 'St Cuthberts' },
-  { id: 'st-edmunds', label: 'St Edmunds', company: 'St Edmunds' },
-  { id: 'st-hugh-of-lincoln', label: 'St Hugh of Lincoln', company: 'St Hugh of Lincoln' },
-  { id: 'st-josephs-guildford', label: 'St Josephs (Guildford)', company: 'St Josephs (Guildford)' },
-  { id: 'st-polycarps', label: 'St Polycarps', company: 'St Polycarps' },
-  { id: 'st-thomas-of-canterbury', label: 'St Thomas of Canterbury', company: 'St Thomas of Canterbury' },
-  { id: 'the-marist', label: 'The Marist', company: 'The Marist' },
-  { id: 'sjb', label: 'SJB', company: 'SJB' },
-  { id: 'salesian-school', label: 'Salesian School', company: 'Salesian School' },
-  { id: 'xavier-cet', label: 'Xavier CET', company: 'Xavier CET' },
-  { id: 'sjb-safe', label: 'SJB - SAfE', company: 'SJB - SAfE' },
-  { id: 'sjb-mathshub', label: 'SJB - Mathshub', company: 'SJB - Mathshub' },
-  { id: 'st-francis', label: 'St Francis', company: 'St Francis' },
-  { id: 'st-clements', label: 'St Clements', company: 'St Clements' },
-  { id: 'st-josephs-redhill', label: 'St Josephs (Redhill)', company: 'St Josephs (Redhill)' },
-  { id: 'st-peters-leatherhead', label: 'St Peters (Leatherhead)', company: 'St Peters (Leatherhead)' },
-  { id: 'st-josephs-dorking', label: 'St Josephs (Dorking)', company: 'St Josephs (Dorking)' },
-];
-
-// One entry per site/building. `location` maps straight onto the Location
-// column. There's no easy way to export a real locations list from
-// Freshservice yet, so this temporarily mirrors COMPANY_PRESETS. Once a
-// real locations list is available, replace this with its own array (same
-// shape as COMPANY_PRESETS, using `location` instead of `company`).
-export const LOCATION_PRESETS = COMPANY_PRESETS.map((c) => ({
-  id: c.id,
-  label: c.label,
-  location: c.company,
-}));
+// One entry per site — Company and Location are set together since every
+// site in this org is its own Company *and* its own Location (matching the
+// original import templates, where those two columns were always
+// identical). If a site's Location ever needs to differ from its Company
+// name, add a `location` field to that entry to override it.
+export const SITE_PRESETS = [
+  { id: 'cardinal-newman', label: 'Cardinal Newman' },
+  { id: 'holy-family', label: 'Holy Family' },
+  { id: 'st-albans', label: 'St Albans' },
+  { id: 'st-annes', label: 'St Annes' },
+  { id: 'st-augustines', label: 'St Augustines' },
+  { id: 'st-charles-borromeo', label: 'St Charles Borromeo' },
+  { id: 'st-cuthbert-mayne', label: 'St Cuthbert Mayne' },
+  { id: 'st-cuthberts', label: 'St Cuthberts' },
+  { id: 'st-edmunds', label: 'St Edmunds' },
+  { id: 'st-hugh-of-lincoln', label: 'St Hugh of Lincoln' },
+  { id: 'st-josephs-guildford', label: 'St Josephs (Guildford)' },
+  { id: 'st-polycarps', label: 'St Polycarps' },
+  { id: 'st-thomas-of-canterbury', label: 'St Thomas of Canterbury' },
+  { id: 'the-marist', label: 'The Marist' },
+  { id: 'sjb', label: 'SJB' },
+  { id: 'salesian-school', label: 'Salesian School' },
+  { id: 'xavier-cet', label: 'Xavier CET' },
+  { id: 'sjb-safe', label: 'SJB - SAfE' },
+  { id: 'sjb-mathshub', label: 'SJB - Mathshub' },
+  { id: 'st-francis', label: 'St Francis' },
+  { id: 'st-clements', label: 'St Clements' },
+  { id: 'st-josephs-redhill', label: 'St Josephs (Redhill)' },
+  { id: 'st-peters-leatherhead', label: 'St Peters (Leatherhead)' },
+  { id: 'st-josephs-dorking', label: 'St Josephs (Dorking)' },
+].map((s) => ({ ...s, company: s.label, location: s.location || s.label }));
 
 // Keyed by asset type id (see js/templates.js). Each entry's `fields` only
 // needs to set the keys that are meaningful for that model — anything not

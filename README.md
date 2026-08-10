@@ -27,13 +27,16 @@ becomes a fully working tab like the other five.
 
 ## Using it
 
-1. Pick an asset type from the side menu (a collapsible "Asset Type" button
-   on narrow screens, an always-visible sidebar on wider ones).
-2. Optionally pick a **Company Preset** to pre-fill Company. A **Location
-   Preset** dropdown appears too once `LOCATION_PRESETS` in `js/catalog.js`
-   has entries. When a type has models from more than one manufacturer, a
-   **Manufacturer** dropdown also appears to narrow things down (e.g.
-   Laptop/PC has 100+ models across Dell/HP/Lenovo/Acer/ASUS/Apple/etc.).
+1. Pick an asset type from the side menu — a sliding drawer opened via the
+   "Asset Type" button on narrow screens (closes again once you pick one),
+   an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
+   PC on first visit.
+2. Optionally pick a **Company / Location Preset** — one dropdown sets both
+   fields at once, since every site in this org is its own Company *and*
+   Location. When a type has models from more than one manufacturer, a
+   **Manufacturer** dropdown appears directly above Product to narrow
+   things down (e.g. Laptop/PC has 100+ models across
+   Dell/HP/Lenovo/Acer/ASUS/Apple/etc.).
 3. Start typing in **Product**, or pick from its suggestions — there's no
    separate "Model Preset" control, Product itself is the catalog. Picking
    (or typing an exact match for) a known model auto-fills Warranty, Cost,
@@ -87,24 +90,27 @@ python3 -m http.server 8000
 
 ```
 index.html          Page layout/containers
-css/styles.css       Styling (light/dark aware)
+css/styles.css       Styling (light/dark aware, side nav/drawer)
 js/templates.js       Column definitions for each asset type (edit here to
                        add a new asset type or change a template's columns)
-js/catalog.js          Company Presets, Location Presets, and Model Presets
-                       shown as dropdowns in the Defaults panel — edit here
-                       to add/retire a company, site, or hardware model
+js/catalog.js          Site Presets (Company + Location together) and
+                       Model Presets shown in the Defaults panel — edit
+                       here to add/retire a site or hardware model
+js/icons.js             2D line-icon SVGs for the side nav, keyed by asset
+                       type id
 js/csv.js              CSV escaping/formatting, filename/download helper,
                        name-pattern token substitution
 js/storage.js          localStorage read/write helpers
-js/app.js              UI wiring — tabs, defaults form, bulk-add, table,
-                       toolbar
+js/app.js              UI wiring — side nav, defaults form, bulk-add,
+                       table, toolbar
 ```
 
 To add a new asset type, add an entry to `ASSET_TYPES` in `js/templates.js`
 with its columns in the same order/wording as the Freshservice template —
 the rest of the app (form rendering, bulk add, table, CSV export) picks it
-up automatically. Set `icon` to a single emoji to give it a glyph in the
-side menu.
+up automatically. Add a matching entry to `ICONS` in `js/icons.js` (keyed
+by the same `id`) to give it a glyph in the side menu; it falls back to no
+icon if omitted.
 
 To add a new hardware model or site, edit `js/catalog.js` — no other files
 need to change. A `MODEL_PRESETS` entry only needs to set the fields that
@@ -112,4 +118,6 @@ matter for that model (e.g. Product/OS/Storage/Warranty/Cost for a tablet);
 anything left out just stays blank for you to fill in on first use. A model
 preset's `manufacturer` field is metadata only (never written to the CSV) —
 it drives the Manufacturer filter and nothing else, so it's fine to leave
-off if you don't know it.
+off if you don't know it. A `SITE_PRESETS` entry sets Company and Location
+to the same value by default; add an explicit `location` to an entry if a
+site's Location ever needs to differ from its Company name.

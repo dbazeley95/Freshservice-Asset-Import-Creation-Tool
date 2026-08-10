@@ -14,7 +14,6 @@ export const ASSET_TYPES = [
   {
     id: 'monitor',
     label: 'Monitor',
-    icon: '🖵',
     columns: [
       col('name', 'Name', 'text', 'row', { required: true }),
       col('company', 'Company', 'text', 'default', { required: true }),
@@ -33,7 +32,6 @@ export const ASSET_TYPES = [
   {
     id: 'touchscreen',
     label: 'Interactive Touchscreen',
-    icon: '🖐️',
     columns: [
       col('name', 'Name', 'text', 'row', { required: true }),
       col('company', 'Company', 'text', 'default', { required: true }),
@@ -51,7 +49,6 @@ export const ASSET_TYPES = [
   {
     id: 'laptop_pc',
     label: 'Laptop / PC',
-    icon: '💻',
     columns: [
       col('name', 'Name', 'text', 'row', { required: true }),
       col('company', 'Company', 'text', 'default', { required: true }),
@@ -72,7 +69,6 @@ export const ASSET_TYPES = [
   {
     id: 'desktop_pc',
     label: 'Desktop PC',
-    icon: '🖥️',
     columns: [
       col('name', 'Name', 'text', 'row', { required: true }),
       col('company', 'Company', 'text', 'default', { required: true }),
@@ -93,7 +89,6 @@ export const ASSET_TYPES = [
   {
     id: 'tablet',
     label: 'Tablet',
-    icon: '📱',
     columns: [
       col('name', 'Display Name', 'text', 'row', { required: true }),
       col('company', 'Company', 'text', 'default', { required: true }),
@@ -120,15 +115,15 @@ export const ASSET_TYPES = [
   // These ids/labels mirror the exact "Asset Type" values from a
   // Freshservice product export, so each one lines up with a real
   // Freshservice asset type rather than a guessed grouping.
-  { id: 'printer_copier', label: 'Printers & Copiers', icon: '🖨️', comingSoon: true, columns: [] },
-  { id: 'phone_telephony', label: 'Phones & Telephony', icon: '☎️', comingSoon: true, columns: [] },
-  { id: 'wifi_access_point', label: 'Wi-Fi Access Points', icon: '📶', comingSoon: true, columns: [] },
-  { id: 'network_switch', label: 'Network Switches', icon: '🔀', comingSoon: true, columns: [] },
-  { id: 'server', label: 'Servers', icon: '🖧', comingSoon: true, columns: [] },
-  { id: 'windows_server', label: 'Windows Servers', icon: '🪟', comingSoon: true, columns: [] },
-  { id: 'docking_station', label: 'Docking Stations', icon: '🔌', comingSoon: true, columns: [] },
-  { id: 'computer_generic', label: 'Computer (Unspecified)', icon: '❓', comingSoon: true, columns: [] },
-  { id: 'hardware_other', label: 'Hardware (Uncategorised)', icon: '🧰', comingSoon: true, columns: [] },
+  { id: 'printer_copier', label: 'Printers & Copiers', comingSoon: true, columns: [] },
+  { id: 'phone_telephony', label: 'Phones & Telephony', comingSoon: true, columns: [] },
+  { id: 'wifi_access_point', label: 'Wi-Fi Access Points', comingSoon: true, columns: [] },
+  { id: 'network_switch', label: 'Network Switches', comingSoon: true, columns: [] },
+  { id: 'server', label: 'Servers', comingSoon: true, columns: [] },
+  { id: 'windows_server', label: 'Windows Servers', comingSoon: true, columns: [] },
+  { id: 'docking_station', label: 'Docking Stations', comingSoon: true, columns: [] },
+  { id: 'computer_generic', label: 'Computer (Unspecified)', comingSoon: true, columns: [] },
+  { id: 'hardware_other', label: 'Hardware (Uncategorised)', comingSoon: true, columns: [] },
 ];
 
 export const ASSET_STATE_SUGGESTIONS = [
