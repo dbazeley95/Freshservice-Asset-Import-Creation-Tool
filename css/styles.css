@@ -452,6 +452,16 @@ select {
   background: var(--input-bg);
   color: var(--text);
   width: 100%;
+  /* Flex/grid items default to min-width: auto — their own content's
+     minimum size — which wins over width: 100% if that content is wider
+     than the container. iOS Safari gives type="date" a fairly wide
+     intrinsic minimum for its native day/month/year control, so without
+     this it can overflow past the field width every other input respects
+     (visible as Acquisition Date/End of Life rendering wider than their
+     neighbours on a narrow phone screen). max-width is the same guard for
+     any container that isn't flex/grid. */
+  min-width: 0;
+  max-width: 100%;
 }
 
 textarea {

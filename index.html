@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.9.1" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.2" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.1 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.2 beta</button>
       </div>
     </div>
 
@@ -176,7 +176,22 @@
         <span id="release-notes-close-icon" class="tab-icon" aria-hidden="true"></span>
       </button>
     </div>
+    <!-- Add a new .changelog-entry here, newest first, every time the
+         version badge bumps — this list is the whole point of the Release
+         Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.2</span><h3 class="changelog-title">Date Field Width Fix</h3></div>
+        <p>Acquisition Date and End of Life could render wider than every other field on some phones (an iOS Safari quirk where a date field's native control refuses to shrink below its own minimum width). Fixed for every field, everywhere.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.1</span><h3 class="changelog-title">Mobile Table &amp; Bulk Add Fixes</h3></div>
+        <p>Name and Delete now stay pinned to the left/right edges of the Rows table while the rest of a row scrolls underneath, so you never lose track of which row you're on or have to scroll past every field to delete one. A bare-serial line pasted alongside Name,Serial lines &mdash; usually a forgotten comma &mdash; now gets a warning icon instead of silently becoming the Asset Tag. A persistent red count now shows how many rows are missing required fields. Input borders and the required-field marker are also easier to spot.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.0</span><h3 class="changelog-title">Release Notes</h3></div>
+        <p>Added this Release Notes popout (also reachable by tapping the version badge), listing every version back to 0.1.0.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.8.2</span><h3 class="changelog-title">Action Button Icons</h3></div>
         <p>Add Assets of Another Product, Clear All Rows, and Download CSV each got a matching glyph (+, &times;, and a download arrow).</p>
@@ -252,6 +267,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.9.1"></script>
+  <script type="module" src="js/app.js?v=0.9.2"></script>
 </body>
 </html>
