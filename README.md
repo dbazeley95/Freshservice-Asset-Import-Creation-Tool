@@ -17,10 +17,11 @@ exactly):
 ## Using it
 
 1. Pick an asset type tab.
-2. Optionally pick a **Location Preset** and/or **Model Preset** to pre-fill
-   the fields below (Company/Location, or Product/Warranty/Cost/Memory/
-   Storage/etc. for that model). Both are just a starting point — every
-   pre-filled value stays editable.
+2. Optionally pick a **Company Preset** and/or **Model Preset** to pre-fill
+   the fields below (Company, or Product/Warranty/Cost/Memory/Storage/etc.
+   for that model). A **Location Preset** dropdown will appear too once
+   `LOCATION_PRESETS` in `js/catalog.js` has entries. All of these are just
+   a starting point — every pre-filled value stays editable.
 3. Fill in the rest of the **Shared Defaults** (Company, Location, Product,
    Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). These
@@ -71,9 +72,9 @@ index.html          Page layout/containers
 css/styles.css       Styling (light/dark aware)
 js/templates.js       Column definitions for each asset type (edit here to
                        add a new asset type or change a template's columns)
-js/catalog.js          Location Presets and Model Presets shown as dropdowns
-                       in the Defaults panel — edit here to add/retire a
-                       hardware model or a site you buy for
+js/catalog.js          Company Presets, Location Presets, and Model Presets
+                       shown as dropdowns in the Defaults panel — edit here
+                       to add/retire a company, site, or hardware model
 js/csv.js              CSV escaping/formatting, filename/download helper,
                        name-pattern token substitution
 js/storage.js          localStorage read/write helpers

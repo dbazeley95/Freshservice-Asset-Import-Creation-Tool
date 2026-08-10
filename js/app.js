@@ -1,7 +1,7 @@
 import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, rowColumns } from './templates.js';
 import { buildCsv, downloadCsv, applyNamePattern } from './csv.js';
 import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js';
-import { LOCATION_PRESETS, MODEL_PRESETS } from './catalog.js';
+import { COMPANY_PRESETS, LOCATION_PRESETS, MODEL_PRESETS } from './catalog.js';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -102,12 +102,19 @@ function buildPresetField(labelText, id, options, onChange) {
   return wrap;
 }
 
+function applyCompanyPreset(assetType, state, presetId) {
+  const preset = COMPANY_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return;
+  state.defaults.company = preset.company;
+  addSuggestion('company', preset.company);
+  persist(activeTypeId, state);
+  renderDefaultsForm(assetType, state);
+}
+
 function applyLocationPreset(assetType, state, presetId) {
   const preset = LOCATION_PRESETS.find((p) => p.id === presetId);
   if (!preset) return;
-  state.defaults.company = preset.company;
   state.defaults.location = preset.location;
-  addSuggestion('company', preset.company);
   addSuggestion('location', preset.location);
   persist(activeTypeId, state);
   renderDefaultsForm(assetType, state);
@@ -133,10 +140,18 @@ function renderDefaultsForm(assetType, state) {
   const suggestions = loadSuggestions();
 
   els.defaultsForm.appendChild(
-    buildPresetField('Location Preset', 'def-preset-location', LOCATION_PRESETS, (val) =>
-      applyLocationPreset(assetType, state, val)
+    buildPresetField('Company Preset', 'def-preset-company', COMPANY_PRESETS, (val) =>
+      applyCompanyPreset(assetType, state, val)
     )
   );
+
+  if (LOCATION_PRESETS.length > 0) {
+    els.defaultsForm.appendChild(
+      buildPresetField('Location Preset', 'def-preset-location', LOCATION_PRESETS, (val) =>
+        applyLocationPreset(assetType, state, val)
+      )
+    );
+  }
 
   const modelPresets = MODEL_PRESETS[assetType.id] || [];
   if (modelPresets.length > 0) {
