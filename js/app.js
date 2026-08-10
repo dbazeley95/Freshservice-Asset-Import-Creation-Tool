@@ -270,8 +270,14 @@ function renderDefaultsForm(assetType, state) {
     wrap.className = 'field';
 
     const label = document.createElement('label');
-    label.textContent = col.header + (col.required ? ' *' : '');
+    label.textContent = col.header;
     label.htmlFor = `def-${col.key}`;
+    if (col.required) {
+      const marker = document.createElement('span');
+      marker.className = 'required-marker';
+      marker.textContent = ' *';
+      label.appendChild(marker);
+    }
     wrap.appendChild(label);
 
     const input = document.createElement('input');
