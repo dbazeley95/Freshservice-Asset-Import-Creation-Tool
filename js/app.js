@@ -16,6 +16,8 @@ const els = {
   rowCount: document.getElementById('row-count'),
   downloadBtn: document.getElementById('download-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
+  importEditBtn: document.getElementById('import-edit-btn'),
+  importEditFile: document.getElementById('import-edit-file'),
   typeDescription: document.getElementById('type-description'),
   activeSections: document.getElementById('active-sections'),
   comingSoonPanel: document.getElementById('coming-soon-panel'),
@@ -551,6 +553,37 @@ function parseCsvFile(text) {
   return rows.map((cells) => (cells.length >= 2 && cells[1] ? { name: cells[0], serial: cells[1] } : { name: '', serial: cells[0] }));
 }
 
+// Loads a previously-exported (or otherwise matching) full CSV straight
+// into the Rows table for editing — every column, not just Name/Serial.
+// Header cells are matched against assetType.columns by header text
+// (case-insensitive); unmatched CSV columns are ignored and unmatched
+// template columns are left blank rather than guessed. Returns
+// matchedCount so the caller can tell "wrong template" apart from "empty
+// file".
+function parseCsvForEditing(assetType, text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map(parseCsvLine);
+  if (lines.length === 0) return { rows: [], matchedCount: 0 };
+
+  const columnByHeader = new Map(assetType.columns.map((c) => [c.header.trim().toLowerCase(), c]));
+  const colForIndex = lines[0].map((cell) => columnByHeader.get(cell.trim().toLowerCase()) || null);
+  const matchedCount = colForIndex.filter(Boolean).length;
+  if (matchedCount === 0) return { rows: [], matchedCount: 0 };
+
+  const rows = lines.slice(1).map((cells) => {
+    const row = {};
+    for (const col of assetType.columns) row[col.key] = '';
+    colForIndex.forEach((col, i) => {
+      if (col && cells[i] !== undefined) row[col.key] = cells[i];
+    });
+    return row;
+  });
+  return { rows, matchedCount };
+}
+
 // Builds full row objects (every column, not just Name/Serial/Asset Tag)
 // from the Assets textarea, using the current Shared Defaults — shared by
 // the live preview and the actual "Add Rows from Serials" commit so the
@@ -831,6 +864,32 @@ function renderTable(assetType, state) {
 // ---------- Toolbar actions ----------
 
 function wireToolbar(assetType, state) {
+  if (els.importEditBtn && els.importEditFile) {
+    els.importEditBtn.onclick = () => els.importEditFile.click();
+    els.importEditFile.onchange = async () => {
+      const file = els.importEditFile.files[0];
+      els.importEditFile.value = '';
+      if (!file) return;
+      const { rows, matchedCount } = parseCsvForEditing(assetType, await file.text());
+      if (matchedCount === 0) {
+        alert(
+          `That CSV's header row doesn't match any columns from the "${assetType.label}" template, so nothing was imported. Make sure the first row has headers like Name, Serial Number, Asset Tag, etc.`
+        );
+        return;
+      }
+      if (rows.length === 0) {
+        alert('No data rows found in that CSV (just a header row, or the file was empty).');
+        return;
+      }
+      for (const row of rows) {
+        row.id = newRowId();
+        state.rows.push(row);
+      }
+      persist(activeTypeId, state);
+      renderTable(assetType, state);
+    };
+  }
+
   els.clearRowsBtn.onclick = () => {
     if (state.rows.length === 0) return;
     const ok = confirm(`Delete all ${state.rows.length} row(s) for ${assetType.label}? This cannot be undone.`);
@@ -892,6 +951,9 @@ function renderAll() {
   renderTable(assetType, state);
   wireToolbar(assetType, state);
 }
+
+const importEditIcon = document.getElementById('import-edit-icon');
+if (importEditIcon) importEditIcon.innerHTML = iconSvg('upload');
 
 const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
 const feedbackLink = document.getElementById('feedback-link');

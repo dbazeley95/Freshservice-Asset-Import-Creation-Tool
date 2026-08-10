@@ -1,4 +1,4 @@
-# Freshservice Asset Import Generator
+# Freshservice Asset Import Leverage System
 
 A static, client-side web app for quickly building Freshservice asset import
 CSVs. No backend, no accounts, no data upload — everything runs and stays in
@@ -84,6 +84,18 @@ becomes a fully working tab like the other five.
 Your defaults, bulk-add settings, and rows are saved per asset type in your
 browser's local storage automatically, so switching tabs or reloading the
 page won't lose anything. Use **Clear All Rows** to start a fresh batch.
+
+### Editing an existing export
+
+**Import CSV for Editing**, above the Rows table, loads a full `.csv` file —
+every column, not just Name/Serial — straight into the table so you can
+tweak an export you already made (or a matching Freshservice export) and
+re-download it. It matches columns by header text against the current asset
+type's template, so the file needs a header row with names like `Name`,
+`Serial Number`, `Asset Tag`, `Product`, etc.; any column it doesn't
+recognise is ignored, and any template column missing from the file is left
+blank. Imported rows are added alongside whatever's already in the table,
+the same way Add Rows from Serials works.
 
 ## Hosting on GitHub Pages
 

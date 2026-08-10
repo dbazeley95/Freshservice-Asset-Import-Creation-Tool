@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Freshservice Asset Import Generator</title>
+  <title>Freshservice Asset Import Leverage System</title>
   <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%A5%EF%B8%8F%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -12,8 +12,8 @@
   <header class="app-header">
     <div class="header-top">
       <div class="header-title">
-        <h1>Freshservice Asset Import Generator</h1>
-        <span class="version-badge">v0.5.0 beta</span>
+        <h1>Freshservice Asset Import Leverage System</h1>
+        <span class="version-badge">v0.6.0 beta</span>
       </div>
       <div class="header-actions">
         <a id="feedback-link" class="header-btn" href="#">
@@ -70,6 +70,11 @@
               <h2 id="table-heading">Rows</h2>
               <span id="row-count" class="row-count"></span>
               <div class="spacer"></div>
+              <button id="import-edit-btn" type="button" class="secondary">
+                <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
+                Import CSV for Editing
+              </button>
+              <input id="import-edit-file" type="file" accept=".csv,text/csv" hidden />
               <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
               <button id="download-btn" type="button" class="primary">Download CSV</button>
             </div>
@@ -117,6 +122,9 @@
 
       <h3>7. Download CSV</h3>
       <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import.</p>
+
+      <h3>Editing an existing export</h3>
+      <p><strong>Import CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
 
       <h3>Your data</h3>
       <p>Everything stays in this browser's local storage on this device &mdash; nothing is uploaded anywhere. Closing the tab is safe; clearing site data is not.</p>
