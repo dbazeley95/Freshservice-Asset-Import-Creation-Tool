@@ -231,6 +231,7 @@ function renderManufacturerFilterField(assetType, state) {
 
   const select = document.createElement('select');
   select.id = 'def-model-manufacturer';
+  select.title = "Narrows Product's suggestions below.";
   const allOpt = document.createElement('option');
   allOpt.value = '';
   allOpt.textContent = 'All Manufacturers';
@@ -255,17 +256,91 @@ function renderManufacturerFilterField(assetType, state) {
     renderHardwareForm(assetType, state);
   });
 
-  const hint = document.createElement('p');
-  hint.className = 'hint';
-  hint.textContent = 'Narrows the Product suggestions below. Pick a suggested Product to auto-fill Warranty/Cost/specs for that model.';
-  wrap.appendChild(hint);
-
   return wrap;
 }
 
-// Builds one labeled field (label + input + any datalist) for a Shared
-// Defaults column. Shared by the General and Hardware Specific panels —
-// which panel a column lands in is decided by col.group in templates.js.
+// A lightweight suggestions dropdown for text inputs, replacing the
+// browser-native <input list> + <datalist> pairing — datalist support on
+// mobile Safari is unreliable (the popup can fail to appear at all,
+// especially once the field's been cleared), so this is a small
+// self-contained combobox instead: fully within our control, consistent
+// across every device. `getOptions()` is called fresh each time the list
+// opens/filters, so it stays in sync with a changing Manufacturer filter
+// etc. `onSelect(value)` fires after the input's value is already set.
+function attachCombobox(input, wrap, getOptions, onSelect) {
+  wrap.classList.add('combobox-wrap');
+  const list = document.createElement('ul');
+  list.className = 'combobox-list';
+  list.hidden = true;
+  wrap.appendChild(list);
+
+  let highlighted = -1;
+
+  function close() {
+    list.hidden = true;
+    list.innerHTML = '';
+    highlighted = -1;
+  }
+
+  function open(filterText) {
+    const q = filterText.trim().toLowerCase();
+    const options = getOptions().filter((opt) => !q || opt.toLowerCase().includes(q));
+    list.innerHTML = '';
+    highlighted = -1;
+    if (options.length === 0) {
+      close();
+      return;
+    }
+    for (const opt of options.slice(0, 50)) {
+      const li = document.createElement('li');
+      li.textContent = opt;
+      li.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); // keep focus on the input, don't let blur fire first
+        choose(opt);
+      });
+      list.appendChild(li);
+    }
+    list.hidden = false;
+  }
+
+  function choose(value) {
+    input.value = value;
+    close();
+    onSelect(value);
+  }
+
+  function updateHighlight() {
+    const items = list.querySelectorAll('li');
+    items.forEach((li, i) => li.classList.toggle('highlighted', i === highlighted));
+    if (items[highlighted]) items[highlighted].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('focus', () => open(''));
+  input.addEventListener('input', () => open(input.value));
+  input.addEventListener('blur', () => setTimeout(close, 120));
+  input.addEventListener('keydown', (e) => {
+    const items = list.querySelectorAll('li');
+    if (list.hidden || items.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlighted = Math.min(highlighted + 1, items.length - 1);
+      updateHighlight();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlighted = Math.max(highlighted - 1, 0);
+      updateHighlight();
+    } else if (e.key === 'Enter' && highlighted >= 0) {
+      e.preventDefault();
+      choose(items[highlighted].textContent);
+    } else if (e.key === 'Escape') {
+      close();
+    }
+  });
+}
+
+// Builds one labeled field (label + input/select) for a Shared Defaults
+// column. Shared by the General and Hardware Specific panels — which
+// panel a column lands in is decided by col.group in templates.js.
 function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
   const wrap = document.createElement('div');
   wrap.className = 'field';
@@ -281,23 +356,33 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
   }
   wrap.appendChild(label);
 
+  if (col.key === 'assetState') {
+    const select = buildAssetStateSelect(state.defaults[col.key]);
+    select.id = `def-${col.key}`;
+    select.addEventListener('change', () => {
+      state.defaults[col.key] = select.value;
+      persist(activeTypeId, state);
+      refreshBulkPreview(assetType, state);
+    });
+    wrap.appendChild(select);
+    return wrap;
+  }
+
   const input = document.createElement('input');
   input.id = `def-${col.key}`;
   input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
   if (col.input === 'number') input.step = 'any';
   input.value = state.defaults[col.key] ?? '';
+  wrap.appendChild(input);
 
-  if (col.key === 'assetState') {
-    input.setAttribute('list', 'dl-asset-state');
-  } else if (col.key === 'product' && modelPresets.length > 0) {
-    const listId = `dl-${assetType.id}-product-catalog`;
-    input.setAttribute('list', listId);
-    const options = productCatalogOptions(modelPresets, modelFilterState[assetType.id] || '');
-    wrap.appendChild(buildDatalist(listId, options));
+  const onSuggestionSelected = () => {
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  if (col.key === 'product' && modelPresets.length > 0) {
+    attachCombobox(input, wrap, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected);
   } else if (col.input === 'text') {
-    const listId = `dl-${assetType.id}-${col.key}`;
-    input.setAttribute('list', listId);
-    wrap.appendChild(buildDatalist(listId, suggestions[col.key] || []));
+    attachCombobox(input, wrap, () => suggestions[col.key] || [], onSuggestionSelected);
   }
 
   input.addEventListener('input', () => {
@@ -315,7 +400,6 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     }
   });
 
-  wrap.appendChild(input);
   return wrap;
 }
 
@@ -361,15 +445,23 @@ function renderHardwareForm(assetType, state) {
   }
 }
 
-function buildDatalist(id, options) {
-  const dl = document.createElement('datalist');
-  dl.id = id;
-  for (const opt of options) {
+// A real <select> (not a text input) for Asset State — it's a closed set
+// of valid Freshservice states, and native <select> is fully reliable on
+// mobile where a free-text-plus-suggestions field can be flaky.
+function buildAssetStateSelect(currentValue) {
+  const select = document.createElement('select');
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '--';
+  select.appendChild(blank);
+  for (const s of ASSET_STATE_SUGGESTIONS) {
     const o = document.createElement('option');
-    o.value = opt;
-    dl.appendChild(o);
+    o.value = s;
+    o.textContent = s;
+    select.appendChild(o);
   }
-  return dl;
+  select.value = currentValue ?? '';
+  return select;
 }
 
 // ---------- Bulk add panel ----------
@@ -679,16 +771,27 @@ function renderTable(assetType, state) {
     tr.dataset.rowId = row.id;
     for (const col of assetType.columns) {
       const td = document.createElement('td');
+
+      if (col.key === 'assetState') {
+        const select = buildAssetStateSelect(row[col.key]);
+        select.dataset.key = col.key;
+        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        select.addEventListener('change', () => {
+          row[col.key] = select.value;
+          select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+          persist(activeTypeId, state);
+        });
+        td.appendChild(select);
+        tr.appendChild(td);
+        continue;
+      }
+
       const input = document.createElement('input');
       input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
       if (col.input === 'number') input.step = 'any';
       input.value = row[col.key] ?? '';
       input.dataset.key = col.key;
       if (isRowInvalid(assetType, row, col)) input.classList.add('invalid');
-
-      if (col.key === 'assetState') {
-        input.setAttribute('list', 'dl-asset-state');
-      }
 
       input.addEventListener('input', () => {
         row[col.key] = input.value;
@@ -789,10 +892,6 @@ function renderAll() {
   renderTable(assetType, state);
   wireToolbar(assetType, state);
 }
-
-document.getElementById('dl-asset-state-holder').appendChild(
-  buildDatalist('dl-asset-state', ASSET_STATE_SUGGESTIONS)
-);
 
 const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
 const feedbackLink = document.getElementById('feedback-link');
