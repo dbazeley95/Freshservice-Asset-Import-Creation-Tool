@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.8.1" />
+  <link rel="stylesheet" href="css/styles.css?v=0.8.2" />
 </head>
 <body>
   <header class="app-header">
@@ -29,7 +29,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <span class="version-badge">v0.8.1 beta</span>
+        <span class="version-badge">v0.8.2 beta</span>
       </div>
     </div>
 
@@ -80,7 +80,10 @@
             <h2 id="add-product-heading">Add Assets of Another Product</h2>
             <p class="hint">Adds the assets pasted above into the Rows table below, using the current Hardware Specific details as their Product. Change Product/Hardware Specific and click this again to add another product to the same export &mdash; up to 10 different products per export.</p>
             <div id="bulk-preview-wrap"></div>
-            <button id="add-rows-btn" type="button" class="primary">Add Assets of Another Product</button>
+            <button id="add-rows-btn" type="button" class="primary">
+              <span id="add-rows-icon" class="tab-icon" aria-hidden="true"></span>
+              Add Assets of Another Product
+            </button>
           </section>
 
           <section class="panel" aria-labelledby="table-heading">
@@ -93,8 +96,14 @@
                 Import Populated CSV for Editing
               </button>
               <input id="import-edit-file" type="file" accept=".csv,text/csv" hidden />
-              <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
-              <button id="download-btn" type="button" class="primary">Download CSV</button>
+              <button id="clear-rows-btn" type="button" class="danger-outline">
+                <span id="clear-rows-icon" class="tab-icon" aria-hidden="true"></span>
+                Clear All Rows
+              </button>
+              <button id="download-btn" type="button" class="primary">
+                <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
+                Download CSV
+              </button>
             </div>
             <div id="table-wrap" class="table-wrap"></div>
           </section>
@@ -152,6 +161,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.8.1"></script>
+  <script type="module" src="js/app.js?v=0.8.2"></script>
 </body>
 </html>

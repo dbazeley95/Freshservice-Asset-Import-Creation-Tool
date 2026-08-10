@@ -115,6 +115,10 @@ export const ICONS = {
   chevronDown: `
     <path d="M5.5 8.5L12 15l6.5-6.5"/>
   `,
+  plus: `
+    <line x1="12" y1="5" x2="12" y2="19"/>
+    <line x1="5" y1="12" x2="19" y2="12"/>
+  `,
 };
 
 export function iconSvg(key) {

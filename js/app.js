@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.8.1';
-import { buildCsv, downloadCsv } from './csv.js?v=0.8.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.8.1';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.8.1';
-import { iconSvg } from './icons.js?v=0.8.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.8.2';
+import { buildCsv, downloadCsv } from './csv.js?v=0.8.2';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.8.2';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.8.2';
+import { iconSvg } from './icons.js?v=0.8.2';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -943,6 +943,15 @@ function renderAll() {
 
 const importEditIcon = document.getElementById('import-edit-icon');
 if (importEditIcon) importEditIcon.innerHTML = iconSvg('upload');
+
+const addRowsIcon = document.getElementById('add-rows-icon');
+if (addRowsIcon) addRowsIcon.innerHTML = iconSvg('plus');
+
+const clearRowsIcon = document.getElementById('clear-rows-icon');
+if (clearRowsIcon) clearRowsIcon.innerHTML = iconSvg('close');
+
+const downloadIcon = document.getElementById('download-icon');
+if (downloadIcon) downloadIcon.innerHTML = iconSvg('download');
 
 const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
 const feedbackLink = document.getElementById('feedback-link');
