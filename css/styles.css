@@ -355,6 +355,12 @@ main {
 
 #bulk-preview-wrap:not(:empty) {
   margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+#add-rows-btn {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
 .field {
@@ -462,6 +468,7 @@ td.preview-missing {
 button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   font: inherit;
   padding: 0.55rem 1rem;
