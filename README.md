@@ -14,13 +14,25 @@ exactly):
 - Desktop PC
 - Tablet
 
+There are also tabs for **Printers & Copiers**, **Phones & Telephony**,
+**Network Equipment**, **Servers**, **AV & Projectors**, and **Other** —
+these are marked "(Coming soon)" because there's no Freshservice import
+template for them yet, so the tab just shows a message. Their product
+catalogs already exist in `js/catalog.js` (`MODEL_PRESETS`), pulled from a
+full product export, so nothing is lost — add columns for one of them in
+`js/templates.js` whenever a real template is available and it becomes a
+fully working tab like the other five.
+
 ## Using it
 
 1. Pick an asset type tab.
 2. Optionally pick a **Company Preset** and/or **Model Preset** to pre-fill
    the fields below (Company, or Product/Warranty/Cost/Memory/Storage/etc.
    for that model). A **Location Preset** dropdown will appear too once
-   `LOCATION_PRESETS` in `js/catalog.js` has entries. All of these are just
+   `LOCATION_PRESETS` in `js/catalog.js` has entries. When a type has models
+   from more than one manufacturer, a **Manufacturer** dropdown appears
+   above Model Preset to narrow a long list down (e.g. Laptop/PC has 100+
+   models across Dell/HP/Lenovo/Acer/ASUS/Apple/etc.). All of these are just
    a starting point — every pre-filled value stays editable.
 3. Fill in the rest of the **Shared Defaults** (Company, Location, Product,
    Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
@@ -90,4 +102,7 @@ up automatically.
 To add a new hardware model or site, edit `js/catalog.js` — no other files
 need to change. A `MODEL_PRESETS` entry only needs to set the fields that
 matter for that model (e.g. Product/OS/Storage/Warranty/Cost for a tablet);
-anything left out just stays blank for you to fill in on first use.
+anything left out just stays blank for you to fill in on first use. A model
+preset's `manufacturer` field is metadata only (never written to the CSV) —
+it drives the Manufacturer filter and nothing else, so it's fine to leave
+off if you don't know it.

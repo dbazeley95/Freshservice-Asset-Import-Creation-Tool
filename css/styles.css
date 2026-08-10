@@ -83,6 +83,17 @@ body {
   font-weight: 600;
 }
 
+.tab-coming-soon {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.tab-coming-soon.active {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--text-muted);
+}
+
 main {
   max-width: 1100px;
   margin: 0 auto;

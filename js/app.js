@@ -15,7 +15,15 @@ const els = {
   addRowBtn: document.getElementById('add-row-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
   typeDescription: document.getElementById('type-description'),
+  activeSections: document.getElementById('active-sections'),
+  comingSoonPanel: document.getElementById('coming-soon-panel'),
+  comingSoonMessage: document.getElementById('coming-soon-message'),
 };
+
+// Remembers the chosen Manufacturer filter per asset type for this page
+// load only — not persisted, it's just a convenience for narrowing a long
+// Model Preset list.
+const modelFilterState = {};
 
 let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || ASSET_TYPES[0].id;
 let idCounter = 0;
@@ -59,8 +67,8 @@ function renderTabs() {
   for (const type of ASSET_TYPES) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'tab' + (type.id === activeTypeId ? ' active' : '');
-    btn.textContent = type.label;
+    btn.className = 'tab' + (type.id === activeTypeId ? ' active' : '') + (type.comingSoon ? ' tab-coming-soon' : '');
+    btn.textContent = type.comingSoon ? `${type.label} (Coming soon)` : type.label;
     btn.addEventListener('click', () => {
       if (type.id === activeTypeId) return;
       activeTypeId = type.id;
@@ -73,7 +81,7 @@ function renderTabs() {
 
 // ---------- Defaults panel ----------
 
-function buildPresetField(labelText, id, options, onChange) {
+function buildPresetField(labelText, id, options, onChange, formatOptionLabel = (o) => o.label) {
   const wrap = document.createElement('div');
   wrap.className = 'field';
 
@@ -89,7 +97,7 @@ function buildPresetField(labelText, id, options, onChange) {
   for (const opt of sortedOptions) {
     const o = document.createElement('option');
     o.value = opt.id;
-    o.textContent = opt.label;
+    o.textContent = formatOptionLabel(opt);
     select.appendChild(o);
   }
   // No blank/"Custom" placeholder option — leave the dropdown showing
@@ -99,7 +107,7 @@ function buildPresetField(labelText, id, options, onChange) {
 
   select.addEventListener('change', () => onChange(select.value));
   wrap.appendChild(select);
-  return wrap;
+  return { wrap, select };
 }
 
 function applyCompanyPreset(assetType, state, presetId) {
@@ -135,6 +143,89 @@ function applyModelPreset(assetType, state, presetId) {
   renderDefaultsForm(assetType, state);
 }
 
+const UNKNOWN_MANUFACTURER = '__unknown__';
+
+function modelPresetLabel(opt) {
+  return opt.manufacturer ? `${opt.label} — ${opt.manufacturer}` : opt.label;
+}
+
+function populateModelSelect(select, presets, manufacturerFilter) {
+  const filtered = !manufacturerFilter
+    ? presets
+    : presets.filter((p) =>
+        manufacturerFilter === UNKNOWN_MANUFACTURER ? !p.manufacturer : p.manufacturer === manufacturerFilter
+      );
+  select.innerHTML = '';
+  const sorted = [...filtered].sort((a, b) => a.label.localeCompare(b.label));
+  for (const opt of sorted) {
+    const o = document.createElement('option');
+    o.value = opt.id;
+    o.textContent = modelPresetLabel(opt);
+    select.appendChild(o);
+  }
+  select.selectedIndex = -1;
+}
+
+function renderModelPresetFields(assetType, state) {
+  const modelPresets = MODEL_PRESETS[assetType.id] || [];
+  if (modelPresets.length === 0) return [];
+
+  const manufacturers = [...new Set(modelPresets.map((p) => p.manufacturer).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  const hasUnknown = modelPresets.some((p) => !p.manufacturer);
+
+  const fields = [];
+
+  if (manufacturers.length > 1) {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    const label = document.createElement('label');
+    label.textContent = 'Manufacturer';
+    label.htmlFor = 'def-model-manufacturer';
+    wrap.appendChild(label);
+
+    const select = document.createElement('select');
+    select.id = 'def-model-manufacturer';
+    const allOpt = document.createElement('option');
+    allOpt.value = '';
+    allOpt.textContent = 'All Manufacturers';
+    select.appendChild(allOpt);
+    for (const m of manufacturers) {
+      const o = document.createElement('option');
+      o.value = m;
+      o.textContent = m;
+      select.appendChild(o);
+    }
+    if (hasUnknown) {
+      const o = document.createElement('option');
+      o.value = UNKNOWN_MANUFACTURER;
+      o.textContent = 'Unknown';
+      select.appendChild(o);
+    }
+    select.value = modelFilterState[assetType.id] || '';
+    wrap.appendChild(select);
+    fields.push(wrap);
+
+    select.addEventListener('change', () => {
+      modelFilterState[assetType.id] = select.value;
+      populateModelSelect(modelSelectField.select, modelPresets, select.value);
+    });
+  }
+
+  const modelSelectField = buildPresetField(
+    'Model Preset',
+    'def-preset-model',
+    [],
+    (val) => applyModelPreset(assetType, state, val),
+    modelPresetLabel
+  );
+  populateModelSelect(modelSelectField.select, modelPresets, modelFilterState[assetType.id] || '');
+  fields.push(modelSelectField.wrap);
+
+  return fields;
+}
+
 function renderDefaultsForm(assetType, state) {
   els.defaultsForm.innerHTML = '';
   const suggestions = loadSuggestions();
@@ -142,24 +233,19 @@ function renderDefaultsForm(assetType, state) {
   els.defaultsForm.appendChild(
     buildPresetField('Company Preset', 'def-preset-company', COMPANY_PRESETS, (val) =>
       applyCompanyPreset(assetType, state, val)
-    )
+    ).wrap
   );
 
   if (LOCATION_PRESETS.length > 0) {
     els.defaultsForm.appendChild(
       buildPresetField('Location Preset', 'def-preset-location', LOCATION_PRESETS, (val) =>
         applyLocationPreset(assetType, state, val)
-      )
+      ).wrap
     );
   }
 
-  const modelPresets = MODEL_PRESETS[assetType.id] || [];
-  if (modelPresets.length > 0) {
-    els.defaultsForm.appendChild(
-      buildPresetField('Model Preset', 'def-preset-model', modelPresets, (val) =>
-        applyModelPreset(assetType, state, val)
-      )
-    );
+  for (const field of renderModelPresetFields(assetType, state)) {
+    els.defaultsForm.appendChild(field);
   }
 
   for (const col of defaultColumns(assetType)) {
@@ -443,9 +529,26 @@ function wireToolbar(assetType, state) {
 
 function renderAll() {
   const assetType = getAssetType(activeTypeId);
-  const state = getState(activeTypeId);
 
   renderTabs();
+
+  if (assetType.comingSoon) {
+    els.typeDescription.textContent = '';
+    els.activeSections.hidden = true;
+    els.comingSoonPanel.hidden = false;
+    const modelCount = (MODEL_PRESETS[assetType.id] || []).length;
+    els.comingSoonMessage.textContent =
+      `There's no Freshservice import template wired up for ${assetType.label} yet, so this tab isn't functional. ` +
+      (modelCount > 0
+        ? `${modelCount} product${modelCount === 1 ? '' : 's'} from your product export ${modelCount === 1 ? 'is' : 'are'} already catalogued in js/catalog.js and ready to use the moment a template is added.`
+        : 'Once a template is added for this type, it will work like any other tab.');
+    return;
+  }
+
+  els.activeSections.hidden = false;
+  els.comingSoonPanel.hidden = true;
+
+  const state = getState(activeTypeId);
   els.typeDescription.textContent = `Fill in shared defaults, bulk-add rows from pasted serial numbers, then fine-tune and download a CSV matching the Freshservice "${assetType.label}" import template.`;
   renderDefaultsForm(assetType, state);
   renderBulkForm(assetType, state);

@@ -105,6 +105,18 @@ export const ASSET_TYPES = [
       col('storage', 'Storage(GB)', 'number', 'default'),
     ],
   },
+  // The types below don't have a Freshservice import template wired up
+  // yet, so they have no columns and the app shows a "Coming soon"
+  // message instead of Defaults/Bulk Add/Rows for them. Their Model
+  // Presets already exist in js/catalog.js (MODEL_PRESETS[id]) so nothing
+  // from a product export is lost — add the columns here once a real
+  // template is available and they'll work like any other asset type.
+  { id: 'printer_copier', label: 'Printers & Copiers', comingSoon: true, columns: [] },
+  { id: 'phone_telephony', label: 'Phones & Telephony', comingSoon: true, columns: [] },
+  { id: 'network_equipment', label: 'Network Equipment', comingSoon: true, columns: [] },
+  { id: 'server', label: 'Servers', comingSoon: true, columns: [] },
+  { id: 'av_equipment', label: 'AV & Projectors', comingSoon: true, columns: [] },
+  { id: 'other_uncategorised', label: 'Other', comingSoon: true, columns: [] },
 ];
 
 export const ASSET_STATE_SUGGESTIONS = [

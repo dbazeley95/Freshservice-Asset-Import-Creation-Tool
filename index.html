@@ -19,28 +19,35 @@
   <main>
     <p id="type-description" class="type-description"></p>
 
-    <section class="panel" aria-labelledby="defaults-heading">
-      <h2 id="defaults-heading">Shared Defaults</h2>
-      <p class="hint">These values are copied onto new rows when you add them. Each row can still be edited individually afterwards.</p>
-      <div id="defaults-form" class="form-grid"></div>
+    <section id="coming-soon-panel" class="panel" aria-labelledby="coming-soon-heading" hidden>
+      <h2 id="coming-soon-heading">Coming soon</h2>
+      <p id="coming-soon-message" class="hint"></p>
     </section>
 
-    <section class="panel" aria-labelledby="bulk-heading">
-      <h2 id="bulk-heading">Bulk Add from Serial Numbers</h2>
-      <div id="bulk-form" class="form-grid"></div>
-    </section>
+    <div id="active-sections">
+      <section class="panel" aria-labelledby="defaults-heading">
+        <h2 id="defaults-heading">Shared Defaults</h2>
+        <p class="hint">These values are copied onto new rows when you add them. Each row can still be edited individually afterwards.</p>
+        <div id="defaults-form" class="form-grid"></div>
+      </section>
 
-    <section class="panel" aria-labelledby="table-heading">
-      <div class="table-toolbar">
-        <h2 id="table-heading">Rows</h2>
-        <span id="row-count" class="row-count"></span>
-        <div class="spacer"></div>
-        <button id="add-row-btn" type="button" class="secondary">Add Blank Row</button>
-        <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
-        <button id="download-btn" type="button" class="primary">Download CSV</button>
-      </div>
-      <div id="table-wrap" class="table-wrap"></div>
-    </section>
+      <section class="panel" aria-labelledby="bulk-heading">
+        <h2 id="bulk-heading">Bulk Add from Serial Numbers</h2>
+        <div id="bulk-form" class="form-grid"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="table-heading">
+        <div class="table-toolbar">
+          <h2 id="table-heading">Rows</h2>
+          <span id="row-count" class="row-count"></span>
+          <div class="spacer"></div>
+          <button id="add-row-btn" type="button" class="secondary">Add Blank Row</button>
+          <button id="clear-rows-btn" type="button" class="danger-outline">Clear All Rows</button>
+          <button id="download-btn" type="button" class="primary">Download CSV</button>
+        </div>
+        <div id="table-wrap" class="table-wrap"></div>
+      </section>
+    </div>
   </main>
 
   <div id="dl-asset-state-holder" hidden></div>
