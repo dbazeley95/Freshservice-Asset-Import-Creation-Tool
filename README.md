@@ -108,7 +108,11 @@ instead of staying in their own now-empty bucket.
    Freshservice import template for that asset type. If any rows are
    missing a required field, a red count stays next to the row total in
    **Rows** until they're fixed — not just a one-time warning when you
-   click Download.
+   click Download. Once you've downloaded, an **Open Freshservice to
+   Import** button appears alongside it, opening the Freshservice CMDB
+   Items list in a new tab — that's where Freshservice's own Import
+   button lives (it's a popup, not a page of its own, so this is as
+   close as a link can get you).
 
 Your defaults, bulk-add settings, and rows are saved per asset type in your
 browser's local storage automatically, so switching tabs or reloading the

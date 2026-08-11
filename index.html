@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.14.1" />
+  <link rel="stylesheet" href="css/styles.css?v=0.15.0" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.14.1 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.15.0 beta</button>
       </div>
     </div>
 
@@ -113,6 +113,10 @@
               <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
               Download CSV
             </button>
+            <button id="open-freshservice-btn" type="button" class="primary" hidden>
+              <span id="open-freshservice-icon" class="tab-icon" aria-hidden="true"></span>
+              Open Freshservice to Import
+            </button>
           </section>
         </div>
       </main>
@@ -157,7 +161,7 @@
       <p>Its live preview shows exactly what clicking the button will add to the <strong>Rows</strong> table below. Rows accumulate rather than replacing what's there &mdash; to mix another product into the same export, change the Product/Hardware Specific details above and click <strong>Add Assets of Another Product</strong> again before downloading. Each export can hold up to 10 different products; you can fine-tune any field per row afterwards.</p>
 
       <h3>7. Download CSV</h3>
-      <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import. If any rows are missing required fields, a red count stays next to the row total in <strong>Rows</strong> until they're fixed &mdash; not just a one-time warning when you click Download.</p>
+      <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import. If any rows are missing required fields, a red count stays next to the row total in <strong>Rows</strong> until they're fixed &mdash; not just a one-time warning when you click Download. Once you've downloaded, an <strong>Open Freshservice to Import</strong> button appears alongside it &mdash; it opens the Freshservice CMDB Items list in a new tab, which is where Freshservice's own Import button lives (it's a popup, not a page of its own, so this is as close as a link can get you).</p>
 
       <h3>Editing an existing export</h3>
       <p><strong>Import Populated CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
@@ -181,6 +185,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.15.0</span><h3 class="changelog-title">Open Freshservice to Import</h3></div>
+        <p>A new "Open Freshservice to Import" button appears next to Download CSV as soon as you've downloaded a file, opening the Freshservice CMDB Items list in a new tab so you're one click from the Import button (Freshservice's own Import is a JS popup rather than its own page, so this is the closest a link can get you).</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.14.1</span><h3 class="changelog-title">Product Catalog Tidy-Up</h3></div>
         <p>Synced the Product catalog with a fresh Freshservice export: Printers &amp; Copiers' two e-STUDIO409 models are now named without their serial-number suffixes (e-STUDIO409CS, e-STUDIO409P), and three retired entries (Generic / Text Only, and Other Devices' Monitor and Pro Dock) were removed since they're no longer in the live catalog. EduPC and EduMiniPC now carry their Eduthing manufacturer.</p>
@@ -308,6 +316,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.14.1"></script>
+  <script type="module" src="js/app.js?v=0.15.0"></script>
 </body>
 </html>

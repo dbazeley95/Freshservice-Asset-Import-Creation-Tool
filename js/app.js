@@ -4,13 +4,18 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.14.1';
-import { buildCsv, downloadCsv } from './csv.js?v=0.14.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.14.1';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.14.1';
-import { iconSvg } from './icons.js?v=0.14.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.15.0';
+import { buildCsv, downloadCsv } from './csv.js?v=0.15.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.15.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.15.0';
+import { iconSvg } from './icons.js?v=0.15.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
+
+// Freshservice's own "Import" button is a JS-triggered modal on this list
+// page rather than a page of its own, so this is the closest thing to a
+// direct link — it lands you where that button lives, ready to click it.
+const FRESHSERVICE_IMPORT_URL = 'https://helpdesk.xaviercet.org.uk/cmdb/items';
 
 const els = {
   tabs: document.getElementById('type-tabs'),
@@ -22,6 +27,7 @@ const els = {
   rowCount: document.getElementById('row-count'),
   invalidRowCount: document.getElementById('invalid-row-count'),
   downloadBtn: document.getElementById('download-btn'),
+  openFreshserviceBtn: document.getElementById('open-freshservice-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
   importEditBtn: document.getElementById('import-edit-btn'),
   importEditFile: document.getElementById('import-edit-file'),
@@ -999,6 +1005,7 @@ function wireToolbar(assetType, state) {
     const csv = buildCsv(assetType, state.rows);
     const today = new Date().toISOString().slice(0, 10);
     downloadCsv(`freshservice-${assetType.id}-import-${today}.csv`, csv);
+    els.openFreshserviceBtn.hidden = false;
   };
 }
 
@@ -1045,6 +1052,10 @@ if (clearRowsIcon) clearRowsIcon.innerHTML = iconSvg('close');
 
 const downloadIcon = document.getElementById('download-icon');
 if (downloadIcon) downloadIcon.innerHTML = iconSvg('download');
+
+const openFreshserviceIcon = document.getElementById('open-freshservice-icon');
+if (openFreshserviceIcon) openFreshserviceIcon.innerHTML = iconSvg('externalLink');
+els.openFreshserviceBtn.onclick = () => window.open(FRESHSERVICE_IMPORT_URL, '_blank', 'noopener');
 
 const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
 const feedbackLink = document.getElementById('feedback-link');

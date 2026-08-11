@@ -614,6 +614,14 @@ button {
   cursor: pointer;
 }
 
+/* `button { display: inline-flex }` above wins over the browser's own
+   `[hidden] { display: none }` rule (author styles beat user-agent
+   styles regardless of selector specificity), so a hidden button would
+   otherwise still render — this restores the native hidden behaviour. */
+button[hidden] {
+  display: none;
+}
+
 /* Every button is one of three fills — blue (primary/default action),
    red (destructive), or green (the one true "you're done" action,
    Download CSV) — plus the small handful of unstyled utility controls
