@@ -15,16 +15,24 @@ exactly):
 - iPads / Tablets
 - Wi-Fi Access Points
 - Other Devices
+- Network Switches
+- Phones & Telephony (Extension is optional; every other field is
+  required, as usual)
+- Printers & Copiers (IP Address is optional; every other field is
+  required, as usual)
 
-There are also tabs for **Printers & Copiers**, **Phones & Telephony**,
-**Network Switches**, **Servers**, **Docking Stations**, and **Computer
-(Unspecified)** — these are marked "(Coming soon)" because there's no
-Freshservice import template for them yet, so the tab just shows a
-message. They mirror the exact Asset Type values from a Freshservice
-product export (not a guessed grouping), and their product catalogs
-already exist in `js/catalog.js` (`MODEL_PRESETS`), so nothing is lost —
-add columns for one of them in `js/templates.js` whenever a real template
-is available and it becomes a fully working tab like the other seven.
+There are also tabs for **Servers** and **Docking Stations** — these are
+marked "(Coming soon)" because there's no Freshservice import template for
+them yet, so the tab just shows a message. They mirror the exact Asset
+Type values from a Freshservice product export (not a guessed grouping),
+and their product catalogs already exist in `js/catalog.js`
+(`MODEL_PRESETS`), so nothing is lost — add columns for one of them in
+`js/templates.js` whenever a real template is available and it becomes a
+fully working tab like the other ten.
+
+"Computer (Unspecified)" has been removed — its six catalogued products
+were all actually laptops, so they were merged into the Laptop catalog
+instead of staying in their own now-empty bucket.
 
 ## Using it
 

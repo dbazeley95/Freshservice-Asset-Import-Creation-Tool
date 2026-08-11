@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.11.0" />
+  <link rel="stylesheet" href="css/styles.css?v=0.12.0" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.11.0 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.12.0 beta</button>
       </div>
     </div>
 
@@ -132,7 +132,7 @@
     </div>
     <div class="help-dialog-body">
       <h3>1. Pick an asset type</h3>
-      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, or Other Devices. Types marked "Coming soon" don't have an import template wired up yet.</p>
+      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Other Devices, Network Switches, Phones &amp; Telephony, or Printers &amp; Copiers. Types marked "Coming soon" don't have an import template wired up yet.</p>
 
       <h3>2. Fill in General</h3>
       <p>Type the <strong>Company</strong> &mdash; for a known site, <strong>Location</strong> fills in automatically, unless you've already typed one yourself. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
@@ -180,6 +180,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.12.0</span><h3 class="changelog-title">Network Switches, Phones &amp; Telephony, Printers &amp; Copiers</h3></div>
+        <p>All three are now fully working tabs with the standard column set (Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, Warranty Expiry Date). Phones &amp; Telephony adds an optional Extension field; Printers &amp; Copiers adds an optional IP Address field &mdash; both skip the usual required-field check. "Computer (Unspecified)" is removed: its six catalogued products were all actually laptops, so they're now part of the Laptop catalog instead of sitting in their own empty bucket.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.11.0</span><h3 class="changelog-title">Other Devices</h3></div>
         <p>"Hardware (Uncategorised)" is renamed to Other Devices and is now a fully working tab &mdash; Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Warranty (In Months), Cost, Asset State, Acquisition Date, and Warranty Expiry Date.</p>
@@ -291,6 +295,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.11.0"></script>
+  <script type="module" src="js/app.js?v=0.12.0"></script>
 </body>
 </html>

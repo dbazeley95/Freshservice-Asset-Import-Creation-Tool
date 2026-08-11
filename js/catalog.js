@@ -55,14 +55,13 @@ export const SITE_PRESETS = [
 // and the default Warranty (Dell = 48 months, everything else = 12,
 // per your stated policy) baked into `fields.warranty` below.
 //
-// monitor/touchscreen/laptop_pc/desktop_pc/tablet feed the fully working
-// asset templates. Every other key here (printer_copier, phone_telephony,
-// wifi_access_point, network_switch, server, docking_station,
-// computer_generic, hardware_other) has no Freshservice
-// import template wired up yet (see ASSET_TYPES in js/templates.js, where
-// they're marked comingSoon) — their presets are captured here now so
-// nothing from a product export gets lost, ready to use the moment a
-// template exists for that type.
+// monitor/touchscreen/laptop_pc/desktop_pc/tablet/wifi_access_point/
+// hardware_other/network_switch/phone_telephony/printer_copier feed the
+// fully working asset templates. Every other key here (server,
+// docking_station) has no Freshservice import template wired up yet (see
+// ASSET_TYPES in js/templates.js, where they're marked comingSoon) — their
+// presets are captured here now so nothing from a product export gets
+// lost, ready to use the moment a template exists for that type.
 //
 // This whole catalog was rebuilt from an actual Freshservice product
 // export that includes each product's real Asset Type — every entry below
@@ -484,6 +483,24 @@ export const MODEL_PRESETS = {
       fields: { product: "14e Chromebook Gen 2", warranty: 12 },
     },
     {
+      id: "20bus01r08",
+      label: "20BUS01R08",
+      manufacturer: "Lenovo",
+      fields: { product: "20BUS01R08", warranty: 12 },
+    },
+    {
+      id: "20bus61r00",
+      label: "20BUS61R00",
+      manufacturer: "Lenovo",
+      fields: { product: "20BUS61R00", warranty: 12 },
+    },
+    {
+      id: "21ab000nuk",
+      label: "21AB000NUK",
+      manufacturer: "Lenovo",
+      fields: { product: "21AB000NUK", warranty: 12 },
+    },
+    {
       id: "2356bq5",
       label: "2356BQ5",
       manufacturer: "Lenovo",
@@ -508,6 +525,12 @@ export const MODEL_PRESETS = {
       fields: { product: "250 G10", warranty: 12 },
     },
     {
+      id: "250-g5",
+      label: "250 G5",
+      manufacturer: "HP",
+      fields: { product: "250 G5", warranty: 12 },
+    },
+    {
       id: "250-g6",
       label: "250 G6",
       manufacturer: "HP",
@@ -524,6 +547,12 @@ export const MODEL_PRESETS = {
       label: "250 G8",
       manufacturer: "HP",
       fields: { product: "250 G8", warranty: 12 },
+    },
+    {
+      id: "250-g9",
+      label: "250 G9",
+      manufacturer: "HP",
+      fields: { product: "250 G9", warranty: 12 },
     },
     {
       id: "255-g5-notebook-pc",
@@ -860,6 +889,12 @@ export const MODEL_PRESETS = {
       label: "Latitude 5440",
       manufacturer: "Dell",
       fields: { product: "Latitude 5440", warranty: 48 },
+    },
+    {
+      id: "latitude-5550",
+      label: "Latitude 5550",
+      manufacturer: "Dell",
+      fields: { product: "Latitude 5550", warranty: 48 },
     },
     {
       id: "latitude-e6420",
@@ -1936,44 +1971,6 @@ export const MODEL_PRESETS = {
       label: "Pro Dock WD25",
       manufacturer: "Dell",
       fields: { product: "Pro Dock WD25", warranty: 48 },
-    },
-  ],
-  computer_generic: [
-    {
-      id: "20bus01r08",
-      label: "20BUS01R08",
-      manufacturer: "Lenovo",
-      fields: { product: "20BUS01R08", warranty: 12 },
-    },
-    {
-      id: "20bus61r00",
-      label: "20BUS61R00",
-      manufacturer: "Lenovo",
-      fields: { product: "20BUS61R00", warranty: 12 },
-    },
-    {
-      id: "21ab000nuk",
-      label: "21AB000NUK",
-      manufacturer: "Lenovo",
-      fields: { product: "21AB000NUK", warranty: 12 },
-    },
-    {
-      id: "250-g5",
-      label: "250 G5",
-      manufacturer: "HP",
-      fields: { product: "250 G5", warranty: 12 },
-    },
-    {
-      id: "250-g9",
-      label: "250 G9",
-      manufacturer: "HP",
-      fields: { product: "250 G9", warranty: 12 },
-    },
-    {
-      id: "latitude-5550",
-      label: "Latitude 5550",
-      manufacturer: "Dell",
-      fields: { product: "Latitude 5550", warranty: 48 },
     },
   ],
   hardware_other: [
