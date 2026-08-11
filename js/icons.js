@@ -102,6 +102,10 @@ export const ICONS = {
     <line x1="12" y1="7.5" x2="12" y2="16.5"/>
     <line x1="7.5" y1="12" x2="16.5" y2="12"/>
   `,
+  theme: `
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"/>
+  `,
   help: `
     <circle cx="12" cy="12" r="9"/>
     <path d="M9.2 9.4a2.8 2.8 0 015.4 1c0 1.8-2.6 2-2.6 4"/>

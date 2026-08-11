@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Freshservice Asset Import Leverage System</title>
   <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
+  <!-- Applies a saved Light/Dark override before first paint, inline and
+       blocking (not the deferred module in js/app.js) so there's no flash
+       of the wrong theme while that loads. "System" (the default) leaves
+       no data-theme attribute, so css/styles.css's prefers-color-scheme
+       media query decides instead — this script only ever runs for the
+       two explicit overrides. -->
+  <script>
+    (function () {
+      var theme = localStorage.getItem('fsai:v1:theme');
+      if (theme === 'light' || theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    })();
+  </script>
   <!-- ?v= busts GitHub Pages' CDN cache (max-age=600) on deploy, matching
        the version badge whenever css/js/manifest/icon files change. This
        matters even more for the favicon/apple-touch-icon/manifest icon
@@ -13,15 +27,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.0.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.0.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.0.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.1.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.1.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.1.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.0.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.0.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.1.0" />
 </head>
 <body>
   <header class="app-header">
@@ -42,14 +56,23 @@
         <span id="install-app-icon" class="tab-icon" aria-hidden="true"></span>
         Install App
       </button>
+      <div class="theme-select-wrap">
+        <span id="theme-select-icon" class="tab-icon" aria-hidden="true"></span>
+        <label for="theme-select" class="sr-only">Theme</label>
+        <select id="theme-select" class="theme-select">
+          <option value="system">Theme: System</option>
+          <option value="light">Theme: Light</option>
+          <option value="dark">Theme: Dark</option>
+        </select>
+      </div>
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.0.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.1.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.0.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.1.0</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -153,6 +176,9 @@
       </button>
     </div>
     <div class="help-dialog-body">
+      <h3>Theme</h3>
+      <p>The <strong>Theme</strong> dropdown in the header switches between System (follows your OS/browser setting), Light, and Dark. Your choice is remembered and applied before the page paints on your next visit.</p>
+
       <h3>1. Pick an asset type</h3>
       <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, or Other Devices. Types marked "Coming soon" don't have an import template wired up yet.</p>
 
@@ -203,6 +229,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.1.0</span><h3 class="changelog-title">Theme Selector</h3></div>
+        <p>A new Theme dropdown in the header (System/Light/Dark) lets you override the color scheme instead of only following your OS/browser setting. Your choice is remembered and applied before the page paints on your next visit, so there's no flash of the wrong theme. First step toward more theme options planned for later.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.0.0</span><h3 class="changelog-title">Out of Beta</h3></div>
         <p>Dropped the "beta" tag &mdash; every asset type has a working template, the workflow's been used and refined through dozens of iterations, and the install/icon/caching issues found along the way are fixed. Added a Compiled date next to the version badge so it's clear at a glance how current a given screenshot or bug report is.</p>
@@ -374,6 +404,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.0.0"></script>
+  <script type="module" src="js/app.js?v=1.1.0"></script>
 </body>
 </html>

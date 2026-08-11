@@ -24,8 +24,17 @@
   --success-text: #ffffff;
 }
 
+/* Theme resolution, in priority order:
+   1. :root[data-theme="dark"|"light"] — an explicit choice from the Theme
+      selector (js/app.js sets this attribute and remembers it in
+      localStorage). Wins regardless of OS setting.
+   2. :root:not([data-theme="light"]) inside the media query — "System"
+      (the default, no attribute set): follows the OS/browser preference.
+   Both dark blocks list the same values; kept as two blocks rather than
+   one shared selector so an explicit "dark" choice doesn't depend on the
+   OS also reporting dark, and so it stays plain CSS with no preprocessor. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #14161a;
     --panel-bg: #1c1f26;
     --text: #e8eaed;
@@ -47,6 +56,29 @@
     --success: #4ade80;
     --success-text: #0b0e14;
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #14161a;
+  --panel-bg: #1c1f26;
+  --text: #e8eaed;
+  --text-muted: #9aa1ac;
+  --border: #333844;
+  --accent: #607ed2;
+  --accent-text: #0b0e14;
+  --danger: #e05258;
+  --input-bg: #14161a;
+  --table-head-bg: #22262f;
+  --table-row-alt: #191c22;
+  --coming-soon: #c46ea6;
+  --coming-soon-bg: #3e2f40;
+  --badge-bg: #413f32;
+  --badge-text: #ebd166;
+  --input-border: #5f6780;
+  --warning: #ebd166;
+  --warning-bg: #413f32;
+  --success: #4ade80;
+  --success-text: #0b0e14;
 }
 
 * {
@@ -821,6 +853,65 @@ tbody td input {
 .header-btn .tab-icon {
   width: 1rem;
   height: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.theme-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.theme-select-wrap .tab-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Reset to plain text inside the pill rather than the usual bordered
+   input/select look — appearance: none drops the native chrome (arrow
+   included) on every engine that honours it; the ones that don't
+   (older browsers) just keep a small native arrow, which still reads
+   fine against the pill background. */
+.theme-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0;
+  min-height: 0;
+  width: auto;
+  cursor: pointer;
+}
+
+.theme-select:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.theme-select option {
+  color: initial;
+  background: var(--panel-bg);
 }
 
 /* Shared chrome for popout <dialog>s (Help, Release Notes) — each dialog

@@ -38,6 +38,12 @@ instead of staying in their own now-empty bucket.
 
 ## Using it
 
+The **Theme** dropdown in the header (System/Light/Dark) picks the color
+scheme — System follows your OS/browser setting automatically; Light and
+Dark override it explicitly. Your choice is remembered in `localStorage`
+and applied before the page paints on your next visit, so there's no
+flash of the wrong theme.
+
 1. Pick an asset type from the side menu — a sliding drawer opened via the
    "Asset Type" button on narrow screens (closes again once you pick one),
    an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
