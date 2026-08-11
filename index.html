@@ -16,7 +16,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.16.0" />
+  <link rel="stylesheet" href="css/styles.css?v=0.16.1" />
 </head>
 <body>
   <header class="app-header">
@@ -43,7 +43,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.0 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.1 beta</button>
       </div>
     </div>
 
@@ -196,6 +196,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.16.1</span><h3 class="changelog-title">App Icon Redesign</h3></div>
+        <p>The installable app icon is now a 2D line-glyph computer &mdash; the same style and glyph used for Desktop in the side menu &mdash; instead of the org logo, so it stands out more distinctly as this tool on a home screen or taskbar.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.16.0</span><h3 class="changelog-title">Installable as an App</h3></div>
         <p>This can now be pinned/installed like a native app. On Chrome/Edge (desktop or Android), a new "Install App" button appears in the header once the browser decides the site qualifies &mdash; click it to add a standalone, taskbar/home-screen-pinnable copy with its own icon. Safari (iOS/macOS) has no equivalent button since it doesn't support a programmatic install prompt, but Add to Home Screen from the Share sheet now uses a proper app icon and name there too.</p>
       </div>
@@ -334,6 +338,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.16.0"></script>
+  <script type="module" src="js/app.js?v=0.16.1"></script>
 </body>
 </html>
