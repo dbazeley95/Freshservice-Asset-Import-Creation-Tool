@@ -146,6 +146,13 @@ body {
   font-size: 1.1em;
 }
 
+.version-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .version-badge {
   padding: 0.15rem 0.6rem;
   border: 1px solid var(--border);
@@ -160,6 +167,12 @@ body {
 
 .version-badge:hover {
   filter: brightness(1.05);
+}
+
+.compiled-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .subtitle {
