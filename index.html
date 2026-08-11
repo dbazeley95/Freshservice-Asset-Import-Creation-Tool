@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.15.0" />
+  <link rel="stylesheet" href="css/styles.css?v=0.15.1" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.15.0 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.15.1 beta</button>
       </div>
     </div>
 
@@ -186,6 +186,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.15.1</span><h3 class="changelog-title">Hardware Specific Field Order</h3></div>
+        <p>Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, and Other Devices now end with Acquisition Date, Warranty (In Months), Warranty Expiry Date, then End of Life &mdash; in that order, both in the Hardware Specific panel and the downloaded CSV. Product, Cost, and Asset State keep their existing positions near the top.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.15.0</span><h3 class="changelog-title">Open Freshservice to Import</h3></div>
         <p>A new "Open Freshservice to Import" button appears next to Download CSV as soon as you've downloaded a file, opening the Freshservice CMDB Items list in a new tab so you're one click from the Import button (Freshservice's own Import is a JS popup rather than its own page, so this is the closest a link can get you).</p>
       </div>
@@ -316,6 +320,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.15.0"></script>
+  <script type="module" src="js/app.js?v=0.15.1"></script>
 </body>
 </html>
