@@ -17,7 +17,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.16.3" />
+  <link rel="stylesheet" href="css/styles.css?v=0.16.4" />
 </head>
 <body>
   <header class="app-header">
@@ -41,10 +41,10 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.3 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.4 beta</button>
       </div>
     </div>
 
@@ -197,6 +197,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.16.4</span><h3 class="changelog-title">Header Icon</h3></div>
+        <p>The header now shows the same computer+logo app icon (rounded into a small badge) instead of the bare Xavier CET logo &mdash; reads clearly in both light and dark mode since it carries its own navy background.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.16.3</span><h3 class="changelog-title">Logo Favicon</h3></div>
         <p>The browser tab icon is now the Xavier CET logo instead of a generic computer emoji. It's the logo alone rather than the fuller computer+logo app icon, since that composition turned out too detailed to read at true favicon size (16px) &mdash; a single bold mark holds up much better that small.</p>
       </div>
@@ -347,6 +351,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.16.3"></script>
+  <script type="module" src="js/app.js?v=0.16.4"></script>
 </body>
 </html>
