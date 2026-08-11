@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.14.0" />
+  <link rel="stylesheet" href="css/styles.css?v=0.14.1" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.14.0 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.14.1 beta</button>
       </div>
     </div>
 
@@ -182,6 +182,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.14.1</span><h3 class="changelog-title">Product Catalog Tidy-Up</h3></div>
+        <p>Synced the Product catalog with a fresh Freshservice export: Printers &amp; Copiers' two e-STUDIO409 models are now named without their serial-number suffixes (e-STUDIO409CS, e-STUDIO409P), and three retired entries (Generic / Text Only, and Other Devices' Monitor and Pro Dock) were removed since they're no longer in the live catalog. EduPC and EduMiniPC now carry their Eduthing manufacturer.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.14.0</span><h3 class="changelog-title">Other Devices Reordered, Extension Set Per Row</h3></div>
         <p>Other Devices has moved to the bottom of the side menu (after Servers) &mdash; it's a catch-all bucket and shouldn't be anyone's first choice. Phones &amp; Telephony's optional Extension is no longer a single shared value copied onto every row: it's now a genuine per-device field, just like Serial Number. Set it per line in Bulk Add (<code>Name, Serial, Extension</code>) or edit it per row afterwards in the Rows table.</p>
       </div>
@@ -304,6 +308,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.14.0"></script>
+  <script type="module" src="js/app.js?v=0.14.1"></script>
 </body>
 </html>

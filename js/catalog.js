@@ -1213,11 +1213,13 @@ export const MODEL_PRESETS = {
     {
       id: "eduminipc",
       label: "EduMiniPC",
+      manufacturer: "Eduthing",
       fields: { product: "EduMiniPC", warranty: 12 },
     },
     {
       id: "edupc",
       label: "EduPC",
+      manufacturer: "Eduthing",
       fields: { product: "EduPC", warranty: 12 },
     },
     {
@@ -1743,16 +1745,16 @@ export const MODEL_PRESETS = {
       fields: { product: "e-STUDIO3525AC", warranty: 12 },
     },
     {
-      id: "e-studio409cs-7531430034ml6-cxtgv-230-045",
-      label: "e-STUDIO409CS 7531430034ML6 CXTGV.230.045",
+      id: "e-studio409cs",
+      label: "e-STUDIO409CS",
       manufacturer: "Toshiba",
-      fields: { product: "e-STUDIO409CS 7531430034ML6 CXTGV.230.045", warranty: 12 },
+      fields: { product: "e-STUDIO409CS", warranty: 12 },
     },
     {
-      id: "e-studio409p-46014524104w5-mslbd-230-047",
-      label: "e-STUDIO409P 46014524104W5 MSLBD.230.047",
+      id: "e-studio409p",
+      label: "e-STUDIO409P",
       manufacturer: "Toshiba",
-      fields: { product: "e-STUDIO409P 46014524104W5 MSLBD.230.047", warranty: 12 },
+      fields: { product: "e-STUDIO409P", warranty: 12 },
     },
     {
       id: "e-studio4525ac",
@@ -1825,11 +1827,6 @@ export const MODEL_PRESETS = {
       label: "FS-2100DN",
       manufacturer: "Kyocera",
       fields: { product: "FS-2100DN", warranty: 12 },
-    },
-    {
-      id: "generic-text-only",
-      label: "Generic / Text Only",
-      fields: { product: "Generic / Text Only", warranty: 12 },
     },
     {
       id: "jack",
@@ -1987,20 +1984,9 @@ export const MODEL_PRESETS = {
       fields: { product: "KX-DT521", warranty: 12 },
     },
     {
-      id: "monitor",
-      label: "Monitor",
-      fields: { product: "Monitor", warranty: 12 },
-    },
-    {
       id: "power-amplifier",
       label: "Power Amplifier",
       fields: { product: "Power Amplifier", warranty: 12 },
-    },
-    {
-      id: "pro-dock",
-      label: "Pro Dock",
-      manufacturer: "Dell",
-      fields: { product: "Pro Dock", warranty: 48 },
     },
     {
       id: "projector",
