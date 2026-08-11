@@ -20,15 +20,15 @@ exactly):
   required, as usual)
 - Printers & Copiers (IP Address is optional; every other field is
   required, as usual)
+- Servers (adds Memory(GB) and Disk Space(GB))
 
-There are also tabs for **Servers** and **Docking Stations** — these are
-marked "(Coming soon)" because there's no Freshservice import template for
-them yet, so the tab just shows a message. They mirror the exact Asset
-Type values from a Freshservice product export (not a guessed grouping),
-and their product catalogs already exist in `js/catalog.js`
-(`MODEL_PRESETS`), so nothing is lost — add columns for one of them in
-`js/templates.js` whenever a real template is available and it becomes a
-fully working tab like the other ten.
+There's also a tab for **Docking Stations** — marked "(Coming soon)"
+because there's no Freshservice import template for it yet, so the tab
+just shows a message. It mirrors the exact Asset Type value from a
+Freshservice product export (not a guessed grouping), and its product
+catalog already exists in `js/catalog.js` (`MODEL_PRESETS`), so nothing is
+lost — add columns for it in `js/templates.js` whenever a real template is
+available and it becomes a fully working tab like the other eleven.
 
 "Computer (Unspecified)" has been removed — its six catalogued products
 were all actually laptops, so they were merged into the Laptop catalog

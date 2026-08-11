@@ -201,6 +201,26 @@ export const ASSET_TYPES = [
       col('ipAddress', 'IP Address', 'text', 'default', { group: 'hardware', required: false }),
     ],
   },
+  {
+    id: 'server',
+    label: 'Servers',
+    columns: [
+      col('name', 'Name', 'text', 'row'),
+      col('company', 'Company', 'text', 'default', { group: 'general' }),
+      col('location', 'Location', 'text', 'default', { group: 'general' }),
+      col('assetTag', 'Asset Tag', 'text', 'row'),
+      col('endOfLife', 'End of Life', 'date', 'default', { group: 'hardware' }),
+      col('product', 'Product', 'text', 'default', { group: 'hardware' }),
+      col('serialNumber', 'Serial Number', 'text', 'row'),
+      col('cost', 'Cost', 'number', 'default', { group: 'hardware' }),
+      col('warranty', 'Warranty (In Months)', 'number', 'default', { group: 'hardware' }),
+      col('assetState', 'Asset State', 'text', 'default', { group: 'hardware', datalist: 'assetStates' }),
+      col('acquisitionDate', 'Acquisition Date', 'date', 'default', { group: 'hardware' }),
+      col('warrantyExpiry', 'Warranty Expiry Date', 'date', 'default', { group: 'hardware' }),
+      col('memory', 'Memory(GB)', 'number', 'default', { group: 'hardware' }),
+      col('disk', 'Disk Space(GB)', 'number', 'default', { group: 'hardware' }),
+    ],
+  },
   // The types below don't have a Freshservice import template wired up
   // yet, so they have no columns and the app shows a "Coming soon"
   // message instead of Defaults/Bulk Add/Rows for them. Their Model
@@ -211,7 +231,6 @@ export const ASSET_TYPES = [
   // These ids/labels mirror the exact "Asset Type" values from a
   // Freshservice product export, so each one lines up with a real
   // Freshservice asset type rather than a guessed grouping.
-  { id: 'server', label: 'Servers', comingSoon: true, columns: [] },
   { id: 'docking_station', label: 'Docking Stations', comingSoon: true, columns: [] },
 ];
 
