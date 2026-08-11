@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.3.1';
-import { buildCsv, downloadCsv } from './csv.js?v=1.3.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.3.1';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.3.1';
-import { iconSvg } from './icons.js?v=1.3.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.4.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.4.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.4.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.4.0';
+import { iconSvg } from './icons.js?v=1.4.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1099,6 +1099,89 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
   wireInfoDialog(releaseNotesDialog, [releaseNotesBtn, versionBadgeBtn], releaseNotesClose);
 }
 
+// ---------- Matrix theme's falling-character rain ----------
+
+// A background ambience, not a foreground effect — every guard here exists
+// so it doesn't get in the way of actually using the app: dim (low alpha,
+// so it reads clearly behind panels without fighting their text), throttled
+// well below 60fps (redraws every MATRIX_FRAME_INTERVAL ms, not every
+// frame), paused via the Page Visibility API whenever the tab isn't
+// visible, and skipped entirely under prefers-reduced-motion. Only ever
+// running while [data-theme='matrix'] is actually selected — start/stop
+// are called from applyTheme() below.
+const MATRIX_CHARS =
+  'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789';
+const MATRIX_FONT_SIZE = 16;
+const MATRIX_FRAME_INTERVAL = 70;
+const matrixCanvas = document.getElementById('matrix-rain');
+let matrixCtx = null;
+let matrixColumns = [];
+let matrixFrameId = null;
+let matrixLastFrameTime = 0;
+
+function matrixResize() {
+  if (!matrixCanvas) return;
+  matrixCanvas.width = window.innerWidth;
+  matrixCanvas.height = window.innerHeight;
+  const columnCount = Math.ceil(matrixCanvas.width / MATRIX_FONT_SIZE);
+  matrixColumns = Array.from({ length: columnCount }, () => Math.random() * -100);
+}
+
+function matrixDraw(time) {
+  matrixFrameId = requestAnimationFrame(matrixDraw);
+  if (time - matrixLastFrameTime < MATRIX_FRAME_INTERVAL) return;
+  matrixLastFrameTime = time;
+
+  // A translucent black rect over the previous frame, rather than
+  // clearing it outright, is what leaves the fading trail behind each
+  // falling character instead of a hard-edged blink.
+  matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+  matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  matrixCtx.fillStyle = 'rgba(57, 255, 106, 0.45)';
+  matrixCtx.font = `${MATRIX_FONT_SIZE}px monospace`;
+
+  for (let i = 0; i < matrixColumns.length; i++) {
+    const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+    const x = i * MATRIX_FONT_SIZE;
+    const y = matrixColumns[i] * MATRIX_FONT_SIZE;
+    matrixCtx.fillText(char, x, y);
+    if (y > matrixCanvas.height && Math.random() > 0.975) {
+      matrixColumns[i] = 0;
+    } else {
+      matrixColumns[i]++;
+    }
+  }
+}
+
+function startMatrixRain() {
+  if (!matrixCanvas || matrixFrameId || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  matrixCtx = matrixCanvas.getContext('2d');
+  matrixResize();
+  window.addEventListener('resize', matrixResize);
+  matrixLastFrameTime = 0;
+  matrixFrameId = requestAnimationFrame(matrixDraw);
+}
+
+function stopMatrixRain() {
+  if (matrixFrameId) {
+    cancelAnimationFrame(matrixFrameId);
+    matrixFrameId = null;
+  }
+  window.removeEventListener('resize', matrixResize);
+  if (matrixCtx && matrixCanvas) {
+    matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.documentElement.getAttribute('data-theme') !== 'matrix') return;
+  if (document.hidden) {
+    stopMatrixRain();
+  } else {
+    startMatrixRain();
+  }
+});
+
 // ---------- Theme selector ----------
 
 // "System" (no stored value, or explicitly 'system') leaves no data-theme
@@ -1110,7 +1193,7 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
 // a saved override before first paint (to avoid a flash of the wrong
 // theme); this just keeps the <select> in sync and reacts to changes.
 const THEME_KEY = 'fsai:v1:theme';
-const THEME_VALUES = ['light', 'dark', 'vista', 'mac', 'xp', 'win31'];
+const THEME_VALUES = ['light', 'dark', 'vista', 'mac', 'xp', 'win31', 'matrix'];
 const themeSelect = document.getElementById('theme-select');
 if (themeSelect) {
   document.getElementById('theme-select-icon').innerHTML = iconSvg('theme');
@@ -1120,6 +1203,11 @@ if (themeSelect) {
       document.documentElement.setAttribute('data-theme', value);
     } else {
       document.documentElement.removeAttribute('data-theme');
+    }
+    if (value === 'matrix') {
+      startMatrixRain();
+    } else {
+      stopMatrixRain();
     }
   }
 

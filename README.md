@@ -51,9 +51,15 @@ explicitly:
   rounded corners, Tahoma, glossy (but flat, no blur) gradient buttons.
 - **Windows 3.1** — a teal desktop, gray panels with the classic Win16
   3D bevel (`border-style: outset`/`inset`), sharp corners everywhere.
+- **Matrix** — a black/green terminal look (monospace type, glowing
+  outline buttons) with a falling-character canvas animating behind
+  everything. Dimmed and throttled well below 60fps so it reads as
+  ambience rather than a distraction, pauses automatically whenever the
+  tab isn't visible, and skips entirely under `prefers-reduced-motion`.
 
 Every option beyond Light/Dark is a full visual reskin, not just a
-palette swap — same blue/red/green button color coding throughout,
+palette swap — same blue/red/green(/cyan for Matrix) button color coding
+throughout,
 just restyled per theme. Your choice is remembered in `localStorage` and
 applied before the page paints on your next visit, so there's no flash
 of the wrong theme.

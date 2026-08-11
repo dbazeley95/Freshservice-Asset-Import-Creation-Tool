@@ -499,6 +499,106 @@
   border: 1px solid #000000;
 }
 
+/* Fixed + negative z-index: sits behind every panel/header (all of which
+   are normal-flow, so implicitly z-index:0) and never affects layout or
+   scroll height. Hidden outside the Matrix theme; js/app.js only ever
+   draws to it while [data-theme='matrix'] is set. */
+#matrix-rain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: none;
+  pointer-events: none;
+}
+
+[data-theme='matrix'] #matrix-rain {
+  display: block;
+}
+
+/* ---------- Matrix theme ----------
+   Black-and-green terminal look, monospace type, glowing outline
+   buttons — plus the falling-character canvas behind everything
+   (js/app.js draws to #matrix-rain; this file only styles the chrome).
+   Panels stay a near-opaque dark green rather than glass-transparent
+   like Vista, so the rain reads as background ambience in the gaps
+   between them instead of competing with the data-entry text sitting
+   on top of it. */
+:root[data-theme='matrix'] {
+  --bg: #000000;
+  --panel-bg: rgba(0, 12, 0, 0.94);
+  --text: #39ff6a;
+  --text-muted: #2c8a45;
+  --border: rgba(57, 255, 106, 0.4);
+  --accent: #39ff6a;
+  --accent-text: #001a00;
+  --danger: #ff3b3b;
+  --input-bg: rgba(0, 20, 0, 0.9);
+  --table-head-bg: rgba(0, 35, 0, 0.9);
+  --table-row-alt: rgba(0, 20, 0, 0.5);
+  --coming-soon: #7fffb0;
+  --coming-soon-bg: rgba(0, 40, 20, 0.55);
+  --badge-bg: rgba(0, 20, 0, 0.9);
+  --badge-text: #39ff6a;
+  --input-border: rgba(57, 255, 106, 0.5);
+  --warning: #ffd23f;
+  --warning-bg: rgba(40, 35, 0, 0.6);
+  --success: #00ffc8;
+  --success-text: #001a00;
+}
+
+[data-theme='matrix'] body {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+[data-theme='matrix'] .app-header,
+[data-theme='matrix'] .panel,
+[data-theme='matrix'] .info-dialog,
+[data-theme='matrix'] .side-nav,
+[data-theme='matrix'] .table-wrap {
+  border-radius: 0;
+  border-color: rgba(57, 255, 106, 0.35);
+  box-shadow: 0 0 14px rgba(57, 255, 106, 0.15);
+}
+
+[data-theme='matrix'] button.primary,
+[data-theme='matrix'] .header-btn,
+[data-theme='matrix'] .theme-select-wrap,
+[data-theme='matrix'] .tab.active {
+  background: #000000;
+  border: 1px solid #39ff6a;
+  color: #39ff6a;
+  text-shadow: 0 0 6px rgba(57, 255, 106, 0.8);
+  box-shadow: 0 0 8px rgba(57, 255, 106, 0.35);
+}
+
+[data-theme='matrix'] button.primary:hover,
+[data-theme='matrix'] .header-btn:hover {
+  box-shadow: 0 0 14px rgba(57, 255, 106, 0.6);
+}
+
+[data-theme='matrix'] button.danger {
+  background: #000000;
+  border: 1px solid #ff3b3b;
+  color: #ff3b3b;
+  text-shadow: 0 0 6px rgba(255, 59, 59, 0.8);
+  box-shadow: 0 0 8px rgba(255, 59, 59, 0.3);
+}
+
+[data-theme='matrix'] button.success {
+  background: #000000;
+  border: 1px solid #00ffc8;
+  color: #00ffc8;
+  text-shadow: 0 0 6px rgba(0, 255, 200, 0.8);
+  box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
+}
+
+[data-theme='matrix'] input,
+[data-theme='matrix'] select:not(.theme-select),
+[data-theme='matrix'] textarea {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
 * {
   box-sizing: border-box;
 }
