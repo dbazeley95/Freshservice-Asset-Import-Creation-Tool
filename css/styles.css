@@ -639,7 +639,12 @@ body {
 .app-shell {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  /* Top padding — without it, both the sidebar (desktop) and the "Asset
+     Type" toggle (mobile) sit flush against .app-header's bottom edge,
+     which reads as touching/sitting on its border rather than as a
+     separate section, especially with a themed header border/pattern
+     (e.g. Classic Mac's pinstripes) making that seam more visible. */
+  padding: 1.25rem 1.5rem 3rem;
 }
 
 .nav-toggle {
