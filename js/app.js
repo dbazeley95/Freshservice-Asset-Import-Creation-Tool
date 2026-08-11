@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns } from './templates.js?v=0.13.0';
-import { buildCsv, downloadCsv } from './csv.js?v=0.13.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.13.0';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.13.0';
-import { iconSvg } from './icons.js?v=0.13.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.14.0';
+import { buildCsv, downloadCsv } from './csv.js?v=0.14.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.14.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.14.0';
+import { iconSvg } from './icons.js?v=0.14.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -481,11 +481,26 @@ function lineHasNameSerialDelimiter(line) {
   return line.includes('\t') || line.includes(',');
 }
 
-function splitNameSerial(line) {
+// extraCols are per-device 'row' fields beyond Name/Serial that this asset
+// type wants set per line too (e.g. Phones & Telephony's Extension) — see
+// extraRowColumns in templates.js. With none, this only ever splits on the
+// FIRST delimiter, so a Name that itself contains a comma (legal — Bulk
+// Add isn't real CSV) still round-trips intact. With extras, a plain
+// split is used instead so each extra gets its own segment; a line can
+// still give fewer values than there are extras (they're left blank).
+function splitBulkLine(line, extraCols) {
   const delim = line.includes('\t') ? '\t' : line.includes(',') ? ',' : null;
-  if (!delim) return { name: '', serial: line.trim() };
-  const idx = line.indexOf(delim);
-  return { name: line.slice(0, idx).trim(), serial: line.slice(idx + 1).trim() };
+  if (!delim) return { name: '', serial: line.trim(), extras: {} };
+  if (extraCols.length === 0) {
+    const idx = line.indexOf(delim);
+    return { name: line.slice(0, idx).trim(), serial: line.slice(idx + 1).trim(), extras: {} };
+  }
+  const [name = '', serial = '', ...rest] = line.split(delim).map((p) => p.trim());
+  const extras = {};
+  extraCols.forEach((col, i) => {
+    extras[col.key] = rest[i] ?? '';
+  });
+  return { name, serial, extras };
 }
 
 // Minimal CSV line parser (handles "quoted, fields" with "" escaping) —
@@ -587,11 +602,15 @@ function buildRowsFromText(assetType, state, text) {
   // it's caught in review instead of silently becoming Name = Asset Tag.
   const anyLineHasDelimiter = lines.some(lineHasNameSerialDelimiter);
   const shortCode = shortCodeForCompany(state.defaults.company);
+  const extraCols = extraRowColumns(assetType);
   return lines.map((line) => {
-    const { name: manualName, serial } = splitNameSerial(line);
+    const { name: manualName, serial, extras } = splitBulkLine(line, extraCols);
     const row = {};
     for (const col of defaultColumns(assetType)) {
       row[col.key] = state.defaults[col.key] ?? '';
+    }
+    for (const col of extraCols) {
+      row[col.key] = extras[col.key] ?? '';
     }
     row.serialNumber = serial;
     row.assetTag = shortCode ? `${shortCode}-${serial}` : '';
@@ -711,7 +730,7 @@ function renderBulkForm(assetType, state) {
     fileInput.value = '';
     if (!file) return;
     const entries = parseCsvFile(await file.text());
-    // Join with a tab, not a comma: splitNameSerial prefers tab when
+    // Join with a tab, not a comma: splitBulkLine prefers tab when
     // present, so a Name that itself contains a comma (legal in a quoted
     // CSV field) survives the round-trip through this textarea intact.
     textarea.value = entries.map(({ name, serial }) => (name ? `${name}\t${serial}` : serial)).join('\n');
@@ -726,11 +745,22 @@ function renderBulkForm(assetType, state) {
   const textarea = document.createElement('textarea');
   textarea.id = 'bulk-serials';
   textarea.rows = 6;
-  textarea.placeholder =
-    'Paste one per line — a bare serial (Name defaults to the same value as Asset Tag), or ' +
-    '"Name, Serial" (or paste two columns from a spreadsheet) to set the name yourself\n' +
-    'e.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
-    '\n...or use Import CSV above to load a Name,Serial file instead.';
+  const extraCols = extraRowColumns(assetType);
+  if (extraCols.length > 0) {
+    const extraHeaders = extraCols.map((c) => c.header).join(', ');
+    const extraExample = extraCols.map(() => '123').join(', ');
+    textarea.placeholder =
+      'Paste one per line — a bare serial (Name defaults to the same value as Asset Tag), or ' +
+      `"Name, Serial, ${extraHeaders}" (or paste columns from a spreadsheet) to set them yourself ` +
+      `— trailing values can be left off a line if you don't have them yet\n` +
+      `e.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217, ${extraExample}\n...`;
+  } else {
+    textarea.placeholder =
+      'Paste one per line — a bare serial (Name defaults to the same value as Asset Tag), or ' +
+      '"Name, Serial" (or paste two columns from a spreadsheet) to set the name yourself\n' +
+      'e.g.\nLL7QX4MQ9N\nMAR-05, LXQL7XR217\n...' +
+      '\n...or use Import CSV above to load a Name,Serial file instead.';
+  }
   bulkSerialsTextarea = textarea;
   textarea.addEventListener('input', () => schedulePreviewUpdate(assetType, state, textarea.value));
   serialsField.appendChild(textarea);

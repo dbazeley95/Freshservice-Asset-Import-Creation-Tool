@@ -14,13 +14,15 @@ exactly):
 - Desktop
 - iPads / Tablets
 - Wi-Fi Access Points
-- Other Devices
 - Network Switches
-- Phones & Telephony (Extension is optional; every other field is
-  required, as usual)
+- Phones & Telephony (Extension is optional and set per row, like Serial
+  Number, rather than as a shared default; every other field is required,
+  as usual)
 - Printers & Copiers (IP Address is optional; every other field is
   required, as usual)
 - Servers (adds Memory(GB) and Disk Space(GB))
+- Other Devices (deliberately last in the menu &mdash; it's a catch-all
+  bucket, not meant to be anyone's first choice)
 
 There's also a tab for **Docking Stations** — marked "(Coming soon)"
 because there's no Freshservice import template for it yet, so the tab
@@ -64,6 +66,13 @@ instead of staying in their own now-empty bucket.
    - a `Name, Serial` pair (or paste two columns straight from a
      spreadsheet — tab-separated works too), for when names were assigned
      before serials were recorded and don't match up device-for-device.
+
+   Asset types with a genuinely per-device field beyond Name/Serial/Asset
+   Tag (currently just Phones & Telephony's Extension) accept it as extra
+   trailing values on the same line — `Name, Serial, Extension` — instead
+   of it being one shared value copied onto every row; leave the trailing
+   value off a line if you don't have it yet, and set or edit it per row
+   afterwards in the Rows table like any other field.
 
    If a bare-serial line shows up in the same paste as `Name, Serial`
    lines, it's almost always a forgotten comma rather than an intentional
