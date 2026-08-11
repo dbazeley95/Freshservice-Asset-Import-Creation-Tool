@@ -968,11 +968,16 @@ main {
   margin-top: 0.5rem;
 }
 
-/* The final action of the whole page — full width and set apart below
-   the table it exports, rather than sitting in the toolbar alongside
-   Clear All Rows/Import, so it reads as the last step, not one option
-   among several. */
-#download-btn {
+/* The final actions of the page — full width and set apart below the
+   table they act on, rather than sitting in the toolbar alongside Clear
+   All Rows/Import, so they read as the last steps, not options among
+   several. #open-freshservice-btn is content-width by default (like any
+   other button) and only reads full-width because it happens to wrap
+   onto its own line below #download-btn's own width:100% — matching its
+   sizing here explicitly, rather than relying on that coincidence, is
+   what actually makes it look consistent. */
+#download-btn,
+#open-freshservice-btn {
   width: 100%;
   margin-top: 1rem;
   font-size: 1rem;

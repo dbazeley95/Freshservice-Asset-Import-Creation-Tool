@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.4.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.1" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.4.1" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.4.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.4.1" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.1" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.1</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.4.1</span><h3 class="changelog-title">Open Freshservice Button Width Fix</h3></div>
+        <p>"Open Freshservice to Import" was narrower than Download CSV above it &mdash; it never got the full-width sizing added for Download CSV, so it fell back to default content-width and only looked full-width by coincidence (wrapping onto its own line below Download CSV's own full-width box). Both buttons now share the same width rule explicitly.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.4.0</span><h3 class="changelog-title">Matrix Theme</h3></div>
         <p>A sixth Theme option: a black/green terminal skin (monospace type, glowing outline buttons) with a falling-character canvas animating behind everything. Kept deliberately restrained since it's the first animated theme &mdash; dimmed and throttled well below 60fps, paused automatically whenever the tab isn't visible, and skipped entirely under <code>prefers-reduced-motion</code>, so it stays background ambience rather than competing with actually using the app.</p>
@@ -432,6 +436,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.4.0"></script>
+  <script type="module" src="js/app.js?v=1.4.1"></script>
 </body>
 </html>
