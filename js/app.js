@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.16.6';
-import { buildCsv, downloadCsv } from './csv.js?v=0.16.6';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.16.6';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.16.6';
-import { iconSvg } from './icons.js?v=0.16.6';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.16.7';
+import { buildCsv, downloadCsv } from './csv.js?v=0.16.7';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.16.7';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.16.7';
+import { iconSvg } from './icons.js?v=0.16.7';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 

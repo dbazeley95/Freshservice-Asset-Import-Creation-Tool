@@ -5,19 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Freshservice Asset Import Leverage System</title>
   <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png" />
-  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- ?v= busts GitHub Pages' CDN cache (max-age=600) on deploy, matching
+       the version badge whenever css/js/manifest/icon files change. This
+       matters even more for the favicon/apple-touch-icon/manifest icon
+       links below than for css/js — browsers cache favicons by URL far
+       more stubbornly than normal page assets, sometimes for days,
+       independent of any server cache-control header, so a same-URL icon
+       swap can go unnoticed indefinitely without a ?v= bump forcing a
+       genuinely new URL. -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=0.16.7" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=0.16.7" />
+  <link rel="manifest" href="manifest.webmanifest?v=0.16.7" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=0.16.7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <!-- ?v= busts GitHub Pages' CDN cache (max-age=600) on deploy — bump it
-       (here and on the js/app.js script tag below) to match the version
-       badge whenever css/js changes, or returning visitors can keep an old
-       cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.16.6" />
+  <link rel="stylesheet" href="css/styles.css?v=0.16.7" />
 </head>
 <body>
   <header class="app-header">
@@ -41,10 +45,10 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=0.16.7" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.6 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.16.7 beta</button>
       </div>
     </div>
 
@@ -196,6 +200,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.16.7</span><h3 class="changelog-title">Icon Cache-Busting Fix</h3></div>
+        <p>The browser tab (favicon), Home Screen, and PWA install icon files kept the same filenames across every recent icon redesign, so browsers that had already cached an older version had no reason to notice the new one &mdash; favicons are cached far more stubbornly than normal page assets, sometimes for days. All icon/manifest links now carry the same <code>?v=</code> cache-busting already used for CSS/JS, so icon updates take effect immediately going forward.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.16.6</span><h3 class="changelog-title">Simplified Icon: Monitor Only</h3></div>
         <p>Dropped the tower from every icon (Home Screen, PWA install, favicon, header) and kept just the monitor with the Xavier CET logo in its screen. With no tower competing for space, the screen &mdash; and the logo inside it &mdash; is noticeably bigger and clearer at every size, including the true 16px size most browsers actually render tab icons at.</p>
@@ -359,6 +367,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.16.6"></script>
+  <script type="module" src="js/app.js?v=0.16.7"></script>
 </body>
 </html>
