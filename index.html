@@ -10,7 +10,7 @@
        (here and on the js/app.js script tag below) to match the version
        badge whenever css/js changes, or returning visitors can keep an old
        cached copy for up to 10 minutes. -->
-  <link rel="stylesheet" href="css/styles.css?v=0.9.4" />
+  <link rel="stylesheet" href="css/styles.css?v=0.9.5" />
 </head>
 <body>
   <header class="app-header">
@@ -33,7 +33,7 @@
       <img class="brand-logo" src="assets/logo.png" alt="Xavier Catholic Education Trust logo" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.4 beta</button>
+        <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v0.9.5 beta</button>
       </div>
     </div>
 
@@ -181,6 +181,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">0.9.5</span><h3 class="changelog-title">Date Field Width Fix, Take Two</h3></div>
+        <p>The 0.9.2 fix wasn't enough on real iOS Safari &mdash; Acquisition Date and End of Life could still render wider than every other field. iOS's native date control apparently ignores min-width/max-width in a grid/flex layout regardless; it now also drops the native chrome (<code>-webkit-appearance: none</code>) in favor of a plainer control that actually respects the page's sizing, while still opening the native date picker when tapped.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">0.9.4</span><h3 class="changelog-title">Download CSV Moved Below Rows</h3></div>
         <p>Moved out of the Rows toolbar to its own full-width button below the table, so it reads as the final step after reviewing your rows rather than one option among several.</p>
       </div>
@@ -275,6 +279,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=0.9.4"></script>
+  <script type="module" src="js/app.js?v=0.9.5"></script>
 </body>
 </html>

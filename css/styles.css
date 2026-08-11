@@ -414,6 +414,12 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  /* .field is itself a CSS Grid item (in .form-grid) as well as a flex
+     container for its own label+input — grid items get the same
+     content-based automatic minimum size as flex items unless this is
+     zeroed, which is one more place a wide native control could force
+     this cell wider than its column. */
+  min-width: 0;
 }
 
 .field-wide {
@@ -477,6 +483,16 @@ select {
      any container that isn't flex/grid. */
   min-width: 0;
   max-width: 100%;
+}
+
+/* min-width/max-width alone weren't enough on real iOS Safari — its native
+   day/month/year control apparently still renders at its own intrinsic
+   width in a grid/flex layout regardless. -webkit-appearance: none drops
+   iOS's native chrome in favor of a plainer control that actually obeys
+   the CSS box model; tapping it still opens the native date picker. */
+input[type='date'] {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 textarea {
