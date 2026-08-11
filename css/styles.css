@@ -467,6 +467,7 @@ input,
 textarea,
 select {
   font: inherit;
+  line-height: 1.4;
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--input-border);
   border-radius: 6px;
@@ -483,6 +484,18 @@ select {
      any container that isn't flex/grid. */
   min-width: 0;
   max-width: 100%;
+}
+
+/* An explicit floor, not just padding + line-height, so every field is
+   guaranteed the same height regardless of a given input type's own
+   default vertical metrics — the date fix below removes iOS's native
+   chrome from type="date", which turned out to include padding/height
+   iOS was adding on top of ours, so without this those two fields render
+   shorter than every plain text/number field next to them. 2.75rem also
+   happens to clear Apple's 44px minimum touch target guideline. */
+input,
+select {
+  min-height: 2.75rem;
 }
 
 /* min-width/max-width alone weren't enough on real iOS Safari — its native
