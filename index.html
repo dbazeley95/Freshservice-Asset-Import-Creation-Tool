@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.1" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.1" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.4.1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.2" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.2" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.4.2" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.1" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.4.1" />
+  <link rel="stylesheet" href="css/styles.css?v=1.4.2" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.1" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.2" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.1</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.2</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -120,7 +120,7 @@
 
           <section class="panel" aria-labelledby="general-heading">
             <h2 id="general-heading">General</h2>
-            <p class="hint">Which site this batch belongs to. Type the Company &mdash; Location fills in automatically for known sites, unless you've already typed one yourself. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
+            <p class="hint">Which site this batch belongs to. Click into Company to see every known site, or type to filter &mdash; Location fills in automatically for a known site, unless you've already typed one yourself. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
             <div id="general-form" class="form-grid"></div>
           </section>
 
@@ -195,7 +195,7 @@
       <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, or Other Devices. Types marked "Coming soon" don't have an import template wired up yet.</p>
 
       <h3>2. Fill in General</h3>
-      <p>Type the <strong>Company</strong> &mdash; for a known site, <strong>Location</strong> fills in automatically, unless you've already typed one yourself. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
+      <p><strong>Company</strong> has a dropdown of every known site &mdash; click in to see the full list, or type to filter it (typing a site not yet in the list still gets remembered for next time). Picking or typing a known site auto-fills <strong>Location</strong>, unless you've already typed one yourself; Location always stays freely editable afterwards. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
 
       <h3>3. Fill in Hardware Specific</h3>
       <p>Fields marked with a red <strong>*</strong> are required. Start typing in <strong>Product</strong> to see suggestions, or narrow them first with the <strong>Manufacturer</strong> dropdown above it. Picking a known product auto-fills its Warranty and other specs.</p>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.4.2</span><h3 class="changelog-title">Company Dropdown Restored</h3></div>
+        <p>Company now has a dropdown of every known site again &mdash; click in to see the full list, or type to filter it. This was a real dropdown (a native <code>&lt;select&gt;</code>) once, dropped in v0.8.0 in favor of free text with typed-history suggestions only; it's back now using the same reliable combobox already used for Product, rather than the old native select. Typing a site not yet in the list is still remembered for next time. Location stays exactly as it's been &mdash; auto-filled from a matching site but always freely editable, since it's expected to grow to hundreds of values that don't each need a catalog entry.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.4.1</span><h3 class="changelog-title">Open Freshservice Button Width Fix</h3></div>
         <p>"Open Freshservice to Import" was narrower than Download CSV above it &mdash; it never got the full-width sizing added for Download CSV, so it fell back to default content-width and only looked full-width by coincidence (wrapping onto its own line below Download CSV's own full-width box). Both buttons now share the same width rule explicitly.</p>
@@ -436,6 +440,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.4.1"></script>
+  <script type="module" src="js/app.js?v=1.4.2"></script>
 </body>
 </html>

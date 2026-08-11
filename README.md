@@ -68,10 +68,15 @@ of the wrong theme.
    "Asset Type" button on narrow screens (closes again once you pick one),
    an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
    PC on first visit.
-2. Fill in **General** — which site this batch belongs to. Type the
-   **Company**; for a known site, **Location** fills in automatically
-   (since every site in this org is its own Company *and* Location), unless
-   you've already typed one yourself.
+2. Fill in **General** — which site this batch belongs to. **Company**
+   has a dropdown of every known site (`SITE_PRESETS` in
+   `js/catalog.js`) — click in to see the full list, or type to filter
+   it; a site you type that isn't in the list yet is still remembered
+   and offered next time. Picking or typing a known site fills in
+   **Location** automatically (since every site in this org is its own
+   Company *and* Location), unless you've already typed one yourself —
+   Location always stays freely editable afterwards, since it's
+   expected to grow well past the preset list.
 3. Fill in **Hardware Specific** — what the hardware itself is (Product,
    Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). Start

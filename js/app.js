@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.4.1';
-import { buildCsv, downloadCsv } from './csv.js?v=1.4.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.4.1';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.4.1';
-import { iconSvg } from './icons.js?v=1.4.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.4.2';
+import { buildCsv, downloadCsv } from './csv.js?v=1.4.2';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.4.2';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.4.2';
+import { iconSvg } from './icons.js?v=1.4.2';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -207,6 +207,20 @@ function productCatalogOptions(modelPresets, manufacturerFilter) {
   return [...new Set(names)].sort((a, b) => a.localeCompare(b));
 }
 
+// Company's dropdown combines every known Site Preset — so the full list
+// shows up immediately on click, the way a dedicated preset dropdown did
+// before it was merged into free text — with anything typed that isn't in
+// that list yet, so a site not in catalog.js still gets remembered and
+// offered next time. Location deliberately has no equivalent: it's
+// expected to grow to hundreds of values that don't each need a
+// catalog.js entry, so it stays plain typed-history suggestions, still
+// auto-filled from a matching Site Preset but always freely editable.
+function companyPresetOptions(suggestions) {
+  const presetNames = SITE_PRESETS.map((p) => p.company);
+  const typed = suggestions.company || [];
+  return [...new Set([...presetNames, ...typed])].sort((a, b) => a.localeCompare(b));
+}
+
 // Manufacturer filter narrows the Product field's suggestions below —
 // there's no separate Model Preset control, so this is the only extra
 // field a catalogued asset type adds above the ordinary Hardware fields.
@@ -379,6 +393,8 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
   };
   if (col.key === 'product' && modelPresets.length > 0) {
     attachCombobox(input, wrap, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected);
+  } else if (col.key === 'company') {
+    attachCombobox(input, wrap, () => companyPresetOptions(suggestions), onSuggestionSelected);
   } else if (col.input === 'text') {
     attachCombobox(input, wrap, () => suggestions[col.key] || [], onSuggestionSelected);
   }
