@@ -135,6 +135,20 @@ recognise is ignored, and any template column missing from the file is left
 blank. Imported rows are added alongside whatever's already in the table,
 the same way Add Rows from Serials works.
 
+## Installing as an app
+
+This is a installable PWA (Progressive Web App). On Chrome/Edge (desktop
+or Android), an **Install App** button appears in the header once the
+browser decides the site qualifies — it adds a standalone, taskbar/home
+screen-pinnable copy with its own icon (`manifest.webmanifest`,
+`assets/icons/`). Safari (iOS/macOS) has no equivalent programmatic
+prompt, so the button never appears there, but **Add to Home Screen**
+from the Share sheet still works and now uses a proper app icon and name
+(the `apple-touch-icon`/`apple-mobile-web-app-*` tags in `index.html`).
+`service-worker.js` exists only to satisfy the browser's installability
+check — it doesn't do any offline caching beyond a network-first
+fallback, so it never fights the `?v=` cache-busting used elsewhere.
+
 ## Hosting on GitHub Pages
 
 This is a plain static site (`index.html`, `css/`, `js/`) with no build step.
@@ -181,6 +195,12 @@ js/csv.js              CSV escaping/formatting and filename/download helper
 js/storage.js          localStorage read/write helpers
 js/app.js              UI wiring — side nav, General/Hardware Specific
                        forms, bulk-add + live preview, table, toolbar
+manifest.webmanifest   PWA manifest (name, icons, theme colors) — see
+                       "Installing as an app" above
+service-worker.js      Minimal service worker, exists only to satisfy the
+                       browser's PWA installability check
+assets/icons/          App icons generated from assets/logo.png at the
+                       sizes/purposes manifest.webmanifest references
 ```
 
 To add a new asset type, add an entry to `ASSET_TYPES` in `js/templates.js`

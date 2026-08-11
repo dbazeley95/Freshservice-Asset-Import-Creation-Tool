@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.15.1';
-import { buildCsv, downloadCsv } from './csv.js?v=0.15.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.15.1';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.15.1';
-import { iconSvg } from './icons.js?v=0.15.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=0.16.0';
+import { buildCsv, downloadCsv } from './csv.js?v=0.16.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=0.16.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=0.16.0';
+import { iconSvg } from './icons.js?v=0.16.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1100,3 +1100,42 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
 }
 
 renderAll();
+
+// ---------- Install as PWA ----------
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+// The browser only offers a programmatic install prompt on Chromium-based
+// browsers (Chrome/Edge/Android) via `beforeinstallprompt` — Safari (iOS
+// and macOS) has no equivalent event, so this button simply never appears
+// there; Add to Home Screen on iOS is still available through the native
+// Share sheet, which the apple-touch-icon/apple-mobile-web-app-* tags in
+// index.html's <head> are for.
+let deferredInstallPrompt = null;
+const installAppBtn = document.getElementById('install-app-btn');
+if (installAppBtn) {
+  document.getElementById('install-app-icon').innerHTML = iconSvg('install');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installAppBtn.hidden = false;
+  });
+
+  installAppBtn.onclick = async () => {
+    if (!deferredInstallPrompt) return;
+    installAppBtn.hidden = true;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  };
+
+  window.addEventListener('appinstalled', () => {
+    installAppBtn.hidden = true;
+    deferredInstallPrompt = null;
+  });
+}
