@@ -182,8 +182,13 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* :not(.theme-select) matters here — without it, this (an [attr]+element
+   selector, specificity 0,1,1) would beat .theme-select's own
+   `background: transparent` (0,1,0) and paint a white box behind the
+   header's Theme dropdown text, the exact bug this comment is here to
+   stop from regressing. */
 [data-theme='vista'] input,
-[data-theme='vista'] select,
+[data-theme='vista'] select:not(.theme-select),
 [data-theme='vista'] textarea {
   background: var(--input-bg);
   box-shadow: 0 1px 2px rgba(20, 40, 70, 0.12) inset;
@@ -196,6 +201,302 @@
 [data-theme='vista'] .version-badge,
 [data-theme='vista'] .compiled-date {
   background: rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Classic Mac theme ----------
+   Mostly a black/white/gray reskin — System 7's chrome really was
+   monochrome — plus a pinstriped title bar (the signature System 7
+   window look) and sharp-cornered panels; .header-btn/.tab.active etc.
+   keep their existing pill shape (System 7's own OK/Cancel buttons were
+   rounded-rect too), so unlike Vista/XP/Win3.1 below, buttons need no
+   border-radius override here at all — only color, border, and font. */
+:root[data-theme='mac'] {
+  --bg: #dddddd;
+  --panel-bg: #ffffff;
+  --text: #000000;
+  --text-muted: #4d4d4d;
+  --border: #000000;
+  --accent: #000000;
+  --accent-text: #ffffff;
+  --danger: #aa0000;
+  --input-bg: #ffffff;
+  --table-head-bg: #ffffff;
+  --table-row-alt: #eeeeee;
+  --coming-soon: #4d4d4d;
+  --coming-soon-bg: #eeeeee;
+  --badge-bg: #ffffff;
+  --badge-text: #000000;
+  --input-border: #000000;
+  --warning: #7a5c00;
+  --warning-bg: #fff6d5;
+  --success: #005f1f;
+  --success-text: #ffffff;
+}
+
+[data-theme='mac'] body {
+  font-family: Geneva, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+[data-theme='mac'] .app-header {
+  background: repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 2px, #dddddd 3px, #dddddd 4px);
+  border-bottom: 1px solid #000000;
+}
+
+[data-theme='mac'] .panel,
+[data-theme='mac'] .info-dialog,
+[data-theme='mac'] .side-nav,
+[data-theme='mac'] .table-wrap,
+[data-theme='mac'] .brand-logo,
+[data-theme='mac'] .brand-box {
+  border-radius: 0;
+}
+
+[data-theme='mac'] .info-dialog {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='mac'] .info-dialog-header {
+  border-radius: 0;
+}
+
+/* No colored fills — just a colored border on an otherwise white/black
+   button, keeping the semantic blue/red/green coding without breaking
+   the monochrome chrome. */
+[data-theme='mac'] button.primary,
+[data-theme='mac'] .header-btn,
+[data-theme='mac'] .theme-select-wrap {
+  background: #ffffff;
+  border: 2px solid #14283d;
+  color: #14283d;
+}
+
+[data-theme='mac'] button.danger {
+  background: #ffffff;
+  border: 2px solid #aa0000;
+  color: #aa0000;
+}
+
+[data-theme='mac'] button.success {
+  background: #ffffff;
+  border: 2px solid #005f1f;
+  color: #005f1f;
+}
+
+[data-theme='mac'] .tab.active {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+[data-theme='mac'] thead th {
+  background: #ffffff;
+  border-bottom: 2px solid #000000;
+  font-weight: 700;
+}
+
+/* ---------- Windows XP theme ----------
+   XP's "Luna" style: a flat blue gradient title bar with rounded top
+   corners (no blur — Luna predates Aero Glass), Tahoma, and glossy but
+   flat gradient buttons. */
+:root[data-theme='xp'] {
+  --bg: #ece9d8;
+  --panel-bg: #ffffff;
+  --text: #000000;
+  --text-muted: #4a4a4a;
+  --border: #a0a0a0;
+  --accent: #3a6ea5;
+  --accent-text: #ffffff;
+  --danger: #cc3333;
+  --input-bg: #ffffff;
+  --table-head-bg: #d6e4f0;
+  --table-row-alt: #eef4fb;
+  --coming-soon: #6a3d8f;
+  --coming-soon-bg: #e9def2;
+  --badge-bg: #ffffff;
+  --badge-text: #14283d;
+  --input-border: #7f9db9;
+  --warning: #8a6d1a;
+  --warning-bg: #fff6d5;
+  --success: #2f7a3d;
+  --success-text: #ffffff;
+}
+
+[data-theme='xp'] body {
+  font-family: Tahoma, Verdana, 'Segoe UI', sans-serif;
+}
+
+[data-theme='xp'] .app-header {
+  background: linear-gradient(to bottom, #4f91d8 0%, #2f6cb8 45%, #245ea0 50%, #3a7cc4 100%);
+  border-radius: 10px 10px 0 0;
+  border: 1px solid #1a4a80;
+}
+
+[data-theme='xp'] .app-header,
+[data-theme='xp'] .app-header .brand-title,
+[data-theme='xp'] .app-header .subtitle,
+[data-theme='xp'] .app-header .compiled-date {
+  color: #ffffff;
+}
+
+[data-theme='xp'] .app-header .brand-box {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+[data-theme='xp'] .app-header .brand-title,
+[data-theme='xp'] .app-header .compiled-date {
+  color: var(--text);
+}
+
+[data-theme='xp'] .panel,
+[data-theme='xp'] .info-dialog,
+[data-theme='xp'] .side-nav {
+  border-radius: 4px;
+}
+
+[data-theme='xp'] button.primary,
+[data-theme='xp'] .header-btn,
+[data-theme='xp'] .theme-select-wrap,
+[data-theme='xp'] .tab.active {
+  background: linear-gradient(to bottom, #eaf4ff 0%, #b6d6f4 45%, #6badde 50%, #3a7cc4 100%);
+  border-color: #2f6cb8;
+  color: #0f3050;
+  border-radius: 6px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-theme='xp'] button.danger {
+  background: linear-gradient(to bottom, #ffefef 0%, #f5bcbc 45%, #e28a8a 50%, #c24545 100%);
+  border-color: #a03030;
+  color: #4a0d05;
+  border-radius: 6px;
+}
+
+[data-theme='xp'] button.success {
+  background: linear-gradient(to bottom, #eefcee 0%, #c4ecc4 45%, #93d698 50%, #4c9e58 100%);
+  border-color: #35753f;
+  color: #0c2f11;
+  border-radius: 6px;
+}
+
+[data-theme='xp'] thead th {
+  background: linear-gradient(to bottom, #eaf2fa 0%, #d6e4f0 100%);
+}
+
+/* ---------- Windows 3.1 theme ----------
+   The chunkiest of the four: sharp corners everywhere, and the classic
+   Win16 3D bevel — border-style: outset/inset does the light/dark edge
+   shading natively, no gradients or box-shadow tricks needed for it. */
+:root[data-theme='win31'] {
+  --bg: #008080;
+  --panel-bg: #c0c0c0;
+  --text: #000000;
+  --text-muted: #333333;
+  --border: #000000;
+  --accent: #000080;
+  --accent-text: #ffffff;
+  --danger: #800000;
+  --input-bg: #ffffff;
+  --table-head-bg: #c0c0c0;
+  --table-row-alt: #d4d0c8;
+  --coming-soon: #800080;
+  --coming-soon-bg: #e8d8e8;
+  --badge-bg: #c0c0c0;
+  --badge-text: #000000;
+  --input-border: #000000;
+  --warning: #808000;
+  --warning-bg: #ffffcc;
+  --success: #008000;
+  --success-text: #ffffff;
+}
+
+[data-theme='win31'] body {
+  font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;
+}
+
+[data-theme='win31'] .app-header {
+  background: #000080;
+  color: #ffffff;
+  border-radius: 0;
+  border-bottom: 2px solid #000000;
+}
+
+[data-theme='win31'] .app-header .brand-title,
+[data-theme='win31'] .app-header .subtitle,
+[data-theme='win31'] .app-header .compiled-date {
+  color: #ffffff;
+}
+
+[data-theme='win31'] .app-header .brand-box {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  padding: 0.5rem 0.75rem;
+}
+
+[data-theme='win31'] .app-header .brand-title,
+[data-theme='win31'] .app-header .compiled-date {
+  color: var(--text);
+}
+
+[data-theme='win31'] .panel,
+[data-theme='win31'] .info-dialog,
+[data-theme='win31'] .side-nav,
+[data-theme='win31'] .table-wrap,
+[data-theme='win31'] .tab,
+[data-theme='win31'] .tab.active,
+[data-theme='win31'] .version-badge,
+[data-theme='win31'] .compiled-date,
+[data-theme='win31'] button,
+[data-theme='win31'] .header-btn,
+[data-theme='win31'] .theme-select-wrap,
+[data-theme='win31'] input,
+[data-theme='win31'] select,
+[data-theme='win31'] textarea {
+  border-radius: 0;
+}
+
+[data-theme='win31'] .panel,
+[data-theme='win31'] .info-dialog,
+[data-theme='win31'] .side-nav {
+  border: 2px outset #c0c0c0;
+}
+
+[data-theme='win31'] input,
+[data-theme='win31'] select:not(.theme-select),
+[data-theme='win31'] textarea {
+  border: 2px inset #c0c0c0;
+}
+
+[data-theme='win31'] button.primary,
+[data-theme='win31'] .header-btn,
+[data-theme='win31'] .theme-select-wrap,
+[data-theme='win31'] .tab.active {
+  background: #c0d4e8;
+  border: 2px outset #c0d4e8;
+  color: #000000;
+}
+
+[data-theme='win31'] button.danger {
+  background: #e8c0c0;
+  border: 2px outset #e8c0c0;
+  color: #000000;
+}
+
+[data-theme='win31'] button.success {
+  background: #c0e8c4;
+  border: 2px outset #c0e8c4;
+  color: #000000;
+}
+
+[data-theme='win31'] button:active,
+[data-theme='win31'] .header-btn:active {
+  border-style: inset;
+}
+
+[data-theme='win31'] thead th {
+  background: #c0c0c0;
+  border: 1px solid #000000;
 }
 
 * {

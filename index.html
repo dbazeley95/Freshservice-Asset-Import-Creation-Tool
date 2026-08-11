@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Freshservice Asset Import Leverage System</title>
   <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
-  <!-- Applies a saved Light/Dark/Vista override before first paint, inline
+  <!-- Applies a saved explicit-override theme before first paint, inline
        and blocking (not the deferred module in js/app.js) so there's no
        flash of the wrong theme while that loads. "System" (the default)
        leaves no data-theme attribute, so css/styles.css's
        prefers-color-scheme media query decides instead — this script only
-       ever runs for the three explicit overrides. -->
+       ever runs for the explicit overrides (kept in sync with the list in
+       js/app.js's THEME_VALUES). -->
   <script>
     (function () {
+      var THEME_VALUES = ['light', 'dark', 'vista', 'mac', 'xp', 'win31'];
       var theme = localStorage.getItem('fsai:v1:theme');
-      if (theme === 'light' || theme === 'dark' || theme === 'vista') {
+      if (THEME_VALUES.indexOf(theme) !== -1) {
         document.documentElement.setAttribute('data-theme', theme);
       }
     })();
@@ -27,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.2.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.2.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.2.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.3.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.3.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.3.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.2.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.3.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.2.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.3.0" />
 </head>
 <body>
   <header class="app-header">
@@ -64,16 +66,19 @@
           <option value="light">Theme: Light</option>
           <option value="dark">Theme: Dark</option>
           <option value="vista">Theme: Vista</option>
+          <option value="mac">Theme: Classic Mac</option>
+          <option value="xp">Theme: XP</option>
+          <option value="win31">Theme: Windows 3.1</option>
         </select>
       </div>
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.2.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.3.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.2.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.3.0</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -178,7 +183,7 @@
     </div>
     <div class="help-dialog-body">
       <h3>Theme</h3>
-      <p>The <strong>Theme</strong> dropdown in the header switches between System (follows your OS/browser setting), Light, Dark, and Vista &mdash; a retro Windows Vista "Aero Glass" skin, not just a color swap. Your choice is remembered and applied before the page paints on your next visit.</p>
+      <p>The <strong>Theme</strong> dropdown in the header switches between System (follows your OS/browser setting), Light, Dark, and four retro skins &mdash; Vista, Classic Mac, XP, and Windows 3.1 &mdash; each a full visual reskin rather than just a color swap. Your choice is remembered and applied before the page paints on your next visit.</p>
 
       <h3>1. Pick an asset type</h3>
       <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, or Other Devices. Types marked "Coming soon" don't have an import template wired up yet.</p>
@@ -230,6 +235,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.3.0</span><h3 class="changelog-title">Classic Mac, XP &amp; Windows 3.1 Themes</h3></div>
+        <p>Three more retro Theme options: Classic Mac (System 7's black/white chrome and pinstriped title bar), XP (the "Luna" blue gradient title bar and glossy-but-flat buttons), and Windows 3.1 (a teal desktop, gray panels, and the classic Win16 3D bevel). All keep the same blue/red/green button color coding, just restyled per theme. Also fixed a Vista bug where the Theme dropdown showed a stray white box behind its own text.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.2.0</span><h3 class="changelog-title">Vista Theme</h3></div>
         <p>Added Vista as a fourth Theme option &mdash; a proper retro skin (Windows Vista's "Aero Glass" look) rather than a palette swap: translucent blurred panels over a blue gradient desktop, and glossy gradient buttons that keep their blue/red/green color coding. Picked the same way as Light/Dark, and overrides your OS setting the same way too.</p>
@@ -409,6 +418,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.2.0"></script>
+  <script type="module" src="js/app.js?v=1.3.0"></script>
 </body>
 </html>

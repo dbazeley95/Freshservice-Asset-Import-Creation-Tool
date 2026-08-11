@@ -38,12 +38,23 @@ instead of staying in their own now-empty bucket.
 
 ## Using it
 
-The **Theme** dropdown in the header (System/Light/Dark/Vista) picks the
-color scheme — System follows your OS/browser setting automatically;
-Light, Dark, and Vista override it explicitly. Vista is a retro skin
-(Windows Vista's "Aero Glass" look — translucent blurred panels over a
-blue gradient desktop, glossy gradient buttons), not just a palette
-swap like Light/Dark. Your choice is remembered in `localStorage` and
+The **Theme** dropdown in the header picks the color scheme — System
+follows your OS/browser setting automatically; the rest override it
+explicitly:
+
+- **Light** / **Dark** — palette swaps only.
+- **Vista** — Windows Vista's "Aero Glass" look: translucent blurred
+  panels over a blue gradient desktop, glossy gradient buttons.
+- **Classic Mac** — System 7's black/white chrome, a pinstriped title
+  bar, sharp-cornered panels.
+- **XP** — Windows XP's "Luna" look: a flat blue gradient title bar with
+  rounded corners, Tahoma, glossy (but flat, no blur) gradient buttons.
+- **Windows 3.1** — a teal desktop, gray panels with the classic Win16
+  3D bevel (`border-style: outset`/`inset`), sharp corners everywhere.
+
+Every option beyond Light/Dark is a full visual reskin, not just a
+palette swap — same blue/red/green button color coding throughout,
+just restyled per theme. Your choice is remembered in `localStorage` and
 applied before the page paints on your next visit, so there's no flash
 of the wrong theme.
 
