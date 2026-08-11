@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.1.0';
-import { buildCsv, downloadCsv } from './csv.js?v=1.1.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.1.0';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.1.0';
-import { iconSvg } from './icons.js?v=1.1.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.2.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.2.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.2.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.2.0';
+import { iconSvg } from './icons.js?v=1.2.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1103,17 +1103,18 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
 
 // "System" (no stored value, or explicitly 'system') leaves no data-theme
 // attribute at all, so css/styles.css's prefers-color-scheme media query
-// decides — this only ever sets/clears the attribute for the two explicit
-// overrides. The inline script in index.html's <head> already applies a
-// saved Light/Dark choice before first paint (to avoid a flash of the
-// wrong theme); this just keeps the <select> in sync and reacts to changes.
+// decides — this only ever sets/clears the attribute for the three
+// explicit overrides (Light/Dark/Vista). The inline script in index.html's
+// <head> already applies a saved override before first paint (to avoid a
+// flash of the wrong theme); this just keeps the <select> in sync and
+// reacts to changes.
 const THEME_KEY = 'fsai:v1:theme';
 const themeSelect = document.getElementById('theme-select');
 if (themeSelect) {
   document.getElementById('theme-select-icon').innerHTML = iconSvg('theme');
 
   function applyTheme(value) {
-    if (value === 'light' || value === 'dark') {
+    if (value === 'light' || value === 'dark' || value === 'vista') {
       document.documentElement.setAttribute('data-theme', value);
     } else {
       document.documentElement.removeAttribute('data-theme');

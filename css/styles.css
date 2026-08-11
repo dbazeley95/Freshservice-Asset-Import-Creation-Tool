@@ -81,6 +81,123 @@
   --success-text: #0b0e14;
 }
 
+/* ---------- Vista theme ----------
+   A retro skin, not just a palette swap like Light/Dark — Windows Vista's
+   "Aero" look was glass panels (translucent + blurred) over a blue
+   gradient desktop, and glossy gradient buttons with a light-catching
+   highlight across the top half. The --variables below cover flat colors
+   (text, borders, table stripes); the rules further down add the
+   gradients/blur/gloss that variables alone can't express. Same
+   specificity as the dark-theme block above (:root[attr]), so source
+   order (this coming after) is what lets an explicit Vista choice win
+   even when the OS also prefers dark. */
+:root[data-theme='vista'] {
+  --bg: #bcd9f0;
+  --panel-bg: rgba(255, 255, 255, 0.72);
+  --text: #14283d;
+  --text-muted: #3d5975;
+  --border: rgba(70, 120, 170, 0.45);
+  --accent: #3a79b0;
+  --accent-text: #ffffff;
+  --danger: #a3281f;
+  --input-bg: rgba(255, 255, 255, 0.88);
+  --table-head-bg: #eaf3fb;
+  --table-row-alt: rgba(216, 234, 249, 0.55);
+  --coming-soon: #6a3d8f;
+  --coming-soon-bg: rgba(231, 219, 244, 0.7);
+  --badge-bg: rgba(255, 255, 255, 0.8);
+  --badge-text: #14283d;
+  --input-border: #7ea6cc;
+  --warning: #8a6d1a;
+  --warning-bg: rgba(251, 240, 200, 0.75);
+  --success: #2f7a3d;
+  --success-text: #ffffff;
+}
+
+[data-theme='vista'] body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at top, #eef6fc 0%, #bcd9f0 45%, #6fa4cf 100%) fixed;
+}
+
+[data-theme='vista'] .app-header,
+[data-theme='vista'] .panel,
+[data-theme='vista'] .side-nav,
+[data-theme='vista'] .info-dialog,
+[data-theme='vista'] .info-dialog-header {
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-color: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+[data-theme='vista'] .panel,
+[data-theme='vista'] .info-dialog {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 10px 24px rgba(20, 40, 70, 0.18);
+}
+
+/* The glossy gradient recipe every Aero button shares: light at the very
+   top, a highlight band just past halfway, then a deeper shade at the
+   bottom — repeated per color (blue/red/green) instead of tinting one
+   shared gradient, since each needs its own hue. */
+[data-theme='vista'] button.primary,
+[data-theme='vista'] .header-btn,
+[data-theme='vista'] .theme-select-wrap,
+[data-theme='vista'] .tab.active {
+  background: linear-gradient(to bottom, #eaf6ff 0%, #bfe3f8 45%, #7cc0e8 50%, #4a9bd1 100%);
+  border-color: #3a79b0;
+  color: #10314a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='vista'] button.danger {
+  background: linear-gradient(to bottom, #ffe9e9 0%, #f3b3b3 45%, #e17f7f 50%, #b3392b 100%);
+  border-color: #96271b;
+  color: #4a0d05;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+[data-theme='vista'] button.success {
+  background: linear-gradient(to bottom, #eafcea 0%, #bce9bc 45%, #85d08b 50%, #429150 100%);
+  border-color: #2c6b34;
+  color: #0c2f11;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+[data-theme='vista'] button.primary:hover,
+[data-theme='vista'] button.danger:hover,
+[data-theme='vista'] button.success:hover,
+[data-theme='vista'] .header-btn:hover {
+  filter: brightness(1.06);
+}
+
+[data-theme='vista'] .tab {
+  border-radius: 6px;
+}
+
+[data-theme='vista'] .tab:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme='vista'] input,
+[data-theme='vista'] select,
+[data-theme='vista'] textarea {
+  background: var(--input-bg);
+  box-shadow: 0 1px 2px rgba(20, 40, 70, 0.12) inset;
+}
+
+[data-theme='vista'] thead th {
+  background: linear-gradient(to bottom, #f5faff 0%, #dcebf7 100%);
+}
+
+[data-theme='vista'] .version-badge,
+[data-theme='vista'] .compiled-date {
+  background: rgba(255, 255, 255, 0.7);
+}
+
 * {
   box-sizing: border-box;
 }

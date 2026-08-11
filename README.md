@@ -38,11 +38,14 @@ instead of staying in their own now-empty bucket.
 
 ## Using it
 
-The **Theme** dropdown in the header (System/Light/Dark) picks the color
-scheme — System follows your OS/browser setting automatically; Light and
-Dark override it explicitly. Your choice is remembered in `localStorage`
-and applied before the page paints on your next visit, so there's no
-flash of the wrong theme.
+The **Theme** dropdown in the header (System/Light/Dark/Vista) picks the
+color scheme — System follows your OS/browser setting automatically;
+Light, Dark, and Vista override it explicitly. Vista is a retro skin
+(Windows Vista's "Aero Glass" look — translucent blurred panels over a
+blue gradient desktop, glossy gradient buttons), not just a palette
+swap like Light/Dark. Your choice is remembered in `localStorage` and
+applied before the page paints on your next visit, so there's no flash
+of the wrong theme.
 
 1. Pick an asset type from the side menu — a sliding drawer opened via the
    "Asset Type" button on narrow screens (closes again once you pick one),
