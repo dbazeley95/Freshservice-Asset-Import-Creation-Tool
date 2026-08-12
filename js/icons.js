@@ -24,6 +24,11 @@ export const ICONS = {
     <line x1="12" y1="17" x2="12" y2="20"/>
     <path d="M10.3 8.3v5.4l4.6-2.7-4.6-2.7z" fill="currentColor" stroke="none"/>
   `,
+  projector: `
+    <rect x="2" y="6" width="14" height="10" rx="2"/>
+    <circle cx="9" cy="11" r="2.6"/>
+    <path d="M16 8l6-3v12l-6-3z"/>
+  `,
   laptop_pc: `
     <path d="M6.5 5.5h11a1 1 0 011 1V14h-13V6.5a1 1 0 011-1z"/>
     <path d="M2.5 17.5h19l-1.3 1.8a2 2 0 01-1.6.7H5.4a2 2 0 01-1.6-.7L2.5 17.5z"/>

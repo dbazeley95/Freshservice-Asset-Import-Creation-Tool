@@ -534,6 +534,29 @@ export const MODEL_PRESETS = {
       fields: { product: "Clevertouch (model TBC)" },
     },
   ],
+  // Manufacturers confirmed, model names still pending — see the note on
+  // tv_digital_signage above for why these are "(model TBC)" placeholders
+  // rather than invented model names.
+  projector: [
+    {
+      id: "epson-model-tbc",
+      label: "Epson (model TBC)",
+      manufacturer: "Epson",
+      fields: { product: "Epson (model TBC)" },
+    },
+    {
+      id: "benq-model-tbc",
+      label: "BenQ (model TBC)",
+      manufacturer: "BenQ",
+      fields: { product: "BenQ (model TBC)" },
+    },
+    {
+      id: "viewsonic-model-tbc",
+      label: "ViewSonic (model TBC)",
+      manufacturer: "ViewSonic",
+      fields: { product: "ViewSonic (model TBC)" },
+    },
+  ],
   laptop_pc: [
     {
       id: "100e-chromebook-2nd-gen",
@@ -1943,6 +1966,30 @@ export const MODEL_PRESETS = {
       manufacturer: "Splicecom",
       fields: { product: "Splicecom PCS 542", warranty: 12 },
     },
+    {
+      id: "yealink-t54w",
+      label: "Yealink T54W",
+      manufacturer: "Yealink",
+      fields: { product: "Yealink T54W" },
+    },
+    {
+      id: "yealink-t30p",
+      label: "Yealink T30P",
+      manufacturer: "Yealink",
+      fields: { product: "Yealink T30P" },
+    },
+    {
+      id: "fanvil-x5u",
+      label: "Fanvil X5U",
+      manufacturer: "Fanvil",
+      fields: { product: "Fanvil X5U" },
+    },
+    {
+      id: "fanvil-x4u",
+      label: "Fanvil X4U",
+      manufacturer: "Fanvil",
+      fields: { product: "Fanvil X4U" },
+    },
   ],
   wifi_access_point: [
     {
@@ -2004,8 +2051,26 @@ export const MODEL_PRESETS = {
     {
       id: "2530-48g",
       label: "2530-48G",
-      manufacturer: "Aruba",
+      manufacturer: "Aruba/HPe",
       fields: { product: "2530-48G", warranty: 12 },
+    },
+    {
+      id: "network-switch-dell-model-tbc",
+      label: "Dell (model TBC)",
+      manufacturer: "Dell",
+      fields: { product: "Dell (model TBC)" },
+    },
+    {
+      id: "network-switch-tp-link-model-tbc",
+      label: "TP-Link (model TBC)",
+      manufacturer: "TP-Link",
+      fields: { product: "TP-Link (model TBC)" },
+    },
+    {
+      id: "network-switch-unifi-model-tbc",
+      label: "UniFi (model TBC)",
+      manufacturer: "UniFi",
+      fields: { product: "UniFi (model TBC)" },
     },
   ],
   server: [
@@ -2022,6 +2087,18 @@ export const MODEL_PRESETS = {
       fields: { product: "ProLiant ML350 Gen10", warranty: 12 },
     },
     {
+      id: "server-dell-model-tbc",
+      label: "Dell (model TBC)",
+      manufacturer: "Dell",
+      fields: { product: "Dell (model TBC)" },
+    },
+    {
+      id: "server-stone-model-tbc",
+      label: "Stone (model TBC)",
+      manufacturer: "Stone",
+      fields: { product: "Stone (model TBC)" },
+    },
+    {
       id: "virtual-machine",
       label: "Virtual Machine",
       fields: { product: "Virtual Machine", warranty: 12 },
@@ -2033,6 +2110,12 @@ export const MODEL_PRESETS = {
       label: "Pro Dock WD25",
       manufacturer: "Dell",
       fields: { product: "Pro Dock WD25", warranty: 48 },
+    },
+    {
+      id: "docking-station-lenovo-model-tbc",
+      label: "Lenovo (model TBC)",
+      manufacturer: "Lenovo",
+      fields: { product: "Lenovo (model TBC)" },
     },
   ],
   hardware_other: [

@@ -11,6 +11,7 @@ exactly):
 - Monitor
 - Interactive Touchscreen
 - TV / Digital Signage
+- Projectors
 - Laptop
 - Desktop
 - iPads / Tablets
