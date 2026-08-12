@@ -8,7 +8,7 @@ name: Deploy to Cloudflare Workers
 on:
   push:
     branches:
-      - claude/freshservice-asset-generator-31rccz
+      - main
 
 jobs:
   deploy:
