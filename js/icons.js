@@ -71,6 +71,11 @@ export const ICONS = {
     <circle cx="7.5" cy="7" r="0.7" fill="currentColor" stroke="none"/>
     <circle cx="7.5" cy="17" r="0.7" fill="currentColor" stroke="none"/>
   `,
+  ups: `
+    <rect x="4" y="3" width="12" height="18" rx="2"/>
+    <rect x="8" y="1" width="4" height="2"/>
+    <path d="M12.5 6.5l-4.5 6.5h3l-1 6 5-6.5h-3l0.5-6z" fill="currentColor" stroke="none"/>
+  `,
   docking_station: `
     <path d="M9 2.5v5"/>
     <path d="M15 2.5v5"/>

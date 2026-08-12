@@ -2104,6 +2104,20 @@ export const MODEL_PRESETS = {
       fields: { product: "Virtual Machine", warranty: 12 },
     },
   ],
+  ups: [
+    {
+      id: "apc-model-tbc",
+      label: "APC (model TBC)",
+      manufacturer: "APC",
+      fields: { product: "APC (model TBC)" },
+    },
+    {
+      id: "eaton-model-tbc",
+      label: "Eaton (model TBC)",
+      manufacturer: "Eaton",
+      fields: { product: "Eaton (model TBC)" },
+    },
+  ],
   docking_station: [
     {
       id: "pro-dock-wd25",

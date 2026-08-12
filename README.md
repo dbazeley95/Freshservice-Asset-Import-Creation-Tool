@@ -23,6 +23,7 @@ exactly):
 - Printers & Copiers (IP Address is optional; every other field is
   required, as usual)
 - Servers (adds Memory(GB) and Disk Space(GB))
+- UPS
 - Docking Stations
 - Other Devices (deliberately last in the menu &mdash; it's a catch-all
   bucket, not meant to be anyone's first choice)
@@ -238,10 +239,17 @@ assets/icons/          App icons generated from assets/logo.png at the
                        sizes/purposes manifest.webmanifest references
 ```
 
-To add a new asset type, add an entry to `ASSET_TYPES` in `js/templates.js`
-with its columns in the same order/wording as the Freshservice template —
-the rest of the app (form rendering, bulk add, preview, table, CSV export)
-picks it up automatically. Give each 'default' column a `group` of
+Every asset type shares the same underlying field set and order — Name,
+Company, Location, Asset Tag, Product, Serial Number, Cost, Asset State,
+Acquisition Date, Warranty (In Months), Warranty Expiry Date, End of Life —
+built once by `standardColumns()` in `js/templates.js` rather than
+retyped per type, so a new asset type can't quietly drift out of sync with
+the others the way a couple of hand-typed ones once did. To add a new
+asset type with no fields beyond that shared set, add an entry to
+`ASSET_TYPES` with `columns: standardColumns()`; to add extra
+type-specific fields (like Laptop's Processor/Memory/Disk), spread it
+instead — `columns: [...standardColumns(), col(...)]` — and they'll land
+after End of Life. Give each extra 'default' column a `group` of
 `'general'` or `'hardware'` to place it in the right panel. Add a matching
 entry to `ICONS` in `js/icons.js` (keyed by the same `id`) to give it a
 glyph in the side menu; it falls back to no icon if omitted.

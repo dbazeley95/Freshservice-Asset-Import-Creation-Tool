@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.9.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.9.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.9.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.10.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.10.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.10.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.9.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.10.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.9.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.10.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.9.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.10.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.9.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.10.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.10.0</span><h3 class="changelog-title">UPS, and One Consistent Field Order Everywhere</h3></div>
+        <p>UPS is now a fully working tab &mdash; the standard column set plus a Manufacturer filter (APC, Eaton; models pending). Every asset type's fields now follow the exact same order (Name, Company, Location, Asset Tag, Product, Serial Number, Cost, Asset State, Acquisition Date, Warranty (In Months), Warranty Expiry Date, End of Life, then any type-specific extras) &mdash; End of Life had drifted to the wrong spot on a couple of recently-added types, and five older ones (Monitor, Touchscreen, Laptop, Desktop, iPads/Tablets) were missing Warranty Expiry Date entirely; both are fixed now. Under the hood, every template is now built from one shared field list instead of being hand-typed per type, so this kind of drift can't happen again.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.9.0</span><h3 class="changelog-title">Projectors, and Manufacturer Filters Across More Types</h3></div>
         <p>Projectors is now a fully working tab with the standard column set (Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, Warranty Expiry Date) and a Manufacturer filter (Epson, BenQ, ViewSonic &mdash; models pending). Also caught up Phones &amp; Telephony, Network Switches, Servers, and Docking Stations, which previously only had one catalogued manufacturer each (so the filter never appeared): Phones adds Yealink (T54W, T30P) and Fanvil (X5U, X4U); Network Switches adds Dell, TP-Link, and UniFi alongside the existing Aruba/HPe; Servers adds Dell and Stone alongside HP; Docking Stations adds Lenovo alongside Dell.</p>
@@ -476,6 +480,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.9.0"></script>
+  <script type="module" src="js/app.js?v=1.10.0"></script>
 </body>
 </html>
