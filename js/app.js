@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.11.0';
-import { buildCsv, downloadCsv } from './csv.js?v=1.11.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.11.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.11.0';
-import { iconSvg } from './icons.js?v=1.11.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.0.0';
+import { buildCsv, downloadCsv } from './csv.js?v=2.0.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.0.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.0.0';
+import { iconSvg } from './icons.js?v=2.0.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -41,12 +41,53 @@ const els = {
   persistenceWarning: document.getElementById('persistence-warning'),
   persistenceWarningText: document.getElementById('persistence-warning-text'),
   persistenceWarningClose: document.getElementById('persistence-warning-close'),
+  persistenceCue: document.getElementById('persistence-cue'),
+  rowSearchWrap: document.getElementById('row-search-wrap'),
+  rowSearch: document.getElementById('row-search'),
+  bulkEditWrap: document.getElementById('bulk-edit-wrap'),
+  bulkEditCount: document.getElementById('bulk-edit-count'),
+  bulkEditField: document.getElementById('bulk-edit-field'),
+  bulkEditValueWrap: document.getElementById('bulk-edit-value-wrap'),
+  bulkEditApplyBtn: document.getElementById('bulk-edit-apply-btn'),
+  bulkEditClearBtn: document.getElementById('bulk-edit-clear-btn'),
+  modalOverlay: document.getElementById('modal-overlay'),
+  modalMessage: document.getElementById('modal-message'),
+  modalCancelBtn: document.getElementById('modal-cancel-btn'),
+  modalOkBtn: document.getElementById('modal-ok-btn'),
+  settingsDialog: document.getElementById('settings-dialog'),
 };
 
 // Remembers the chosen Manufacturer filter per asset type for this page
 // load only — not persisted, it's just a convenience for narrowing a long
 // Model Preset list.
 const modelFilterState = {};
+
+// Filters which rows renderTable() shows, not the underlying data — see
+// there for why. Not persisted and reset on every asset-type switch (in
+// renderAll()), same lifecycle as modelFilterState above.
+const ROW_SEARCH_THRESHOLD = 8;
+let rowSearchQuery = '';
+function rowMatchesSearch(row, query) {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return [row.name, row.serialNumber, row.assetTag].some((v) => String(v ?? '').toLowerCase().includes(q));
+}
+
+// Which rows are checked for bulk editing, by row.id — module-level (like
+// rowSearchQuery above) so it survives the table's own re-renders (search,
+// row edits) but not an asset-type switch, where it's reset in renderAll().
+let selectedRowIds = new Set();
+
+// Location is deliberately left out: its valid options depend on each row's
+// own Company (see locationOptionsForCompany), so a single blanket value
+// could easily land rows in a Company/Location combination that doesn't
+// exist. Every other default (shared-by-batch) field is safe to stamp
+// across a selection — row-only fields (Name, Serial Number, Asset Tag)
+// aren't offered at all since overwriting those with one shared value would
+// destroy the per-device data they exist to hold.
+function bulkEditableColumns(assetType) {
+  return defaultColumns(assetType).filter((c) => c.key !== 'location');
+}
 
 let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || 'desktop_pc';
 let idCounter = 0;
@@ -78,8 +119,63 @@ function showPersistenceWarning() {
   els.persistenceWarning.hidden = false;
 }
 
+// A themed stand-in for window.confirm()/alert() — those render as a bare
+// OS dialog that ignores every theme (Vista, Classic Mac, XP, Windows 3.1,
+// Matrix...) this app otherwise fully re-skins. Built on the same CSS
+// custom properties every panel already uses (see .modal-box in
+// styles.css), so it matches whichever theme is active for free.
+//
+// Pass cancelText to get confirm()'s behavior (resolves true/false); omit
+// it for alert()'s (a single acknowledgement button, always resolves true
+// — callers that don't need the value just `await` it and move on).
+let modalResolve = null;
+let modalLastFocused = null;
+
+function closeModal(result) {
+  if (!els.modalOverlay || els.modalOverlay.hidden) return;
+  els.modalOverlay.hidden = true;
+  document.removeEventListener('keydown', onModalKeydown);
+  if (modalLastFocused && typeof modalLastFocused.focus === 'function') modalLastFocused.focus();
+  const resolve = modalResolve;
+  modalResolve = null;
+  if (resolve) resolve(result);
+}
+
+function onModalKeydown(e) {
+  if (e.key === 'Escape') closeModal(false);
+}
+
+function showModal({ message, okText = 'OK', cancelText = null, danger = false }) {
+  if (!els.modalOverlay) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    modalResolve = resolve;
+    modalLastFocused = document.activeElement;
+    els.modalMessage.textContent = message;
+    els.modalOkBtn.textContent = okText;
+    els.modalOkBtn.className = danger ? 'danger' : 'primary';
+    els.modalCancelBtn.hidden = !cancelText;
+    els.modalCancelBtn.textContent = cancelText || '';
+    els.modalOverlay.hidden = false;
+    document.addEventListener('keydown', onModalKeydown);
+    els.modalOkBtn.focus();
+  });
+}
+
+if (els.modalOkBtn) els.modalOkBtn.addEventListener('click', () => closeModal(true));
+if (els.modalCancelBtn) els.modalCancelBtn.addEventListener('click', () => closeModal(false));
+if (els.modalOverlay) {
+  els.modalOverlay.addEventListener('click', (e) => {
+    if (e.target === els.modalOverlay) closeModal(false);
+  });
+}
+
+// Unlike showPersistenceWarning() above (one-time, dismissible), this
+// reflects the true current state on every single save attempt — so if the
+// underlying problem is still happening after the banner's been dismissed,
+// there's still something to see rather than the app going quiet about it.
 function persist(typeId, state) {
   const ok = saveState(typeId, state);
+  if (els.persistenceCue) els.persistenceCue.hidden = ok;
   if (!ok) showPersistenceWarning();
 }
 
@@ -649,24 +745,61 @@ function parseCsvLine(line) {
 }
 
 const CSV_HEADER_WORDS = ['name', 'display name', 'serial', 'serial number', 'asset tag'];
-function looksLikeHeaderRow(cells) {
+function looksLikeHeaderRow(cells, extraCols) {
   // Every cell must exactly match a known header word — a single-column
   // "Serial Number" header still counts, while a real data row (e.g. a
   // bare serial with no header at all) never accidentally does.
-  return cells.length > 0 && cells.every((c) => CSV_HEADER_WORDS.includes(c.trim().toLowerCase()));
+  const words = [...CSV_HEADER_WORDS, ...extraCols.map((c) => c.header.trim().toLowerCase())];
+  return cells.length > 0 && cells.every((c) => words.includes(c.trim().toLowerCase()));
 }
 
 // A .csv with a Name column and a Serial column (in that order; a Serial-
 // only file works too, falling back to the same default as a bare pasted
-// serial). A leading header row is detected and skipped.
-function parseCsvFile(text) {
+// serial), plus any of this asset type's own extra per-row columns (e.g.
+// Phones & Telephony's Extension) if the file has them — previously these
+// were silently dropped by this path even though typing/pasting the same
+// data into the textarea worked fine. A leading header row is detected and
+// its column order (not just position) decides where each field comes
+// from; without one, columns are assumed in the same order the Bulk Add
+// textarea itself expects (Name, Serial, then each extra in order).
+function parseCsvFile(text, extraCols) {
   let rows = text
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter(Boolean)
     .map(parseCsvLine);
-  if (rows.length > 0 && looksLikeHeaderRow(rows[0])) rows = rows.slice(1);
-  return rows.map((cells) => (cells.length >= 2 && cells[1] ? { name: cells[0], serial: cells[1] } : { name: '', serial: cells[0] }));
+  if (rows.length === 0) return [];
+
+  const hasHeader = looksLikeHeaderRow(rows[0], extraCols);
+  let colTypes; // 'name' | 'serial' | { extra: key } | null, per column index
+  if (hasHeader) {
+    const extraByHeader = new Map(extraCols.map((c) => [c.header.trim().toLowerCase(), c.key]));
+    colTypes = rows[0].map((cell) => {
+      const h = cell.trim().toLowerCase();
+      if (h === 'name' || h === 'display name') return 'name';
+      if (h === 'serial' || h === 'serial number') return 'serial';
+      return extraByHeader.has(h) ? { extra: extraByHeader.get(h) } : null;
+    });
+    rows = rows.slice(1);
+  } else {
+    colTypes = ['name', 'serial', ...extraCols.map((c) => ({ extra: c.key }))];
+  }
+
+  return rows.map((cells) => {
+    // No header and only one populated column — same bare-serial fallback
+    // as before (Name defaults to Asset Tag, not this column's value).
+    if (!hasHeader && (cells.length === 1 || !cells[1])) {
+      return { name: '', serial: cells[0] ?? '', extras: {} };
+    }
+    const entry = { name: '', serial: '', extras: {} };
+    colTypes.forEach((type, i) => {
+      if (!type || cells[i] === undefined) return;
+      if (type === 'name') entry.name = cells[i];
+      else if (type === 'serial') entry.serial = cells[i];
+      else entry.extras[type.extra] = cells[i];
+    });
+    return entry;
+  });
 }
 
 // Loads a previously-exported (or otherwise matching) full CSV straight
@@ -841,11 +974,17 @@ function renderBulkForm(assetType, state) {
     const file = fileInput.files[0];
     fileInput.value = '';
     if (!file) return;
-    const entries = parseCsvFile(await file.text());
+    const fileExtraCols = extraRowColumns(assetType);
+    const entries = parseCsvFile(await file.text(), fileExtraCols);
     // Join with a tab, not a comma: splitBulkLine prefers tab when
     // present, so a Name that itself contains a comma (legal in a quoted
     // CSV field) survives the round-trip through this textarea intact.
-    textarea.value = entries.map(({ name, serial }) => (name ? `${name}\t${serial}` : serial)).join('\n');
+    textarea.value = entries
+      .map(({ name, serial, extras }) => {
+        const extraVals = fileExtraCols.map((c) => extras[c.key] ?? '');
+        return name || extraVals.some(Boolean) ? [name, serial, ...extraVals].join('\t') : serial;
+      })
+      .join('\n');
     renderBulkPreview(assetType, state, textarea.value);
   });
   serialsActions.appendChild(importBtn);
@@ -922,18 +1061,87 @@ function refreshDuplicateWarnings(state) {
   }
 }
 
+// Builds the single input/select that holds the value about to be stamped
+// onto every selected row — mirrors the per-row widgets in renderTable
+// (real <select> for Asset State/Company, typed input matching col.input
+// otherwise) since the bulk value needs to be just as valid as a per-row
+// edit would be.
+function renderBulkEditValueWidget(col, currentValue) {
+  els.bulkEditValueWrap.innerHTML = '';
+  if (!col) return;
+  let widget;
+  if (col.key === 'assetState') {
+    widget = buildAssetStateSelect(currentValue ?? '');
+  } else if (col.key === 'company') {
+    widget = buildCompanySelect(currentValue ?? '');
+  } else {
+    widget = document.createElement('input');
+    widget.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
+    if (col.input === 'number') widget.step = 'any';
+    widget.value = currentValue ?? '';
+  }
+  widget.id = 'bulk-edit-value';
+  els.bulkEditValueWrap.appendChild(widget);
+}
+
+// Field options only get rebuilt when the asset type actually changes
+// (tracked via a dataset marker on the <select> itself) — every other
+// renderTable() call (search filtering, another row's checkbox, the table
+// re-rendering after Apply) leaves whatever field/value the user has
+// mid-entry alone, since #bulk-edit-wrap lives outside #table-wrap and
+// nothing else touches it.
+function updateBulkEditToolbar(assetType, state) {
+  if (!els.bulkEditWrap) return;
+
+  const columns = bulkEditableColumns(assetType);
+  if (els.bulkEditField.dataset.assetType !== assetType.id) {
+    els.bulkEditField.innerHTML = '';
+    for (const col of columns) {
+      const opt = document.createElement('option');
+      opt.value = col.key;
+      opt.textContent = col.header;
+      els.bulkEditField.appendChild(opt);
+    }
+    els.bulkEditField.dataset.assetType = assetType.id;
+    els.bulkEditField.value = columns[0]?.key || '';
+    renderBulkEditValueWidget(columns[0], '');
+  }
+
+  els.bulkEditWrap.hidden = selectedRowIds.size === 0;
+  els.bulkEditCount.textContent = `${selectedRowIds.size} row${selectedRowIds.size === 1 ? '' : 's'} selected`;
+}
+
 function renderTable(assetType, state) {
   els.tableWrap.innerHTML = '';
   els.rowCount.textContent = `${state.rows.length} row${state.rows.length === 1 ? '' : 's'}`;
 
+  // Drop any selected id that no longer has a matching row — e.g. it was
+  // deleted individually, or the whole batch was cleared — so the bulk-edit
+  // toolbar's count never overstates how many rows are actually still
+  // checked.
+  const liveRowIds = new Set(state.rows.map((r) => r.id));
+  for (const id of selectedRowIds) {
+    if (!liveRowIds.has(id)) selectedRowIds.delete(id);
+  }
+  updateBulkEditToolbar(assetType, state);
+
   // Stays visible after the download-time confirm dialog is dismissed —
   // the red border on an individual invalid field is easy to lose track
   // of once you've scrolled (especially on mobile), so this is the
-  // persistent trail back to "which rows still need attention."
+  // persistent trail back to "which rows still need attention." Computed
+  // against every row regardless of the search filter below — a row
+  // scrolled out of view by a search shouldn't drop out of this count.
   if (els.invalidRowCount) {
     const missing = countRowsMissingFields(assetType, state.rows);
     els.invalidRowCount.hidden = missing === 0;
     els.invalidRowCount.textContent = missing > 0 ? `${missing} row${missing === 1 ? '' : 's'} missing required fields` : '';
+  }
+
+  // A filter box for a handful of rows is clutter, not help — only worth
+  // showing once scrolling to find one row actually becomes the
+  // alternative.
+  if (els.rowSearchWrap) {
+    els.rowSearchWrap.hidden = state.rows.length <= ROW_SEARCH_THRESHOLD;
   }
 
   if (state.rows.length === 0) {
@@ -944,9 +1152,44 @@ function renderTable(assetType, state) {
     return;
   }
 
+  // Filters which rows render below, not state.rows itself — Download CSV,
+  // the missing-fields count above, and duplicate-serial detection all
+  // still see every row regardless of what's filtered out of view.
+  const visibleRows = state.rows.filter((row) => rowMatchesSearch(row, rowSearchQuery));
+  if (visibleRows.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-state';
+    empty.textContent = `No rows match "${rowSearchQuery}".`;
+    els.tableWrap.appendChild(empty);
+    return;
+  }
+
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
+
+  // Selects/deselects every currently-visible row at once — checked when
+  // all of them are already selected, indeterminate when only some are, so
+  // it always reflects the visible set rather than the full (possibly
+  // search-filtered) selection.
+  const thSelect = document.createElement('th');
+  const visibleIds = visibleRows.map((r) => r.id);
+  const selectedVisibleCount = visibleIds.filter((id) => selectedRowIds.has(id)).length;
+  const selectAllCb = document.createElement('input');
+  selectAllCb.type = 'checkbox';
+  selectAllCb.setAttribute('aria-label', 'Select all visible rows');
+  selectAllCb.checked = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
+  selectAllCb.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleIds.length;
+  selectAllCb.addEventListener('change', () => {
+    for (const id of visibleIds) {
+      if (selectAllCb.checked) selectedRowIds.add(id);
+      else selectedRowIds.delete(id);
+    }
+    renderTable(assetType, state);
+  });
+  thSelect.appendChild(selectAllCb);
+  headRow.appendChild(thSelect);
+
   for (const col of assetType.columns) {
     const th = document.createElement('th');
     th.textContent = col.header;
@@ -959,13 +1202,31 @@ function renderTable(assetType, state) {
   table.appendChild(thead);
 
   const tbody = document.createElement('tbody');
-  const suggestions = loadSuggestions();
 
-  for (const row of state.rows) {
+  for (const row of visibleRows) {
     const tr = document.createElement('tr');
     tr.dataset.rowId = row.id;
+
+    const tdSelect = document.createElement('td');
+    const rowCb = document.createElement('input');
+    rowCb.type = 'checkbox';
+    rowCb.checked = selectedRowIds.has(row.id);
+    rowCb.setAttribute('aria-label', `Select row (${row.name || row.assetTag || 'unnamed'})`);
+    rowCb.addEventListener('change', () => {
+      if (rowCb.checked) selectedRowIds.add(row.id);
+      else selectedRowIds.delete(row.id);
+      renderTable(assetType, state);
+    });
+    tdSelect.appendChild(rowCb);
+    tr.appendChild(tdSelect);
+
     for (const col of assetType.columns) {
       const td = document.createElement('td');
+      // Read by the mobile card layout (css/styles.css, max-width: 640px)
+      // via a ::before { content: attr(data-label) } — the table's own
+      // <thead> is hidden at that width, so this is what labels each field
+      // in a stacked card instead.
+      td.dataset.label = col.header;
 
       if (col.key === 'assetState') {
         const select = buildAssetStateSelect(row[col.key]);
@@ -1074,8 +1335,13 @@ function renderTable(assetType, state) {
     delBtn.title = `Delete row (${row.name || row.assetTag || 'unnamed'})`;
     delBtn.setAttribute('aria-label', delBtn.title);
     delBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('close')}</span>`;
-    delBtn.addEventListener('click', () => {
-      const ok = confirm(`Delete row "${row.name || row.assetTag || 'unnamed'}"? This cannot be undone.`);
+    delBtn.addEventListener('click', async () => {
+      const ok = await showModal({
+        message: `Delete row "${row.name || row.assetTag || 'unnamed'}"? This cannot be undone.`,
+        okText: 'Delete',
+        cancelText: 'Cancel',
+        danger: true,
+      });
       if (!ok) return;
       state.rows = state.rows.filter((r) => r.id !== row.id);
       persist(activeTypeId, state);
@@ -1089,7 +1355,6 @@ function renderTable(assetType, state) {
   table.appendChild(tbody);
   els.tableWrap.appendChild(table);
   refreshDuplicateWarnings(state);
-  void suggestions;
 }
 
 // ---------- Toolbar actions ----------
@@ -1101,7 +1366,7 @@ const MAX_PRODUCT_TYPES = 10;
 
 function wireToolbar(assetType, state) {
   if (els.addRowsBtn) {
-    els.addRowsBtn.onclick = () => {
+    els.addRowsBtn.onclick = async () => {
       const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
       const rows = buildRowsFromText(assetType, state, text);
       if (rows.length === 0) return;
@@ -1109,9 +1374,9 @@ function wireToolbar(assetType, state) {
       const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
       const newProduct = state.defaults.product;
       if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
-        alert(
-          `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`
-        );
+        await showModal({
+          message: `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`,
+        });
         return;
       }
 
@@ -1134,13 +1399,13 @@ function wireToolbar(assetType, state) {
       if (!file) return;
       const { rows, matchedCount } = parseCsvForEditing(assetType, await file.text());
       if (matchedCount === 0) {
-        alert(
-          `That CSV's header row doesn't match any columns from the "${assetType.label}" template, so nothing was imported. Make sure the first row has headers like Name, Serial Number, Asset Tag, etc.`
-        );
+        await showModal({
+          message: `That CSV's header row doesn't match any columns from the "${assetType.label}" template, so nothing was imported. Make sure the first row has headers like Name, Serial Number, Asset Tag, etc.`,
+        });
         return;
       }
       if (rows.length === 0) {
-        alert('No data rows found in that CSV (just a header row, or the file was empty).');
+        await showModal({ message: 'No data rows found in that CSV (just a header row, or the file was empty).' });
         return;
       }
       for (const row of rows) {
@@ -1152,25 +1417,32 @@ function wireToolbar(assetType, state) {
     };
   }
 
-  els.clearRowsBtn.onclick = () => {
+  els.clearRowsBtn.onclick = async () => {
     if (state.rows.length === 0) return;
-    const ok = confirm(`Delete all ${state.rows.length} row(s) for ${assetType.label}? This cannot be undone.`);
+    const ok = await showModal({
+      message: `Delete all ${state.rows.length} row(s) for ${assetType.label}? This cannot be undone.`,
+      okText: 'Delete All',
+      cancelText: 'Cancel',
+      danger: true,
+    });
     if (!ok) return;
     state.rows = [];
     persist(activeTypeId, state);
     renderTable(assetType, state);
   };
 
-  els.downloadBtn.onclick = () => {
+  els.downloadBtn.onclick = async () => {
     if (state.rows.length === 0) {
-      alert('Add at least one row before downloading.');
+      await showModal({ message: 'Add at least one row before downloading.' });
       return;
     }
     const missing = countRowsMissingFields(assetType, state.rows);
     if (missing > 0) {
-      const ok = confirm(
-        `${missing} row(s) are missing required fields (highlighted in red). Download anyway?`
-      );
+      const ok = await showModal({
+        message: `${missing} row(s) are missing required fields (highlighted in red). Download anyway?`,
+        okText: 'Download Anyway',
+        cancelText: 'Cancel',
+      });
       if (!ok) return;
     }
     const csv = buildCsv(assetType, state.rows);
@@ -1181,6 +1453,14 @@ function wireToolbar(assetType, state) {
 }
 
 // ---------- Root render ----------
+
+// Points at the live assetType/state from the most recent renderAll() call
+// — so the row-search listener (wired once, outside the per-render toolbar
+// closures) can re-render against the actual in-memory state being edited,
+// not a fresh getState() read from localStorage that could be briefly
+// behind a still-debounced save.
+let currentAssetType = null;
+let currentState = null;
 
 function renderAll() {
   const assetType = getAssetType(activeTypeId);
@@ -1204,7 +1484,12 @@ function renderAll() {
   els.comingSoonPanel.hidden = true;
 
   const state = getState(activeTypeId);
+  currentAssetType = assetType;
+  currentState = state;
   els.typeDescription.textContent = `Fill in General and Hardware Specific details, bulk-add rows from pasted serial numbers, then fine-tune and download a CSV matching the Freshservice "${assetType.label}" import template.`;
+  rowSearchQuery = '';
+  if (els.rowSearch) els.rowSearch.value = '';
+  selectedRowIds.clear();
   renderGeneralForm(assetType, state);
   renderHardwareForm(assetType, state);
   renderBulkForm(assetType, state);
@@ -1228,9 +1513,65 @@ const persistenceWarningIcon = document.getElementById('persistence-warning-icon
 if (persistenceWarningIcon) persistenceWarningIcon.innerHTML = iconSvg('warning');
 const persistenceWarningCloseIcon = document.getElementById('persistence-warning-close-icon');
 if (persistenceWarningCloseIcon) persistenceWarningCloseIcon.innerHTML = iconSvg('close');
+const persistenceCueIcon = document.getElementById('persistence-cue-icon');
+if (persistenceCueIcon) persistenceCueIcon.innerHTML = iconSvg('warning');
 if (els.persistenceWarningClose) {
   els.persistenceWarningClose.addEventListener('click', () => {
     els.persistenceWarning.hidden = true;
+  });
+}
+
+// Lives outside #table-wrap (see index.html), so renderTable() rebuilding
+// the table underneath it never touches this input or steals its focus —
+// wired once here rather than per-render like the table's own controls.
+let rowSearchDebounceTimer = null;
+if (els.rowSearch) {
+  els.rowSearch.addEventListener('input', () => {
+    clearTimeout(rowSearchDebounceTimer);
+    rowSearchDebounceTimer = setTimeout(() => {
+      rowSearchQuery = els.rowSearch.value.trim();
+      if (currentAssetType && currentState) renderTable(currentAssetType, currentState);
+    }, 150);
+  });
+}
+
+// #bulk-edit-wrap's own controls (field select, Apply, Clear Selection) —
+// wired once here, same reasoning as #row-search above: the element lives
+// outside #table-wrap so renderTable() never destroys or recreates it.
+if (els.bulkEditField) {
+  els.bulkEditField.addEventListener('change', () => {
+    if (!currentAssetType) return;
+    const col = bulkEditableColumns(currentAssetType).find((c) => c.key === els.bulkEditField.value);
+    renderBulkEditValueWidget(col, '');
+  });
+}
+
+if (els.bulkEditApplyBtn) {
+  els.bulkEditApplyBtn.addEventListener('click', () => {
+    if (!currentAssetType || !currentState || selectedRowIds.size === 0) return;
+    const col = bulkEditableColumns(currentAssetType).find((c) => c.key === els.bulkEditField.value);
+    if (!col) return;
+    const widget = document.getElementById('bulk-edit-value');
+    const value = widget ? widget.value : '';
+    for (const row of currentState.rows) {
+      if (!selectedRowIds.has(row.id)) continue;
+      row[col.key] = value;
+      // Company's own options list is closed (js/catalog.js) and Location's
+      // valid choices depend on it — same reset the per-row Company select
+      // does on change, so a bulk Company edit can't strand a row on a
+      // Location that no longer belongs to it.
+      if (col.key === 'company') row.location = locationOptionsForCompany(value)[0] || '';
+    }
+    persist(activeTypeId, currentState);
+    selectedRowIds.clear();
+    renderTable(currentAssetType, currentState);
+  });
+}
+
+if (els.bulkEditClearBtn) {
+  els.bulkEditClearBtn.addEventListener('click', () => {
+    selectedRowIds.clear();
+    if (currentAssetType && currentState) renderTable(currentAssetType, currentState);
   });
 }
 
@@ -1246,9 +1587,12 @@ if (feedbackLink) {
   const body = encodeURIComponent(`Version: ${version}\n\nDescribe the bug or feature request:\n`);
   feedbackLink.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
   document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
+  feedbackLink.addEventListener('click', () => {
+    if (els.settingsDialog) els.settingsDialog.close();
+  });
 }
 
-// ---------- Popout dialogs (Help, Release Notes) ----------
+// ---------- Popout dialogs (Settings, Help, Release Notes) ----------
 
 function wireInfoDialog(dialog, openers, closeBtn) {
   if (!dialog) return;
@@ -1259,6 +1603,14 @@ function wireInfoDialog(dialog, openers, closeBtn) {
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });
+}
+
+const settingsMenuBtn = document.getElementById('settings-menu-btn');
+const settingsDialogClose = document.getElementById('settings-dialog-close');
+if (settingsMenuBtn && els.settingsDialog && settingsDialogClose) {
+  document.getElementById('settings-menu-btn-icon').innerHTML = iconSvg('settings');
+  document.getElementById('settings-dialog-close-icon').innerHTML = iconSvg('close');
+  wireInfoDialog(els.settingsDialog, [settingsMenuBtn], settingsDialogClose);
 }
 
 const helpBtn = document.getElementById('help-btn');
@@ -1278,6 +1630,17 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
   document.getElementById('release-notes-btn-icon').innerHTML = iconSvg('notes');
   document.getElementById('release-notes-close-icon').innerHTML = iconSvg('close');
   wireInfoDialog(releaseNotesDialog, [releaseNotesBtn, versionBadgeBtn], releaseNotesClose);
+}
+
+// Help and What's New both live inside #settings-dialog now — opening
+// either should hand off from the settings menu rather than stacking a
+// second modal <dialog> (with its own backdrop) on top of it. Not needed
+// for version-badge-btn, which opens Release Notes directly from the page
+// and is never nested inside the settings menu to begin with.
+if (els.settingsDialog) {
+  for (const opener of [helpBtn, releaseNotesBtn]) {
+    if (opener) opener.addEventListener('click', () => els.settingsDialog.close());
+  }
 }
 
 // ---------- Matrix theme's falling-character rain ----------
@@ -1431,6 +1794,7 @@ if (installAppBtn) {
 
   installAppBtn.onclick = async () => {
     if (!deferredInstallPrompt) return;
+    if (els.settingsDialog) els.settingsDialog.close();
     installAppBtn.hidden = true;
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice;

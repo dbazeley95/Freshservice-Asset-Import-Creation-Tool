@@ -1097,6 +1097,21 @@ select {
   min-height: 2.75rem;
 }
 
+/* Keyboard focus was previously just the browser's own default outline
+   everywhere except .theme-select — inconsistent with a theme system this
+   deliberate, and a plain blue ring looks out of place against e.g. Matrix
+   or Vista. var(--accent) rather than var(--accent-text): the latter is
+   meant for text sitting on an accent-colored background (often white),
+   which would be near-invisible as a ring against a plain input on a
+   light panel. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* min-width/max-width alone weren't enough on real iOS Safari — its native
    day/month/year control apparently still renders at its own intrinsic
    width in a grid/flex layout regardless. -webkit-appearance: none drops
@@ -1328,10 +1343,85 @@ button:hover {
   font-size: 0.85rem;
 }
 
+.row-search-wrap {
+  margin-bottom: 0.75rem;
+}
+
+#row-search {
+  max-width: 320px;
+}
+
+/* Only shown once at least one row is checked (see js/app.js) — display:
+   flex here needs the matching [hidden] override right below it, or the
+   [hidden] attribute toggled in JS would have no visible effect (same
+   cascade gotcha as .persistence-warning above). */
+.bulk-edit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--accent);
+  border-left-width: 4px;
+  border-radius: 8px;
+}
+
+.bulk-edit-wrap[hidden] {
+  display: none;
+}
+
+.bulk-edit-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Without an explicit width, the global `select { width: 100% }` rule
+   (each select's own flex-basis, absent a flex/grid parent to size it
+   otherwise) makes every child of this flex row claim the full row width
+   and wrap onto its own line — same fix #row-search above needed. */
+#bulk-edit-field {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 200px;
+}
+
+#bulk-edit-value-wrap input,
+#bulk-edit-value-wrap select {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 140px;
+  max-width: 220px;
+}
+
 .row-count-invalid {
   color: var(--danger);
   font-size: 0.85rem;
   font-weight: 600;
+}
+
+/* Toggled by persist() (js/app.js) on every save attempt, success or
+   failure — unlike .persistence-warning below, this isn't dismissible and
+   isn't a one-time thing, so it's still there to see if the underlying
+   problem (storage full, private browsing) is still happening after the
+   banner's been closed. */
+.persistence-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.persistence-cue[hidden] {
+  display: none;
+}
+
+.persistence-cue .tab-icon {
+  width: 0.9rem;
+  height: 0.9rem;
 }
 
 /* Shown once per session the moment a save to localStorage actually fails
@@ -1375,6 +1465,48 @@ button:hover {
 
 .spacer {
   flex: 1;
+}
+
+/* The one reusable dialog behind every confirm()/alert() call (see
+   showModal() in js/app.js) — sits above the side-nav backdrop (z-index
+   999/1000) in case both are ever open at once. Same [hidden]-override
+   gotcha as .persistence-warning above: display:flex here needs the
+   explicit [hidden] rule right after it. */
+.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal-box {
+  max-width: 440px;
+  width: 100%;
+  padding: 1.25rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+#modal-message {
+  margin: 0 0 1.1rem;
+  color: var(--text);
+  white-space: pre-line;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 .table-wrap {
@@ -1449,6 +1581,38 @@ tbody td [data-key='product'] {
   background: var(--table-row-alt);
 }
 
+/* #table-wrap (the Rows table specifically — id, not the shared .table-wrap
+   class the preview table above also uses) has a bulk-select checkbox
+   column ahead of Name (see js/app.js), so it's actually column 2 there,
+   not column 1 — override the freeze above (ID beats class, so this wins)
+   to pin Name instead of the checkbox, at a fixed left offset matching the
+   checkbox column's own fixed width. The preview table has no checkbox
+   column, so the unscoped rule above still correctly freezes its Name. */
+#table-wrap table th:first-child,
+#table-wrap table td:first-child {
+  position: static;
+  box-shadow: none;
+  background: transparent;
+  width: 2.4rem;
+  text-align: center;
+}
+
+#table-wrap table th:nth-child(2),
+#table-wrap table td:nth-child(2) {
+  position: sticky;
+  left: 2.4rem;
+  z-index: 2;
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+#table-wrap table td:nth-child(2) {
+  background: var(--panel-bg);
+}
+
+#table-wrap table tbody tr:nth-child(even) td:nth-child(2) {
+  background: var(--table-row-alt);
+}
+
 #table-wrap table th:last-child,
 #table-wrap table td:last-child {
   position: sticky;
@@ -1502,6 +1666,31 @@ tbody td [data-key='product'] {
 .header-btn .tab-icon {
   width: 1rem;
   height: 1rem;
+}
+
+/* The single settings/help trigger that replaced the old row of header
+   buttons — same pill styling (and every theme's override of it) as a
+   plain .header-btn, just circular with no label text. */
+.header-btn.icon-only {
+  padding: 0.55rem;
+}
+
+.header-btn.icon-only .tab-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* What used to be five separate always-visible header buttons (Theme,
+   Leave Feedback, What's New, Help, Install App) now live here instead,
+   opened via the gear icon — stacked and left-aligned rather than the
+   centered horizontal row they used to be, so a long list doesn't force
+   the dialog wider than it needs to be. */
+.settings-menu-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.25rem;
 }
 
 .sr-only {
@@ -1713,5 +1902,109 @@ tbody td [data-key='product'] {
   .table-toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .bulk-edit-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #bulk-edit-value-wrap input,
+  #bulk-edit-value-wrap select,
+  #bulk-edit-field {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Below 640px the Rows table stops being a table at all — each row becomes
+   a bordered card and each cell a labelled line (label from data-label,
+   set in js/app.js), since a table wide enough for a dozen columns has no
+   good horizontal layout on a phone screen even with the sticky columns
+   below. Scoped to #table-wrap (id) specifically, not the .table-wrap
+   class shared by the "Add Assets of Another Product" preview table, so
+   that table's desktop layout is untouched. */
+@media (max-width: 640px) {
+  #table-wrap table,
+  #table-wrap tbody,
+  #table-wrap tr {
+    display: block;
+    width: 100%;
+  }
+
+  #table-wrap thead {
+    display: none;
+  }
+
+  #table-wrap tbody tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+  }
+
+  #table-wrap tbody td {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.1rem;
+    border-bottom: none;
+  }
+
+  #table-wrap tbody td::before {
+    content: attr(data-label);
+    flex: 0 0 40%;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  #table-wrap tbody td input,
+  #table-wrap tbody td select {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Sticky positioning and its shadow/background only make sense with
+     horizontal scroll — in a stacked card layout they'd just pin an
+     arbitrary edge and paint a stray shadow, so cancel them here. Includes
+     nth-child(2) (Name), which is what the desktop-only override above
+     actually freezes in #table-wrap — column 1 there is the bulk-select
+     checkbox, not Name. */
+  #table-wrap table th:first-child,
+  #table-wrap table td:first-child,
+  #table-wrap table th:nth-child(2),
+  #table-wrap table td:nth-child(2),
+  #table-wrap table th:last-child,
+  #table-wrap table td:last-child {
+    position: static;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  /* The checkbox column's fixed desktop width would otherwise squash its
+     card row into a sliver instead of a full-width flex line. It has no
+     data-label (see js/app.js) so ::before renders empty — drop the 40%
+     flex-basis that would still reserve for it, or the checkbox would sit
+     stranded on the right of a blank gap instead of flush left. */
+  #table-wrap tbody td:first-child {
+    width: auto;
+    justify-content: flex-start;
+  }
+
+  #table-wrap tbody td:first-child::before {
+    content: none;
+  }
+
+  /* Delete gets its own centered, unlabelled row — a lone icon button
+     reads fine without "Delete: " printed in front of it. */
+  #table-wrap tbody td:last-child {
+    justify-content: center;
+    padding-top: 0.6rem;
+  }
+
+  #table-wrap tbody td:last-child::before {
+    content: none;
   }
 }
