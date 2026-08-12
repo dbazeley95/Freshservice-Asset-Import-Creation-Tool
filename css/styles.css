@@ -898,6 +898,21 @@ body {
   box-shadow: inset 3px 0 0 var(--coming-soon);
 }
 
+/* Plain informational text, not a button — no hover state, no pointer
+   cursor, nothing to click through to. A dashed top divider echoes the
+   dashed-border look .tab-coming-soon used to give the list's one
+   not-quite-a-real-option entry, without implying this one is disabled
+   rather than simply non-interactive. */
+.tab-missing-note {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.7rem 0;
+  border-top: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  cursor: default;
+}
+
 .app-main {
   min-width: 0;
 }

@@ -21,16 +21,14 @@ exactly):
 - Printers & Copiers (IP Address is optional; every other field is
   required, as usual)
 - Servers (adds Memory(GB) and Disk Space(GB))
+- Docking Stations
 - Other Devices (deliberately last in the menu &mdash; it's a catch-all
   bucket, not meant to be anyone's first choice)
 
-There's also a tab for **Docking Stations** — marked "(Coming soon)"
-because there's no Freshservice import template for it yet, so the tab
-just shows a message. It mirrors the exact Asset Type value from a
-Freshservice product export (not a guessed grouping), and its product
-catalog already exists in `js/catalog.js` (`MODEL_PRESETS`), so nothing is
-lost — add columns for it in `js/templates.js` whenever a real template is
-available and it becomes a fully working tab like the other eleven.
+Every Asset Type value from a real Freshservice product export now has a
+working template — there's no "Coming soon" tab left. If a genuinely new
+Asset Type shows up in a future export, the side nav ends with a
+non-clickable note pointing at **Leave Feedback** to request it added.
 
 "Computer (Unspecified)" has been removed — its six catalogued products
 were all actually laptops, so they were merged into the Laptop catalog

@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.3" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.3" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.4.3" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.5.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.5.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.5.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.3" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.5.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.4.3" />
+  <link rel="stylesheet" href="css/styles.css?v=1.5.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.3" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.5.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.3</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.5.0</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -192,7 +192,7 @@
       <p>The <strong>Theme</strong> dropdown in the header switches between System (follows your OS/browser setting), Light, Dark, and five retro skins &mdash; Vista, Classic Mac, XP, Windows 3.1, and Matrix &mdash; each a full visual reskin rather than just a color swap. Matrix also animates a dimmed, throttled falling-character canvas behind everything; it pauses when the tab isn't visible and skips entirely if you have reduced motion enabled system-wide. Your choice is remembered and applied before the page paints on your next visit.</p>
 
       <h3>1. Pick an asset type</h3>
-      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, or Other Devices. Types marked "Coming soon" don't have an import template wired up yet.</p>
+      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, Docking Stations, or Other Devices. A note at the bottom of the list points at <strong>Leave Feedback</strong> for requesting any type that isn't here yet.</p>
 
       <h3>2. Fill in General</h3>
       <p><strong>Company</strong> has a dropdown of every known site &mdash; click in to see the full list, or type to filter it (typing a site not yet in the list still gets remembered for next time). Picking or typing a known site auto-fills <strong>Location</strong>, unless you've already typed one yourself; Location always stays freely editable afterwards. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.5.0</span><h3 class="changelog-title">Docking Stations, and a Way to Request New Types</h3></div>
+        <p>Docking Stations is now a fully working tab with the standard column set (Name, Company, Location, Asset Tag, Product, Serial Number, Cost, Asset State, Acquisition Date, Warranty (In Months), Warranty Expiry Date, End of Life) &mdash; the last "Coming soon" placeholder is gone; every real Freshservice Asset Type now has a template. In its place, a non-clickable note at the bottom of the Asset Type menu points at <strong>Leave Feedback</strong> for requesting any type that shows up in a future export and isn't here yet.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.4.3</span><h3 class="changelog-title">Sidebar Icons Left-Aligned Again</h3></div>
         <p>Found the actual cause of the sidebar's centering issue: a global rule centers icon+text in every button (correct for Download CSV, Add Assets of Another Product, etc.), and the side nav's tabs are buttons too, so they'd been silently inheriting that centering for a while now &mdash; invisible for short single-line labels, but visibly inconsistent for two-line ones like Interactive Touchscreen and Docking Stations. Tabs are back to a proper left-aligned list, matching every other nav item regardless of label length.</p>
@@ -444,6 +448,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.4.3"></script>
+  <script type="module" src="js/app.js?v=1.5.0"></script>
 </body>
 </html>

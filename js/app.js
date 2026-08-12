@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.4.3';
-import { buildCsv, downloadCsv } from './csv.js?v=1.4.3';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.4.3';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.4.3';
-import { iconSvg } from './icons.js?v=1.4.3';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.5.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.5.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.5.0';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.5.0';
+import { iconSvg } from './icons.js?v=1.5.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -111,6 +111,17 @@ function renderTabs() {
     });
     els.tabs.appendChild(btn);
   }
+
+  // Every real Freshservice Asset Type now has a working template — there's
+  // no "coming soon" placeholder left to imply "we know about more types
+  // than this." This static (non-clickable — nothing to click through to,
+  // just a pointer to the existing Leave Feedback button) note replaces
+  // that signal instead, so a genuinely new type still has somewhere to be
+  // requested rather than just silently not appearing in the list.
+  const missingNote = document.createElement('p');
+  missingNote.className = 'tab-missing-note';
+  missingNote.textContent = 'Product type missing? Please use the Leave Feedback option to request this.';
+  els.tabs.appendChild(missingNote);
 }
 
 // On mobile the side nav is a genuine off-canvas drawer (slides in over a

@@ -55,13 +55,9 @@ export const SITE_PRESETS = [
 // and the default Warranty (Dell = 48 months, everything else = 12,
 // per your stated policy) baked into `fields.warranty` below.
 //
-// monitor/touchscreen/laptop_pc/desktop_pc/tablet/wifi_access_point/
-// hardware_other/network_switch/phone_telephony/printer_copier/server
-// feed the fully working asset templates. Every other key here
-// (docking_station) has no Freshservice import template wired up yet (see
-// ASSET_TYPES in js/templates.js, where they're marked comingSoon) — their
-// presets are captured here now so nothing from a product export gets
-// lost, ready to use the moment a template exists for that type.
+// Every key here feeds a fully working asset template — see ASSET_TYPES in
+// js/templates.js. There's no longer a "coming soon" bucket: every Asset
+// Type value in the source export now has a template.
 //
 // This whole catalog was rebuilt from an actual Freshservice product
 // export that includes each product's real Asset Type — every entry below
