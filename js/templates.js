@@ -21,12 +21,10 @@ function col(key, header, input, source, opts = {}) {
 // independently and drifted out of sync with the others (TV / Digital
 // Signage and Projectors both shipped with End of Life in the wrong place)
 // — building every template from this one list makes that class of mistake
-// structurally impossible going forward. `nameHeader` exists only for
-// Tablet, whose real Freshservice header is "Display Name" rather than
-// "Name".
-function standardColumns({ nameHeader = 'Name' } = {}) {
+// structurally impossible going forward.
+function standardColumns() {
   return [
-    col('name', nameHeader, 'text', 'row'),
+    col('name', 'Name', 'text', 'row'),
     col('company', 'Company', 'text', 'default', { group: 'general' }),
     col('location', 'Location', 'text', 'default', { group: 'general' }),
     col('assetTag', 'Asset Tag', 'text', 'row'),
@@ -86,7 +84,7 @@ export const ASSET_TYPES = [
     id: 'tablet',
     label: 'iPads / Tablets',
     columns: [
-      ...standardColumns({ nameHeader: 'Display Name' }),
+      ...standardColumns(),
       col('os', 'OS', 'text', 'default', { group: 'hardware' }),
       col('storage', 'Storage(GB)', 'number', 'default', { group: 'hardware' }),
     ],
