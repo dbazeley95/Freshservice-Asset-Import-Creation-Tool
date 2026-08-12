@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.6.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.6.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.6.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.7.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.7.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.7.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.6.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.7.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.6.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.7.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.6.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.7.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.6.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.7.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.7.0</span><h3 class="changelog-title">Moved to a New Domain</h3></div>
+        <p>Moved hosting to a new domain.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.6.0</span><h3 class="changelog-title">Company and Location Are Now Both Dropdowns</h3></div>
         <p>Company and Location are no longer free text &mdash; both are closed dropdowns now, in the Defaults panel and per row in the Rows table alike. Picking a Company narrows Location down to just that site's own sub-locations (generated from a Freshservice Locations export), defaulting to the site itself until you pick something more specific; changing Company resets Location back to that default, since a previously-picked sub-location almost never still applies once the option list underneath it has changed. Also removed the dropdown arrow from Processor and every other typed-history-only field (added broadly in 1.5.1) &mdash; it's kept only on Product now, the one field actually backed by a real curated catalog; an arrow on a field that's just remembered whatever you've typed before was misleading.</p>
@@ -460,6 +464,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.6.0"></script>
+  <script type="module" src="js/app.js?v=1.7.0"></script>
 </body>
 </html>
