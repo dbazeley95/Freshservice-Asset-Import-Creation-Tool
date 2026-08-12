@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.12.0';
-import { buildCsv, downloadCsv } from './csv.js?v=1.12.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.12.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.12.0';
-import { iconSvg } from './icons.js?v=1.12.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.13.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.13.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.13.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.13.0';
+import { iconSvg } from './icons.js?v=1.13.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -54,6 +54,7 @@ const els = {
   modalMessage: document.getElementById('modal-message'),
   modalCancelBtn: document.getElementById('modal-cancel-btn'),
   modalOkBtn: document.getElementById('modal-ok-btn'),
+  settingsDialog: document.getElementById('settings-dialog'),
 };
 
 // Remembers the chosen Manufacturer filter per asset type for this page
@@ -1586,9 +1587,12 @@ if (feedbackLink) {
   const body = encodeURIComponent(`Version: ${version}\n\nDescribe the bug or feature request:\n`);
   feedbackLink.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
   document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
+  feedbackLink.addEventListener('click', () => {
+    if (els.settingsDialog) els.settingsDialog.close();
+  });
 }
 
-// ---------- Popout dialogs (Help, Release Notes) ----------
+// ---------- Popout dialogs (Settings, Help, Release Notes) ----------
 
 function wireInfoDialog(dialog, openers, closeBtn) {
   if (!dialog) return;
@@ -1599,6 +1603,14 @@ function wireInfoDialog(dialog, openers, closeBtn) {
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });
+}
+
+const settingsMenuBtn = document.getElementById('settings-menu-btn');
+const settingsDialogClose = document.getElementById('settings-dialog-close');
+if (settingsMenuBtn && els.settingsDialog && settingsDialogClose) {
+  document.getElementById('settings-menu-btn-icon').innerHTML = iconSvg('settings');
+  document.getElementById('settings-dialog-close-icon').innerHTML = iconSvg('close');
+  wireInfoDialog(els.settingsDialog, [settingsMenuBtn], settingsDialogClose);
 }
 
 const helpBtn = document.getElementById('help-btn');
@@ -1618,6 +1630,17 @@ if (releaseNotesBtn && releaseNotesDialog && releaseNotesClose) {
   document.getElementById('release-notes-btn-icon').innerHTML = iconSvg('notes');
   document.getElementById('release-notes-close-icon').innerHTML = iconSvg('close');
   wireInfoDialog(releaseNotesDialog, [releaseNotesBtn, versionBadgeBtn], releaseNotesClose);
+}
+
+// Help and What's New both live inside #settings-dialog now — opening
+// either should hand off from the settings menu rather than stacking a
+// second modal <dialog> (with its own backdrop) on top of it. Not needed
+// for version-badge-btn, which opens Release Notes directly from the page
+// and is never nested inside the settings menu to begin with.
+if (els.settingsDialog) {
+  for (const opener of [helpBtn, releaseNotesBtn]) {
+    if (opener) opener.addEventListener('click', () => els.settingsDialog.close());
+  }
 }
 
 // ---------- Matrix theme's falling-character rain ----------
@@ -1771,6 +1794,7 @@ if (installAppBtn) {
 
   installAppBtn.onclick = async () => {
     if (!deferredInstallPrompt) return;
+    if (els.settingsDialog) els.settingsDialog.close();
     installAppBtn.hidden = true;
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice;

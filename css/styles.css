@@ -1668,6 +1668,31 @@ tbody td [data-key='product'] {
   height: 1rem;
 }
 
+/* The single settings/help trigger that replaced the old row of header
+   buttons — same pill styling (and every theme's override of it) as a
+   plain .header-btn, just circular with no label text. */
+.header-btn.icon-only {
+  padding: 0.55rem;
+}
+
+.header-btn.icon-only .tab-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* What used to be five separate always-visible header buttons (Theme,
+   Leave Feedback, What's New, Help, Install App) now live here instead,
+   opened via the gear icon — stacked and left-aligned rather than the
+   centered horizontal row they used to be, so a long list doesn't force
+   the dialog wider than it needs to be. */
+.settings-menu-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.25rem;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
