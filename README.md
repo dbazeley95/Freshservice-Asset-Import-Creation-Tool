@@ -10,6 +10,7 @@ exactly):
 
 - Monitor
 - Interactive Touchscreen
+- TV / Digital Signage
 - Laptop
 - Desktop
 - iPads / Tablets

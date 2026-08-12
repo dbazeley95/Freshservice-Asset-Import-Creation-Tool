@@ -51,6 +51,25 @@ export const ASSET_TYPES = [
     ],
   },
   {
+    id: 'tv_digital_signage',
+    label: 'TV / Digital Signage',
+    columns: [
+      col('name', 'Name', 'text', 'row'),
+      col('company', 'Company', 'text', 'default', { group: 'general' }),
+      col('location', 'Location', 'text', 'default', { group: 'general' }),
+      col('assetTag', 'Asset Tag', 'text', 'row'),
+      col('endOfLife', 'End of Life', 'date', 'default', { group: 'hardware' }),
+      col('product', 'Product', 'text', 'default', { group: 'hardware' }),
+      col('serialNumber', 'Serial Number', 'text', 'row'),
+      col('cost', 'Cost', 'number', 'default', { group: 'hardware' }),
+      col('warranty', 'Warranty (In Months)', 'number', 'default', { group: 'hardware' }),
+      col('assetState', 'Asset State', 'text', 'default', { group: 'hardware', datalist: 'assetStates' }),
+      col('acquisitionDate', 'Acquisition Date', 'date', 'default', { group: 'hardware' }),
+      col('warrantyExpiry', 'Warranty Expiry Date', 'date', 'default', { group: 'hardware' }),
+      col('screenSize', 'Screen Size (In Inches)', 'number', 'default', { group: 'hardware' }),
+    ],
+  },
+  {
     id: 'laptop_pc',
     label: 'Laptop',
     columns: [
