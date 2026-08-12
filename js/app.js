@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.10.1';
-import { buildCsv, downloadCsv } from './csv.js?v=1.10.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.10.1';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.10.1';
-import { iconSvg } from './icons.js?v=1.10.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.11.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.11.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.11.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.11.0';
+import { iconSvg } from './icons.js?v=1.11.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -38,6 +38,9 @@ const els = {
   comingSoonMessage: document.getElementById('coming-soon-message'),
   navToggle: document.getElementById('nav-toggle'),
   navBackdrop: document.getElementById('nav-backdrop'),
+  persistenceWarning: document.getElementById('persistence-warning'),
+  persistenceWarningText: document.getElementById('persistence-warning-text'),
+  persistenceWarningClose: document.getElementById('persistence-warning-close'),
 };
 
 // Remembers the chosen Manufacturer filter per asset type for this page
@@ -60,8 +63,24 @@ function getState(typeId) {
   return loadState(typeId) || emptyState();
 }
 
+// Shown once per session the first time an actual save fails (storage full,
+// private browsing, etc.) — saveState() already tried and failed silently
+// under the hood, so this is the only place the user finds out their edits
+// from here on aren't being kept. Left up rather than auto-dismissed, since
+// the underlying cause doesn't resolve itself.
+let persistenceWarningShown = false;
+function showPersistenceWarning() {
+  if (persistenceWarningShown || !els.persistenceWarning) return;
+  persistenceWarningShown = true;
+  els.persistenceWarningText.textContent =
+    "Your changes aren't being saved on this device right now (storage may be full, or this is a private/incognito window). " +
+    'Download a CSV of anything important before closing this tab — reloading will lose unsaved rows.';
+  els.persistenceWarning.hidden = false;
+}
+
 function persist(typeId, state) {
-  saveState(typeId, state);
+  const ok = saveState(typeId, state);
+  if (!ok) showPersistenceWarning();
 }
 
 const debounceTimers = new Map();
@@ -879,6 +898,30 @@ function countRowsMissingFields(assetType, rows) {
   }, 0);
 }
 
+// A serial pasted or typed twice creates two rows that look identical to
+// Freshservice — flag it (not block it, same philosophy as the ambiguous-
+// name warning) rather than let it silently through to a failed or
+// mismatched import. Patches the already-rendered inputs directly instead
+// of a full renderTable() call, so editing one row's serial doesn't steal
+// focus back from whichever field is being typed into.
+function refreshDuplicateWarnings(state) {
+  const counts = new Map();
+  for (const row of state.rows) {
+    const serial = String(row.serialNumber ?? '').trim();
+    if (!serial) continue;
+    counts.set(serial, (counts.get(serial) || 0) + 1);
+  }
+  for (const row of state.rows) {
+    const tr = els.tableWrap.querySelector(`tr[data-row-id="${row.id}"]`);
+    const input = tr && tr.querySelector('input[data-key="serialNumber"]');
+    if (!input) continue;
+    const serial = String(row.serialNumber ?? '').trim();
+    const otherCount = serial ? (counts.get(serial) || 1) - 1 : 0;
+    input.classList.toggle('duplicate', otherCount > 0);
+    input.title = otherCount > 0 ? `Duplicate serial number — also used on ${otherCount} other row${otherCount === 1 ? '' : 's'}.` : '';
+  }
+}
+
 function renderTable(assetType, state) {
   els.tableWrap.innerHTML = '';
   els.rowCount.textContent = `${state.rows.length} row${state.rows.length === 1 ? '' : 's'}`;
@@ -941,6 +984,7 @@ function renderTable(assetType, state) {
       if (col.key === 'company') {
         const select = buildCompanySelect(row[col.key]);
         select.dataset.key = col.key;
+        select.title = select.value;
         if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
         select.addEventListener('change', () => {
           row.company = select.value;
@@ -956,9 +1000,11 @@ function renderTable(assetType, state) {
       if (col.key === 'location') {
         const select = buildLocationSelect(row.company, row[col.key]);
         select.dataset.key = col.key;
+        select.title = select.value;
         if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
         select.addEventListener('change', () => {
           row.location = select.value;
+          select.title = select.value;
           select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
           persist(activeTypeId, state);
         });
@@ -972,6 +1018,11 @@ function renderTable(assetType, state) {
       if (col.input === 'number') input.step = 'any';
       input.value = row[col.key] ?? '';
       input.dataset.key = col.key;
+      // A title showing the full value covers Product/Processor/etc. (any
+      // free-text field long enough to clip in this table's compact
+      // columns) without hovering being the only way to read it — dates and
+      // numbers are never long enough for this to matter.
+      if (col.input === 'text') input.title = input.value;
       if (isRowInvalid(assetType, row, col)) input.classList.add('invalid');
 
       let ambiguousIcon = null;
@@ -994,9 +1045,10 @@ function renderTable(assetType, state) {
         if (col.key === 'name' && row._ambiguousName) {
           row._ambiguousName = false;
           input.classList.remove('ambiguous');
-          input.title = '';
           if (ambiguousIcon) ambiguousIcon.remove();
         }
+        if (col.input === 'text') input.title = input.value;
+        if (col.key === 'serialNumber') refreshDuplicateWarnings(state);
         debouncedPersist(activeTypeId, state);
       });
       input.addEventListener('change', () => {
@@ -1023,6 +1075,8 @@ function renderTable(assetType, state) {
     delBtn.setAttribute('aria-label', delBtn.title);
     delBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('close')}</span>`;
     delBtn.addEventListener('click', () => {
+      const ok = confirm(`Delete row "${row.name || row.assetTag || 'unnamed'}"? This cannot be undone.`);
+      if (!ok) return;
       state.rows = state.rows.filter((r) => r.id !== row.id);
       persist(activeTypeId, state);
       renderTable(assetType, state);
@@ -1034,6 +1088,7 @@ function renderTable(assetType, state) {
   }
   table.appendChild(tbody);
   els.tableWrap.appendChild(table);
+  refreshDuplicateWarnings(state);
   void suggestions;
 }
 
@@ -1168,6 +1223,16 @@ if (clearRowsIcon) clearRowsIcon.innerHTML = iconSvg('close');
 
 const downloadIcon = document.getElementById('download-icon');
 if (downloadIcon) downloadIcon.innerHTML = iconSvg('download');
+
+const persistenceWarningIcon = document.getElementById('persistence-warning-icon');
+if (persistenceWarningIcon) persistenceWarningIcon.innerHTML = iconSvg('warning');
+const persistenceWarningCloseIcon = document.getElementById('persistence-warning-close-icon');
+if (persistenceWarningCloseIcon) persistenceWarningCloseIcon.innerHTML = iconSvg('close');
+if (els.persistenceWarningClose) {
+  els.persistenceWarningClose.addEventListener('click', () => {
+    els.persistenceWarning.hidden = true;
+  });
+}
 
 const openFreshserviceIcon = document.getElementById('open-freshservice-icon');
 if (openFreshserviceIcon) openFreshserviceIcon.innerHTML = iconSvg('externalLink');

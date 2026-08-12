@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.10.1" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.10.1" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.10.1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.11.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.11.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.11.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.10.1" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.11.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.10.1" />
+  <link rel="stylesheet" href="css/styles.css?v=1.11.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.10.1" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.11.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.10.1</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.11.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -92,6 +92,20 @@
 
     <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
   </header>
+
+  <!-- Hidden until js/app.js's persist() actually hits a saveState() failure
+       (quota exceeded, private browsing, etc.) — see storage.js. Shown once
+       per session and left up rather than auto-dismissed, since the
+       underlying cause (out of storage, private mode) doesn't resolve
+       itself, and losing track of "my edits aren't being saved" is exactly
+       the failure this exists to prevent. -->
+  <div id="persistence-warning" class="persistence-warning" role="alert" hidden>
+    <span id="persistence-warning-icon" class="tab-icon" aria-hidden="true"></span>
+    <span id="persistence-warning-text"></span>
+    <button id="persistence-warning-close" type="button" class="icon-btn" aria-label="Dismiss">
+      <span id="persistence-warning-close-icon" class="tab-icon" aria-hidden="true"></span>
+    </button>
+  </div>
 
   <div class="app-shell">
     <button id="nav-toggle" type="button" class="nav-toggle" aria-expanded="false" aria-controls="type-tabs">
@@ -241,6 +255,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.11.0</span><h3 class="changelog-title">Data-Safety and Rows Table Fixes</h3></div>
+        <p>Four fixes from a deeper review of the Rows table: (1) a save to this device failing silently (storage full, private browsing) now shows a clear warning rather than risking edits vanishing on reload with no trace; (2) deleting a single row now asks for confirmation, matching Clear All Rows, instead of removing it on one click with no undo; (3) a Serial Number that matches another row's is now flagged (amber, with a tooltip explaining why) instead of silently allowed through; (4) Company, Location, and Product were truncating unreadably in the table ("St Albans" showing as "St Al") &mdash; widened those columns and added tooltips showing the full value on every text field in the table.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.10.1</span><h3 class="changelog-title">iPads / Tablets Header Fix</h3></div>
         <p>iPads / Tablets used "Display Name" instead of "Name" for its first column &mdash; every other type uses "Name", and this one should too.</p>
@@ -484,6 +502,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.10.1"></script>
+  <script type="module" src="js/app.js?v=1.11.0"></script>
 </body>
 </html>

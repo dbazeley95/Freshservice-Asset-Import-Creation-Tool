@@ -16,9 +16,13 @@ export function loadState(typeId) {
 export function saveState(typeId, state) {
   try {
     localStorage.setItem(stateKey(typeId), JSON.stringify(state));
+    return true;
   } catch {
-    // Storage full or unavailable (e.g. private browsing) — fail silently,
-    // the app still works, it just won't persist between reloads.
+    // Storage full or unavailable (e.g. private browsing) — the app still
+    // works, it just won't persist between reloads. Caller surfaces this to
+    // the user rather than failing silently, since otherwise there's no way
+    // to know an edit was never actually saved until it's already lost.
+    return false;
   }
 }
 

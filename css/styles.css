@@ -1202,6 +1202,14 @@ input.ambiguous {
   border-color: var(--warning);
 }
 
+/* Same amber "needs a second look" language as .ambiguous, for a Serial
+   Number that matches another row's — see refreshDuplicateWarnings in
+   js/app.js. */
+input.duplicate {
+  border-color: var(--warning);
+  background: var(--warning-bg);
+}
+
 .ambiguous-icon-inline {
   color: var(--warning);
 }
@@ -1326,6 +1334,45 @@ button:hover {
   font-weight: 600;
 }
 
+/* Shown once per session the moment a save to localStorage actually fails
+   (see storage.js/app.js) — deliberately loud (danger color, left up until
+   dismissed) since the alternative is a user believing their edits are
+   safe when they're not. */
+.persistence-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 1400px;
+  margin: 0 auto 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--danger);
+  border-left-width: 4px;
+  border-radius: 8px;
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Without this, the [hidden] attribute has no effect: an author-stylesheet
+   class selector at equal specificity overrides the browser's own
+   [hidden] { display: none } default, so `display: flex` above would win
+   and the banner would render even while hidden. */
+.persistence-warning[hidden] {
+  display: none;
+}
+
+.persistence-warning .tab-icon {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.persistence-warning #persistence-warning-close {
+  margin-left: auto;
+  color: var(--danger);
+}
+
 .spacer {
   flex: 1;
 }
@@ -1361,8 +1408,23 @@ tbody td {
   border-bottom: 1px solid var(--border);
 }
 
-tbody td input {
+tbody td input,
+tbody td select {
   min-width: 110px;
+}
+
+/* Company/Location/Product routinely hold longer text (full site names,
+   model numbers) than 110px shows without either hovering for the title
+   tooltip or opening the control to read it — confirmed directly ("St
+   Albans" was rendering as "St Al" with the select's default width).
+   Widen just these three rather than every column, so shorter fields
+   (Cost, Warranty, dates) stay compact. Matched by data-key (set in
+   js/app.js) rather than column position, so this keeps working
+   regardless of where these columns land in a given template. */
+tbody td [data-key='company'],
+tbody td [data-key='location'],
+tbody td [data-key='product'] {
+  min-width: 160px;
 }
 
 /* Freeze the first column (Name/Display Name — always column 1, see
