@@ -503,6 +503,37 @@ export const MODEL_PRESETS = {
       fields: { product: "T-Series", warranty: 12 },
     },
   ],
+  // Manufacturer known, model names not yet confirmed — these are
+  // placeholders so the Manufacturer filter has something to narrow
+  // (matching every other catalogued type) without inventing a real-
+  // looking model name that could get typed into an actual export by
+  // mistake. Replace each with the real model once it's confirmed.
+  tv_digital_signage: [
+    {
+      id: "lg-model-tbc",
+      label: "LG (model TBC)",
+      manufacturer: "LG",
+      fields: { product: "LG (model TBC)" },
+    },
+    {
+      id: "samsung-model-tbc",
+      label: "Samsung (model TBC)",
+      manufacturer: "Samsung",
+      fields: { product: "Samsung (model TBC)" },
+    },
+    {
+      id: "philips-model-tbc",
+      label: "Philips (model TBC)",
+      manufacturer: "Philips",
+      fields: { product: "Philips (model TBC)" },
+    },
+    {
+      id: "clevertouch-model-tbc",
+      label: "Clevertouch (model TBC)",
+      manufacturer: "Clevertouch",
+      fields: { product: "Clevertouch (model TBC)" },
+    },
+  ],
   laptop_pc: [
     {
       id: "100e-chromebook-2nd-gen",
