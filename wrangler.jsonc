@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Static-assets-only Worker — no server-side code, just serves this repo's
+  // existing index.html/css/js/assets as-is. That's a straight equivalent
+  // to what GitHub Pages already does, so nothing about the app itself
+  // changes; this file only exists because Cloudflare's Git-connected
+  // Workers deploy flow (`npx wrangler deploy`) needs a config file to know
+  // what to serve.
+  "name": "freshservice-asset-import-leverage-system",
+  "compatibility_date": "2026-08-12",
+  "assets": {
+    "directory": "."
+  }
+}
