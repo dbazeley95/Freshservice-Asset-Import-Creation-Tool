@@ -67,14 +67,16 @@ of the wrong theme.
    an always-visible sidebar on wider ones (≥900px), defaulting to Desktop
    PC on first visit.
 2. Fill in **General** — which site this batch belongs to. **Company**
-   has a dropdown of every known site (`SITE_PRESETS` in
-   `js/catalog.js`) — click in to see the full list, or type to filter
-   it; a site you type that isn't in the list yet is still remembered
-   and offered next time. Picking or typing a known site fills in
-   **Location** automatically (since every site in this org is its own
-   Company *and* Location), unless you've already typed one yourself —
-   Location always stays freely editable afterwards, since it's
-   expected to grow well past the preset list.
+   and **Location** are both closed dropdowns, not free text — Company
+   lists every known site (`SITE_PRESETS` in `js/catalog.js`); picking one
+   narrows Location down to just that site's own sub-locations
+   (`LOCATIONS_BY_COMPANY` in `js/catalog.js`, generated from a
+   Freshservice Locations export), defaulting to the site's own name
+   (its top-level Location) until you pick something more specific. A
+   Company with no matching entry in that list just offers itself as the
+   only Location. Changing Company resets Location back to that default,
+   since the previous pick almost never still applies once the option
+   list underneath it has changed.
 3. Fill in **Hardware Specific** — what the hardware itself is (Product,
    Cost, Warranty, Asset State, Acquisition Date, End of Life, and any
    type-specific fields like Processor/Memory/Disk or OS/Storage). Start
@@ -214,10 +216,12 @@ js/templates.js       Column definitions for each asset type (edit here to
                        Every column is required by default; a 'default'
                        column's `group` ('general' or 'hardware') decides
                        which panel it renders in.
-js/catalog.js          Site Presets (Company + Location together) and
-                       Model Presets shown in the General/Hardware Specific
-                       panels — edit here to add/retire a site or hardware
-                       model
+js/catalog.js          Site Presets (Company dropdown), Locations By
+                       Company (Location dropdown, narrowed to the chosen
+                       Company's sub-locations), and Model Presets shown
+                       in the General/Hardware Specific panels — edit
+                       here to add/retire a site, its sub-locations, or a
+                       hardware model
 js/icons.js             2D line-icon SVGs for the side nav, keyed by asset
                        type id
 js/csv.js              CSV escaping/formatting and filename/download helper
@@ -246,9 +250,15 @@ matter for that model (e.g. Product/OS/Storage/Warranty/Cost for a tablet);
 anything left out just stays blank for you to fill in on first use. A model
 preset's `manufacturer` field is metadata only (never written to the CSV) —
 it drives the Manufacturer filter and nothing else, so it's fine to leave
-off if you don't know it. A `SITE_PRESETS` entry sets Company and Location
-to the same value by default; add an explicit `location` to an entry if a
-site's Location ever needs to differ from its Company name. Its
-`shortCode` (e.g. `SCL`, `MAR`) is what Asset Tag gets built from for that
-site — leave it `''` until you have the real code, and Asset Tag just
-stays blank in the meantime instead of guessing.
+off if you don't know it. A `SITE_PRESETS` entry adds a site to the
+Company dropdown; its `shortCode` (e.g. `SCL`, `MAR`) is what Asset Tag
+gets built from for that site — leave it `''` until you have the real
+code, and Asset Tag just stays blank in the meantime instead of guessing.
+A site's Location dropdown comes from its own entry in
+`LOCATIONS_BY_COMPANY`, keyed by the exact same Company name — the first
+value in that list is always the Company name itself (its default,
+top-level Location), followed by its sub-locations. A Company with no
+entry there falls back to offering just itself. That list is generated
+from a Freshservice Locations export (Admin > Locations, CSV export)
+rather than hand-typed row by row — to refresh it after Freshservice's
+Locations list changes, re-export it and regenerate the block.

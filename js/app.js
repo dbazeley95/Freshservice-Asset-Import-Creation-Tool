@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.5.2';
-import { buildCsv, downloadCsv } from './csv.js?v=1.5.2';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.5.2';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.5.2';
-import { iconSvg } from './icons.js?v=1.5.2';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.6.0';
+import { buildCsv, downloadCsv } from './csv.js?v=1.6.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.6.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=1.6.0';
+import { iconSvg } from './icons.js?v=1.6.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -161,21 +161,17 @@ document.addEventListener('keydown', (e) => {
 
 // ---------- Defaults panels (General + Hardware Specific) ----------
 
-// Fills Location from a matching Site Preset the moment Company is set —
-// but only when Location is still blank, so it never clobbers a value
-// someone already typed by hand (e.g. a site with no Site Preset entry, or
-// a genuinely different Location for that Company).
-function autoFillLocationFromCompany(assetType, state) {
-  if (String(state.defaults.location ?? '').trim()) return;
-  const company = String(state.defaults.company ?? '').trim();
-  if (!company) return;
-  const preset = SITE_PRESETS.find((p) => p.company.toLowerCase() === company.toLowerCase());
-  if (!preset) return;
-  state.defaults.location = preset.location;
-  addSuggestion('location', preset.location);
-  persist(activeTypeId, state);
-  renderGeneralForm(assetType, state);
-  refreshBulkPreview(assetType, state);
+// Company and Location are both closed lists — Company from every known
+// Site Preset, Location from that Company's own entry in
+// LOCATIONS_BY_COMPANY (js/catalog.js), which always starts with the
+// Company name itself followed by its sub-locations. Picking a Company
+// resets Location to that first entry (the Company name), since a
+// previously-picked Location almost never still applies once the option
+// list itself has changed underneath it — pick a more specific
+// sub-location again afterward if needed.
+function locationOptionsForCompany(company) {
+  if (!company) return [];
+  return LOCATIONS_BY_COMPANY[company] || [company];
 }
 
 // Asset Tag is always `${shortCode}-${serial}`, never typed by hand.
@@ -216,20 +212,6 @@ function filteredModelPresets(modelPresets, manufacturerFilter) {
 function productCatalogOptions(modelPresets, manufacturerFilter) {
   const names = filteredModelPresets(modelPresets, manufacturerFilter).map((p) => p.fields.product);
   return [...new Set(names)].sort((a, b) => a.localeCompare(b));
-}
-
-// Company's dropdown combines every known Site Preset — so the full list
-// shows up immediately on click, the way a dedicated preset dropdown did
-// before it was merged into free text — with anything typed that isn't in
-// that list yet, so a site not in catalog.js still gets remembered and
-// offered next time. Location deliberately has no equivalent: it's
-// expected to grow to hundreds of values that don't each need a
-// catalog.js entry, so it stays plain typed-history suggestions, still
-// auto-filled from a matching Site Preset but always freely editable.
-function companyPresetOptions(suggestions) {
-  const presetNames = SITE_PRESETS.map((p) => p.company);
-  const typed = suggestions.company || [];
-  return [...new Set([...presetNames, ...typed])].sort((a, b) => a.localeCompare(b));
 }
 
 // Manufacturer filter narrows the Product field's suggestions below —
@@ -293,12 +275,14 @@ function renderManufacturerFilterField(assetType, state) {
 //
 // Moves `input` into a new tight-fitting wrapper div (rather than reusing
 // its existing .field parent, which also contains the label above it) —
-// that's what lets CSS center the dropdown-affordance chevron (added
-// alongside this) on the input's own height, not the label+input
-// combined height.
-function attachCombobox(input, getOptions, onSelect) {
+// that's what lets CSS center the dropdown-affordance chevron on the
+// input's own height, not the label+input combined height. `chevron: true`
+// adds that affordance — reserve it for fields backed by a real curated
+// list (Product's MODEL_PRESETS catalog); a plain typed-history field has
+// no such list, so a chevron there would be misleading.
+function attachCombobox(input, getOptions, onSelect, { chevron = false } = {}) {
   const comboWrap = document.createElement('div');
-  comboWrap.className = 'combobox-wrap';
+  comboWrap.className = chevron ? 'combobox-wrap combobox-wrap--chevron' : 'combobox-wrap';
   input.replaceWith(comboWrap);
   comboWrap.appendChild(input);
 
@@ -401,6 +385,33 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     return wrap;
   }
 
+  if (col.key === 'company') {
+    const select = buildCompanySelect(state.defaults[col.key]);
+    select.id = `def-${col.key}`;
+    select.addEventListener('change', () => {
+      state.defaults.company = select.value;
+      state.defaults.location = locationOptionsForCompany(select.value)[0] || '';
+      persist(activeTypeId, state);
+      renderGeneralForm(assetType, state);
+      refreshAssetTagHint(state);
+      refreshBulkPreview(assetType, state);
+    });
+    wrap.appendChild(select);
+    return wrap;
+  }
+
+  if (col.key === 'location') {
+    const select = buildLocationSelect(state.defaults.company, state.defaults[col.key]);
+    select.id = `def-${col.key}`;
+    select.addEventListener('change', () => {
+      state.defaults.location = select.value;
+      persist(activeTypeId, state);
+      refreshBulkPreview(assetType, state);
+    });
+    wrap.appendChild(select);
+    return wrap;
+  }
+
   const input = document.createElement('input');
   input.id = `def-${col.key}`;
   input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
@@ -413,9 +424,7 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     input.dispatchEvent(new Event('change', { bubbles: true }));
   };
   if (col.key === 'product' && modelPresets.length > 0) {
-    attachCombobox(input, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected);
-  } else if (col.key === 'company') {
-    attachCombobox(input, () => companyPresetOptions(suggestions), onSuggestionSelected);
+    attachCombobox(input, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected, { chevron: true });
   } else if (col.input === 'text') {
     attachCombobox(input, () => suggestions[col.key] || [], onSuggestionSelected);
   }
@@ -423,7 +432,6 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
   input.addEventListener('input', () => {
     state.defaults[col.key] = input.value;
     debouncedPersist(activeTypeId, state);
-    if (col.key === 'company') refreshAssetTagHint(state);
     refreshBulkPreview(assetType, state);
   });
   input.addEventListener('change', () => {
@@ -433,7 +441,6 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
       const preset = modelPresets.find((p) => p.fields.product === input.value);
       if (preset) applyModelPresetFields(assetType, state, preset);
     }
-    if (col.key === 'company') autoFillLocationFromCompany(assetType, state);
   });
 
   return wrap;
@@ -491,6 +498,49 @@ function buildAssetStateSelect(currentValue) {
     select.appendChild(o);
   }
   select.value = currentValue ?? '';
+  return select;
+}
+
+// A real <select> for Company — every known Site Preset (js/catalog.js),
+// nothing free-typed. Location's own options depend on which Company is
+// selected here (see buildLocationSelect), so anything not in this list
+// would leave Location with no matching sub-locations to offer either.
+function buildCompanySelect(currentValue) {
+  const select = document.createElement('select');
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '--';
+  select.appendChild(blank);
+  const companies = SITE_PRESETS.map((p) => p.company).sort((a, b) => a.localeCompare(b));
+  for (const c of companies) {
+    const o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    select.appendChild(o);
+  }
+  select.value = currentValue ?? '';
+  return select;
+}
+
+// A real <select> for Location, its options narrowed to just the given
+// Company's own sub-locations (LOCATIONS_BY_COMPANY in js/catalog.js) —
+// disabled with no options until a Company is chosen, since there's
+// nothing to filter to yet.
+function buildLocationSelect(company, currentValue) {
+  const select = document.createElement('select');
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '--';
+  select.appendChild(blank);
+  const options = locationOptionsForCompany(company);
+  for (const loc of options) {
+    const o = document.createElement('option');
+    o.value = loc;
+    o.textContent = loc;
+    select.appendChild(o);
+  }
+  select.value = currentValue && options.includes(currentValue) ? currentValue : '';
+  select.disabled = options.length === 0;
   return select;
 }
 
@@ -880,6 +930,35 @@ function renderTable(assetType, state) {
         if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
         select.addEventListener('change', () => {
           row[col.key] = select.value;
+          select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+          persist(activeTypeId, state);
+        });
+        td.appendChild(select);
+        tr.appendChild(td);
+        continue;
+      }
+
+      if (col.key === 'company') {
+        const select = buildCompanySelect(row[col.key]);
+        select.dataset.key = col.key;
+        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        select.addEventListener('change', () => {
+          row.company = select.value;
+          row.location = locationOptionsForCompany(select.value)[0] || '';
+          persist(activeTypeId, state);
+          renderTable(assetType, state);
+        });
+        td.appendChild(select);
+        tr.appendChild(td);
+        continue;
+      }
+
+      if (col.key === 'location') {
+        const select = buildLocationSelect(row.company, row[col.key]);
+        select.dataset.key = col.key;
+        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        select.addEventListener('change', () => {
+          row.location = select.value;
           select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
           persist(activeTypeId, state);
         });

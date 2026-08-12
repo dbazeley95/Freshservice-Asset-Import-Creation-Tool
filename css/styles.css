@@ -1124,22 +1124,26 @@ select.invalid {
 }
 
 /* Extra right padding so typed/selected text never runs under the chevron
-   drawn by ::after below it. */
-.combobox-wrap input {
+   drawn by ::after below it — only on --chevron, so plain typed-history
+   fields (no chevron) don't carry padding they don't need. */
+.combobox-wrap--chevron input {
   padding-right: 1.9rem;
 }
 
 /* A plain dropdown-arrow affordance, matching what a native <select> (e.g.
    Asset State) already shows for free — without it, a combobox field reads
-   as ordinary free text with no hint that it has a suggestion list at all.
-   Two rotated borders rather than an icon/image, so it picks up
-   var(--text-muted) automatically in every theme, including the five
-   retro skins, with no extra per-theme rule needed anywhere. Centered on
-   the input's own height (0 to 100% of .combobox-wrap, which now wraps
-   only the input, not the label above it — see attachCombobox in
-   js/app.js) via top:50% + a fixed negative margin, not a transform
-   percentage, so the rotate() alone doesn't also shift its position. */
-.combobox-wrap::after {
+   as ordinary free text with no hint that it has a list to open. Reserved
+   for fields backed by a real curated list (Product's MODEL_PRESETS
+   catalog), not plain typed-history suggestions — a chevron on those would
+   imply a curated list that isn't actually there. Two rotated borders
+   rather than an icon/image, so it picks up var(--text-muted)
+   automatically in every theme, including the five retro skins, with no
+   extra per-theme rule needed anywhere. Centered on the input's own height
+   (0 to 100% of .combobox-wrap, which now wraps only the input, not the
+   label above it — see attachCombobox in js/app.js) via top:50% + a fixed
+   negative margin, not a transform percentage, so the rotate() alone
+   doesn't also shift its position. */
+.combobox-wrap--chevron::after {
   content: '';
   position: absolute;
   top: 50%;
