@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.5.0';
-import { buildCsv, downloadCsv } from './csv.js?v=1.5.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.5.0';
-import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.5.0';
-import { iconSvg } from './icons.js?v=1.5.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=1.5.1';
+import { buildCsv, downloadCsv } from './csv.js?v=1.5.1';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=1.5.1';
+import { SITE_PRESETS, MODEL_PRESETS } from './catalog.js?v=1.5.1';
+import { iconSvg } from './icons.js?v=1.5.1';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -290,12 +290,22 @@ function renderManufacturerFilterField(assetType, state) {
 // across every device. `getOptions()` is called fresh each time the list
 // opens/filters, so it stays in sync with a changing Manufacturer filter
 // etc. `onSelect(value)` fires after the input's value is already set.
-function attachCombobox(input, wrap, getOptions, onSelect) {
-  wrap.classList.add('combobox-wrap');
+//
+// Moves `input` into a new tight-fitting wrapper div (rather than reusing
+// its existing .field parent, which also contains the label above it) —
+// that's what lets CSS center the dropdown-affordance chevron (added
+// alongside this) on the input's own height, not the label+input
+// combined height.
+function attachCombobox(input, getOptions, onSelect) {
+  const comboWrap = document.createElement('div');
+  comboWrap.className = 'combobox-wrap';
+  input.replaceWith(comboWrap);
+  comboWrap.appendChild(input);
+
   const list = document.createElement('ul');
   list.className = 'combobox-list';
   list.hidden = true;
-  wrap.appendChild(list);
+  comboWrap.appendChild(list);
 
   let highlighted = -1;
 
@@ -403,11 +413,11 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     input.dispatchEvent(new Event('change', { bubbles: true }));
   };
   if (col.key === 'product' && modelPresets.length > 0) {
-    attachCombobox(input, wrap, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected);
+    attachCombobox(input, () => productCatalogOptions(modelPresets, modelFilterState[assetType.id] || ''), onSuggestionSelected);
   } else if (col.key === 'company') {
-    attachCombobox(input, wrap, () => companyPresetOptions(suggestions), onSuggestionSelected);
+    attachCombobox(input, () => companyPresetOptions(suggestions), onSuggestionSelected);
   } else if (col.input === 'text') {
-    attachCombobox(input, wrap, () => suggestions[col.key] || [], onSuggestionSelected);
+    attachCombobox(input, () => suggestions[col.key] || [], onSuggestionSelected);
   }
 
   input.addEventListener('input', () => {
