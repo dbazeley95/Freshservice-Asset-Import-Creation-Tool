@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.11.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.11.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.11.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.12.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.12.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.12.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.11.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.12.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.11.0" />
+  <link rel="stylesheet" href="css/styles.css?v=1.12.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.11.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.12.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.11.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.12.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -105,6 +105,21 @@
     <button id="persistence-warning-close" type="button" class="icon-btn" aria-label="Dismiss">
       <span id="persistence-warning-close-icon" class="tab-icon" aria-hidden="true"></span>
     </button>
+  </div>
+
+  <!-- One reusable dialog for every confirm()/alert() in the app (see
+       showModal() in js/app.js) — themed via the same CSS custom
+       properties every panel already uses, so it matches whichever of the
+       7 themes is active without any theme-specific markup here. Hidden by
+       default; showModal() fills in the message/buttons and un-hides it. -->
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <div id="modal-box" class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="modal-message">
+      <p id="modal-message"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" type="button"></button>
+        <button id="modal-ok-btn" type="button"></button>
+      </div>
+    </div>
   </div>
 
   <div class="app-shell">
@@ -164,6 +179,21 @@
               <h2 id="table-heading">Rows</h2>
               <span id="row-count" class="row-count"></span>
               <span id="invalid-row-count" class="row-count-invalid" hidden></span>
+              <!-- The persistence-warning banner near the top of the page only
+                   ever shows once and can be dismissed — this is the cue that
+                   keeps reappearing on every failed save afterwards, so
+                   dismissing the banner once doesn't mean "never warn me
+                   again" if it's still actually failing (see persist() in
+                   js/app.js). -->
+              <span
+                id="persistence-cue"
+                class="persistence-cue"
+                title="Your changes still aren't being saved on this device right now — download a CSV before closing this tab."
+                hidden
+              >
+                <span id="persistence-cue-icon" class="tab-icon" aria-hidden="true"></span>
+                Not saving
+              </span>
               <div class="spacer"></div>
               <button id="import-edit-btn" type="button" class="primary">
                 <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
@@ -174,6 +204,27 @@
                 <span id="clear-rows-icon" class="tab-icon" aria-hidden="true"></span>
                 Clear All Rows
               </button>
+            </div>
+            <!-- Filters which rows are shown below, not the underlying data —
+                 the full set still downloads/exports regardless of what's
+                 filtered out of view. Hidden entirely until there's more
+                 than a handful of rows to actually need filtering (see
+                 js/app.js). -->
+            <div id="row-search-wrap" class="row-search-wrap" hidden>
+              <label for="row-search" class="sr-only">Filter rows</label>
+              <input id="row-search" type="search" placeholder="Filter by Name, Serial Number, or Asset Tag&hellip;" />
+            </div>
+            <!-- Only appears once at least one row is checked (see js/app.js)
+                 — lets one field's value be stamped onto every selected row
+                 at once, e.g. marking 30 rows Retired via Asset State instead
+                 of editing each one by hand. -->
+            <div id="bulk-edit-wrap" class="bulk-edit-wrap" hidden>
+              <span id="bulk-edit-count" class="bulk-edit-count"></span>
+              <label for="bulk-edit-field" class="sr-only">Field to set</label>
+              <select id="bulk-edit-field"></select>
+              <span id="bulk-edit-value-wrap"></span>
+              <button id="bulk-edit-apply-btn" type="button" class="small">Apply to Selected</button>
+              <button id="bulk-edit-clear-btn" type="button" class="small">Clear Selection</button>
             </div>
             <div id="table-wrap" class="table-wrap"></div>
             <button id="download-btn" type="button" class="success">
@@ -255,6 +306,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.12.0</span><h3 class="changelog-title">Bulk Editing, Themed Dialogs, and a Mobile-Friendly Rows Table</h3></div>
+        <p>A large batch: the Rows table now has a checkbox on every row (plus a select-all in the header) so one field &mdash; Asset State, Cost, Warranty, whatever &mdash; can be stamped onto every selected row at once instead of editing each one by hand (e.g. marking 30 rows Retired in one go). Every browser alert()/confirm() (delete a row, Clear All Rows, the 10-product cap, CSV import errors, downloading with missing fields) is now a themed dialog matching whichever of the app's themes is active, instead of a plain OS popup. Below 640px wide, the Rows table switches from a horizontally-scrolling table to a stack of labelled cards, so editing rows on a phone no longer means scrolling sideways through a dozen columns. A search box appears above the table once it has more than 8 rows, filtering by Name/Serial Number/Asset Tag. Importing a CSV via "Import Populated CSV for Editing" now reads extra per-row columns (like Phones &amp; Telephony's Extension) instead of dropping them. Keyboard focus now gets a themed outline everywhere (inputs, selects, buttons) instead of only the theme picker. And the persistence-failure warning banner, which only ever showed once and could be dismissed, now has a companion &mdash; a small "Not saving" cue next to the row count &mdash; that keeps showing up on every failed save even after the banner's gone, so a storage problem that's still happening doesn't go quiet just because it was already dismissed once.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.11.0</span><h3 class="changelog-title">Data-Safety and Rows Table Fixes</h3></div>
         <p>Four fixes from a deeper review of the Rows table: (1) a save to this device failing silently (storage full, private browsing) now shows a clear warning rather than risking edits vanishing on reload with no trace; (2) deleting a single row now asks for confirmation, matching Clear All Rows, instead of removing it on one click with no undo; (3) a Serial Number that matches another row's is now flagged (amber, with a tooltip explaining why) instead of silently allowed through; (4) Company, Location, and Product were truncating unreadably in the table ("St Albans" showing as "St Al") &mdash; widened those columns and added tooltips showing the full value on every text field in the table.</p>
@@ -502,6 +557,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.11.0"></script>
+  <script type="module" src="js/app.js?v=1.12.0"></script>
 </body>
 </html>
