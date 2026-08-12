@@ -837,6 +837,16 @@ body {
 .tab {
   display: flex;
   align-items: center;
+  /* The global `button` rule sets justify-content: center, meant for
+     pill-style action buttons (Download CSV, Add Assets of Another
+     Product) where a short label centers nicely in a wider box. A nav
+     list reads as a list, not a set of buttons, so this overrides back
+     to left-aligned — text-align: left below was already declaring that
+     intent, but text-align has no effect on flex item positioning, so
+     without this a two-line-wrapped label (Interactive Touchscreen,
+     Docking Stations) visibly centers differently than its single-line
+     neighbors instead of lining up with them. */
+  justify-content: flex-start;
   gap: 0.6rem;
   width: 100%;
   padding: 0.55rem 0.7rem;

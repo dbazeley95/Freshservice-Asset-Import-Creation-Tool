@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.2" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.2" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.4.2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.4.3" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.4.3" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.4.3" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.2" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.4.3" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.4.2" />
+  <link rel="stylesheet" href="css/styles.css?v=1.4.3" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.2" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.4.3" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.2</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.4.3</button>
           <span class="compiled-date">Compiled 11 Aug 2026</span>
         </div>
       </div>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.4.3</span><h3 class="changelog-title">Sidebar Icons Left-Aligned Again</h3></div>
+        <p>Found the actual cause of the sidebar's centering issue: a global rule centers icon+text in every button (correct for Download CSV, Add Assets of Another Product, etc.), and the side nav's tabs are buttons too, so they'd been silently inheriting that centering for a while now &mdash; invisible for short single-line labels, but visibly inconsistent for two-line ones like Interactive Touchscreen and Docking Stations. Tabs are back to a proper left-aligned list, matching every other nav item regardless of label length.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.4.2</span><h3 class="changelog-title">Company Dropdown Restored</h3></div>
         <p>Company now has a dropdown of every known site again &mdash; click in to see the full list, or type to filter it. This was a real dropdown (a native <code>&lt;select&gt;</code>) once, dropped in v0.8.0 in favor of free text with typed-history suggestions only; it's back now using the same reliable combobox already used for Product, rather than the old native select. Typing a site not yet in the list is still remembered for next time. Location stays exactly as it's been &mdash; auto-filled from a matching site but always freely editable, since it's expected to grow to hundreds of values that don't each need a catalog entry.</p>
@@ -440,6 +444,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.4.2"></script>
+  <script type="module" src="js/app.js?v=1.4.3"></script>
 </body>
 </html>
