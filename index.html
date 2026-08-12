@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.13.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.13.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.13.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.0.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.0.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.0.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.13.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.0.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.13.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2.0.0" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -68,11 +68,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.13.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.0.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.13.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.0.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -336,12 +336,8 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.13.0</span><h3 class="changelog-title">One Settings &amp; Help Menu</h3></div>
-        <p>The header used to show five separate buttons/controls at once &mdash; Leave Feedback, What's New, Help, Install App, and the Theme dropdown &mdash; which only grew more cluttered as features were added. They're now behind a single gear icon top-right, opening a "Settings &amp; Help" popout (matching the existing What's New/Help dialog style) that lists all of them. Every theme's own button styling still applies automatically, since it targets those buttons by class rather than by being inside the header.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.12.0</span><h3 class="changelog-title">Bulk Editing, Themed Dialogs, and a Mobile-Friendly Rows Table</h3></div>
-        <p>A large batch: the Rows table now has a checkbox on every row (plus a select-all in the header) so one field &mdash; Asset State, Cost, Warranty, whatever &mdash; can be stamped onto every selected row at once instead of editing each one by hand (e.g. marking 30 rows Retired in one go). Every browser alert()/confirm() (delete a row, Clear All Rows, the 10-product cap, CSV import errors, downloading with missing fields) is now a themed dialog matching whichever of the app's themes is active, instead of a plain OS popup. Below 640px wide, the Rows table switches from a horizontally-scrolling table to a stack of labelled cards, so editing rows on a phone no longer means scrolling sideways through a dozen columns. A search box appears above the table once it has more than 8 rows, filtering by Name/Serial Number/Asset Tag. Importing a CSV via "Import Populated CSV for Editing" now reads extra per-row columns (like Phones &amp; Telephony's Extension) instead of dropping them. Keyboard focus now gets a themed outline everywhere (inputs, selects, buttons) instead of only the theme picker. And the persistence-failure warning banner, which only ever showed once and could be dismissed, now has a companion &mdash; a small "Not saving" cue next to the row count &mdash; that keeps showing up on every failed save even after the banner's gone, so a storage problem that's still happening doesn't go quiet just because it was already dismissed once.</p>
+        <div class="changelog-entry-head"><span class="changelog-version">2.0.0</span><h3 class="changelog-title">Bulk Editing, Themed Dialogs, a Mobile-Friendly Rows Table, and One Settings &amp; Help Menu</h3></div>
+        <p>The biggest update yet, in one release: the Rows table now has a checkbox on every row (plus a select-all in the header) so one field &mdash; Asset State, Cost, Warranty, whatever &mdash; can be stamped onto every selected row at once instead of editing each one by hand (e.g. marking 30 rows Retired in one go). Every browser alert()/confirm() (delete a row, Clear All Rows, the 10-product cap, CSV import errors, downloading with missing fields) is now a themed dialog matching whichever of the app's themes is active, instead of a plain OS popup. Below 640px wide, the Rows table switches from a horizontally-scrolling table to a stack of labelled cards, so editing rows on a phone no longer means scrolling sideways through a dozen columns. A search box appears above the table once it has more than 8 rows, filtering by Name/Serial Number/Asset Tag. Importing a CSV via "Import Populated CSV for Editing" now reads extra per-row columns (like Phones &amp; Telephony's Extension) instead of dropping them. Keyboard focus now gets a themed outline everywhere (inputs, selects, buttons) instead of only the theme picker. The persistence-failure warning banner, which only ever showed once and could be dismissed, now has a companion &mdash; a small "Not saving" cue next to the row count &mdash; that keeps showing up on every failed save even after the banner's gone. And the header's five separate always-visible controls (Leave Feedback, What's New, Help, Install App, Theme) are now behind a single gear icon top-right, opening a "Settings &amp; Help" popout instead of cluttering the header directly.</p>
       </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.11.0</span><h3 class="changelog-title">Data-Safety and Rows Table Fixes</h3></div>
@@ -590,6 +586,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.13.0"></script>
+  <script type="module" src="js/app.js?v=2.0.0"></script>
 </body>
 </html>
