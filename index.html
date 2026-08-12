@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.5.1" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.5.1" />
-  <link rel="manifest" href="manifest.webmanifest?v=1.5.1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=1.5.2" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=1.5.2" />
+  <link rel="manifest" href="manifest.webmanifest?v=1.5.2" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.5.1" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=1.5.2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=1.5.1" />
+  <link rel="stylesheet" href="css/styles.css?v=1.5.2" />
 </head>
 <body>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
@@ -80,11 +80,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.5.1" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=1.5.2" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.5.1</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v1.5.2</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -241,6 +241,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">1.5.2</span><h3 class="changelog-title">Dropdown Arrow Size Fix</h3></div>
+        <p>The dropdown arrow added in 1.5.1 to Company/Product/suggestion fields was noticeably chunkier than the native arrow on a real <code>&lt;select&gt;</code> like Manufacturer or Asset State, right next to it in the same form. Shrunk it down to match.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">1.5.1</span><h3 class="changelog-title">Dropdown Arrow on Company/Product/Suggestion Fields</h3></div>
         <p>Company, Product, and every other suggestion-backed field now show a small dropdown arrow, matching what a native <code>&lt;select&gt;</code> like Asset State already shows for free &mdash; without it, these fields read as ordinary free text with no hint they have a list to open. Also fixed the Compiled date, which hadn't been bumped for a day.</p>
@@ -452,6 +456,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=1.5.1"></script>
+  <script type="module" src="js/app.js?v=1.5.2"></script>
 </body>
 </html>

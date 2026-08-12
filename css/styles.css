@@ -1143,12 +1143,12 @@ select.invalid {
   content: '';
   position: absolute;
   top: 50%;
-  right: 0.85rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-top: -0.3rem;
-  border-right: 2px solid var(--text-muted);
-  border-bottom: 2px solid var(--text-muted);
+  right: 0.9rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: -0.25rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
   transform: rotate(45deg);
   pointer-events: none;
 }
