@@ -19,3 +19,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Assets-only deploys (no `main` entry point, just wrangler.jsonc's
+          # `assets.directory`) need Wrangler 4 — the action's default (3.x)
+          # still requires a `main` script and fails with "Missing
+          # entry-point" otherwise.
+          wranglerVersion: '4'
