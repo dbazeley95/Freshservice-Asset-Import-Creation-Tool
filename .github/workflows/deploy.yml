@@ -22,5 +22,10 @@ jobs:
           # Assets-only deploys (no `main` entry point, just wrangler.jsonc's
           # `assets.directory`) need Wrangler 4 — the action's default (3.x)
           # still requires a `main` script and fails with "Missing
-          # entry-point" otherwise.
-          wranglerVersion: '4'
+          # entry-point" otherwise. Pinned to an exact version rather than
+          # the floating '4' tag: that previously resolved to 4.122.0, whose
+          # miniflare dependency wasn't yet resolvable on npm (a transient
+          # upstream publish/propagation issue), breaking the deploy through
+          # no fault of our own config. 4.121.0 is the version that's
+          # actually succeeded here before.
+          wranglerVersion: '4.121.0'
