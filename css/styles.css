@@ -1,27 +1,39 @@
 /* Xavier Catholic Education Trust brand palette: navy #142146, red
    #c4232a, yellow #ebd166, beige #cfccbc, purple #953d76, white #ffffff.
-   Tints below are derived from those five, not invented. */
+   Most tints below are derived from those five. The exception is --bg,
+   --border, --table-row-alt and --input-border: the original beige-derived
+   versions (a flat, slightly dull khaki) read as dated rather than clean,
+   so these four are a cool, neutral blue-gray instead — a deliberate,
+   requested departure from strict brand-derivation for the sake of a
+   fresher look, not an oversight. Navy stays the one accent color
+   throughout, so the brand identity itself is untouched; only the neutral
+   backdrop it sits on changed. --table-head-bg/--badge-bg/--warning-bg
+   keep the original warm cream — with the page backdrop now cool, that
+   warmth reads as an intentional highlight (header row, badge, warnings)
+   rather than a background tone, which works better than trying to match
+   it everywhere. */
 :root {
-  --bg: #e9e8e1;
+  --bg: #eef1f7;
   --panel-bg: #ffffff;
   --text: #142146;
   --text-muted: #465991;
-  --border: #cfccbc;
+  --border: #dbe0ea;
   --accent: #142146;
   --accent-text: #ffffff;
   --danger: #c4232a;
   --input-bg: #ffffff;
   --table-head-bg: #fbf7e4;
-  --table-row-alt: #f3f2ee;
+  --table-row-alt: #f5f7fb;
   --coming-soon: #953d76;
   --coming-soon-bg: #f2e8ef;
   --badge-bg: #fbf7e4;
   --badge-text: #142146;
-  --input-border: #958e6a;
+  --input-border: #aab2c5;
   --warning: #8a6d1a;
   --warning-bg: #fbf7e4;
   --success: #1a7a4c;
   --success-text: #ffffff;
+  --elevation: 0 1px 3px rgba(20, 33, 70, 0.08), 0 1px 2px rgba(20, 33, 70, 0.06);
 }
 
 /* Theme resolution, in priority order:
@@ -55,6 +67,11 @@
     --warning-bg: #413f32;
     --success: #4ade80;
     --success-text: #0b0e14;
+    /* A plain drop shadow reads weakly against an already-dark backdrop —
+       heavier + more spread than light mode's, plus a faint inset
+       top-edge highlight (a common dark-mode trick for a "raised card"
+       read that a shadow alone doesn't give here). */
+    --elevation: 0 2px 10px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 }
 
@@ -79,6 +96,27 @@
   --warning-bg: #413f32;
   --success: #4ade80;
   --success-text: #0b0e14;
+  --elevation: 0 2px 10px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* --danger (#e05258) itself stays as-is — it's also used as a text color
+   (persistence warning, invalid-row count) against the dark background,
+   where it already clears WCAG AA (4.76:1) comfortably. But white text on
+   that same red as a button fill only reaches 3.81:1, failing the 4.5:1
+   normal-text threshold — the two uses pull in opposite directions
+   (lighter red reads better as text-on-dark, darker red gives white
+   button text more room), so this overrides the button case specifically
+   with a darker red rather than compromising the variable for both. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) button.danger {
+    background: #c23b41;
+    border-color: #c23b41;
+  }
+}
+
+:root[data-theme='dark'] button.danger {
+  background: #c23b41;
+  border-color: #c23b41;
 }
 
 /* ---------- Vista theme ----------
@@ -325,8 +363,14 @@
   font-family: Tahoma, Verdana, 'Segoe UI', sans-serif;
 }
 
+/* ~20% darker at every stop than the original #4f91d8.../#3a7cc4 gradient —
+   the white subtitle text sitting directly on this (unlike the brand
+   title/version badge, which sit on their own near-opaque white brand-box
+   background) fell as low as 3.29:1 against the lightest stop, well under
+   WCAG AA's 4.5:1. Darkening the whole gradient keeps every stop at 4.87:1
+   or better while still reading as the same Luna-blue XP gradient. */
 [data-theme='xp'] .app-header {
-  background: linear-gradient(to bottom, #4f91d8 0%, #2f6cb8 45%, #245ea0 50%, #3a7cc4 100%);
+  background: linear-gradient(to bottom, #3f74ad 0%, #265693 45%, #1d4b80 50%, #2e639d 100%);
   border-radius: 10px 10px 0 0;
   border: 1px solid #1a4a80;
 }
@@ -387,9 +431,14 @@
 /* ---------- Windows 3.1 theme ----------
    The chunkiest of the four: sharp corners everywhere, and the classic
    Win16 3D bevel — border-style: outset/inset does the light/dark edge
-   shading natively, no gradients or box-shadow tricks needed for it. */
+   shading natively, no gradients or box-shadow tricks needed for it.
+   --bg is #008484 rather than the exact classic #008080 teal — a
+   3-out-of-255 nudge, imperceptible as a color shift, needed so black text
+   sitting directly on it (the required-field legend, subtitle text, footer
+   — anything outside a panel's own lighter background) clears 4.5:1; at
+   the literal #008080 it fell just short, at 4.40:1. */
 :root[data-theme='win31'] {
-  --bg: #008080;
+  --bg: #008484;
   --panel-bg: #c0c0c0;
   --text: #000000;
   --text-muted: #333333;
@@ -413,6 +462,19 @@
 
 [data-theme='win31'] body {
   font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;
+}
+
+/* --text-muted (#333333) is legible against a panel's light gray
+   background (6.94:1) but not against the teal --bg directly — no gray
+   muted enough to still look "muted" clears 4.5:1 against this teal, so
+   the few things that sit on bare --bg rather than inside a .panel (the
+   required-field legend, the type description above the panels, the
+   footer) use full --text here instead of --text-muted specifically for
+   this theme. */
+[data-theme='win31'] .required-legend,
+[data-theme='win31'] .type-description,
+[data-theme='win31'] .app-footer {
+  color: var(--text);
 }
 
 [data-theme='win31'] .app-header {
@@ -963,6 +1025,23 @@ main {
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+/* A border alone reads flat on Light/Dark — a little elevation gives
+   panels actual depth against the page instead of just an outline.
+   (.info-dialog/.modal-box aren't included here: they already carry their
+   own, larger ambient shadows appropriate for a floating dialog, which
+   this would only weaken, not improve.) Scoped to exclude every retro
+   skin (Vista's glass, Classic Mac's chrome, XP's bevels, Windows 3.1's
+   outset/inset borders, Matrix's terminal look): each of those already
+   has its own deliberate, period-accurate depth treatment — or
+   deliberately none — and a modern soft drop-shadow layered on top would
+   clash with it, not improve it. --elevation is defined per palette
+   (:root and both dark blocks above) so light vs. dark each gets a shadow
+   that actually reads against their own background, rather than one
+   shared value that's too faint for one or too heavy for the other. */
+:root:not([data-theme='vista']):not([data-theme='mac']):not([data-theme='xp']):not([data-theme='win31']):not([data-theme='matrix']) .panel {
+  box-shadow: var(--elevation);
 }
 
 .panel h2 {
@@ -1705,6 +1784,33 @@ tbody td [data-key='product'] {
   border: 0;
 }
 
+/* Off-screen (not display:none — a hidden link is unreachable by Tab)
+   until it receives keyboard focus, at which point it becomes the first
+   visible thing on the page — the standard skip-link pattern. Lets a
+   keyboard user jump straight to #main-content instead of tabbing through
+   the header and the entire Asset Type side-nav first. */
+.skip-link {
+  position: fixed;
+  top: -3rem;
+  left: 0.75rem;
+  z-index: 3000;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 8px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+/* Plain :focus rather than :focus-visible — the link is physically
+   unclickable by mouse while off-screen, so there's no "avoid showing on
+   mouse click" concern to guard against here, and :focus reveals it for
+   every focus method without exception. */
+.skip-link:focus {
+  top: 0;
+}
+
 .theme-select-wrap {
   display: inline-flex;
   align-items: center;
@@ -2006,5 +2112,84 @@ tbody td [data-key='product'] {
 
   #table-wrap tbody td:last-child::before {
     content: none;
+  }
+}
+
+/* ---------- Entrance transitions (dialogs + toggled status bars) ----------
+
+   Everything that pops into view — the info dialogs, the alert/confirm
+   modal, and the row-search/bulk-edit/persistence bars above the Rows
+   table — used to just snap from not-rendered to fully visible with no
+   in-between frame. This fades + slightly slides/scales each of them in
+   instead.
+
+   All of these go from display:none to visible (native [open] on <dialog>,
+   or the [hidden] attribute elsewhere), and display isn't normally
+   something a transition can animate — it's a discrete, not continuous,
+   property. transition-behavior: allow-discrete plus @starting-style is
+   what makes that possible: @starting-style defines the "before the first
+   frame" values, and allow-discrete keeps display:none in effect only
+   until the rest of the transition finishes, rather than switching
+   instantly. This only covers entrances, not exits (closing is still
+   instant) — @starting-style animates appearing, not disappearing, and
+   animating a graceful exit needs its own JS-driven delay before the
+   element actually leaves the DOM, which isn't worth the added complexity
+   here. Wrapped in prefers-reduced-motion: no-preference so motion-
+   sensitive users get the plain instant show they'd get in a browser old
+   enough not to support this technique at all — this degrades to exactly
+   that (an instant, unanimated appearance) with zero JS and zero risk. */
+@media (prefers-reduced-motion: no-preference) {
+  .info-dialog,
+  .modal-overlay,
+  .row-search-wrap,
+  .bulk-edit-wrap,
+  .persistence-cue,
+  .persistence-warning {
+    transition-property: opacity, transform, overlay, display;
+    transition-duration: 0.18s;
+    transition-timing-function: ease;
+    transition-behavior: allow-discrete;
+  }
+
+  .info-dialog::backdrop {
+    transition-property: opacity, overlay, display;
+    transition-duration: 0.18s;
+    transition-timing-function: ease;
+    transition-behavior: allow-discrete;
+  }
+
+  .modal-box {
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+
+  @starting-style {
+    .info-dialog[open] {
+      opacity: 0;
+      transform: scale(0.96) translateY(-8px);
+    }
+
+    .info-dialog[open]::backdrop {
+      opacity: 0;
+    }
+
+    .modal-overlay:not([hidden]) {
+      opacity: 0;
+    }
+
+    .modal-overlay:not([hidden]) .modal-box {
+      transform: scale(0.96);
+      opacity: 0;
+    }
+
+    .row-search-wrap:not([hidden]),
+    .bulk-edit-wrap:not([hidden]),
+    .persistence-warning:not([hidden]) {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    .persistence-cue:not([hidden]) {
+      opacity: 0;
+    }
   }
 }

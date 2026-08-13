@@ -29,17 +29,22 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.0.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.0.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.0.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.1.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.1.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.1.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.0.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.0.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2.1.0" />
 </head>
 <body>
+  <!-- Invisible until focused (first Tab stop on the page) — lets a
+       keyboard/screen-reader user jump straight past the header and the
+       full Asset Type side-nav list to the actual form, instead of having
+       to tab through all of it every single page load. -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <!-- Matrix theme's falling-character rain — hidden by default, shown and
        animated only while that theme is active (see js/app.js). Fixed +
        negative z-index so it sits behind every panel and never affects
@@ -68,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.0.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.1.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.0.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.1.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
       </div>
@@ -124,7 +129,7 @@
     <nav id="type-tabs" class="side-nav" aria-label="Asset type"></nav>
 
     <div class="app-main">
-      <main>
+      <main id="main-content" tabindex="-1">
         <p id="type-description" class="type-description"></p>
 
         <section id="coming-soon-panel" class="panel" aria-labelledby="coming-soon-heading" hidden>
@@ -165,8 +170,8 @@
           <section class="panel" aria-labelledby="table-heading">
             <div class="table-toolbar">
               <h2 id="table-heading">Rows</h2>
-              <span id="row-count" class="row-count"></span>
-              <span id="invalid-row-count" class="row-count-invalid" hidden></span>
+              <span id="row-count" class="row-count" aria-live="polite"></span>
+              <span id="invalid-row-count" class="row-count-invalid" aria-live="polite" hidden></span>
               <!-- The persistence-warning banner near the top of the page only
                    ever shows once and can be dismissed — this is the cue that
                    keeps reappearing on every failed save afterwards, so
@@ -177,6 +182,7 @@
                 id="persistence-cue"
                 class="persistence-cue"
                 title="Your changes still aren't being saved on this device right now — download a CSV before closing this tab."
+                aria-live="polite"
                 hidden
               >
                 <span id="persistence-cue-icon" class="tab-icon" aria-hidden="true"></span>
@@ -335,6 +341,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.1.0</span><h3 class="changelog-title">Accessibility Pass and a Fresher Light Theme</h3></div>
+        <p>Five improvements from an accessibility and visual-freshness review: (1) the row count, the "missing required fields" count, and the "Not saving" persistence cue now announce themselves to screen readers as they change, instead of updating silently; a duplicate serial number or a missing required field is now exposed to screen readers too (aria-invalid plus a description), not just as a red border only a sighted user would notice; (2) a "Skip to main content" link (the first Tab stop on the page, invisible until focused) lets keyboard and screen reader users jump straight past the header and the full Asset Type menu instead of tabbing through all of it every page load; (3) dialogs and the row-search/bulk-edit/persistence status bars now fade and slide in instead of snapping into view instantly, respecting reduced-motion preferences; (4) an actual contrast audit against every theme turned up three real WCAG AA failures &mdash; Windows 3.1's muted text on its teal background, the XP header's white subtitle against its lightest gradient stop, and Dark theme's red "Clear All Rows" button text &mdash; all fixed without changing how any theme reads at a glance; (5) Light theme's background is a soft cool blue-gray now instead of a dull khaki-beige, and panels/dialogs in Light and Dark both get a subtle shadow for actual depth instead of a border alone &mdash; the five retro skins (Vista/Classic Mac/XP/Windows 3.1/Matrix) are untouched by both changes, each already has its own deliberate look.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.0.0</span><h3 class="changelog-title">Bulk Editing, Themed Dialogs, a Mobile-Friendly Rows Table, and One Settings &amp; Help Menu</h3></div>
         <p>The biggest update yet, in one release: the Rows table now has a checkbox on every row (plus a select-all in the header) so one field &mdash; Asset State, Cost, Warranty, whatever &mdash; can be stamped onto every selected row at once instead of editing each one by hand (e.g. marking 30 rows Retired in one go). Every browser alert()/confirm() (delete a row, Clear All Rows, the 10-product cap, CSV import errors, downloading with missing fields) is now a themed dialog matching whichever of the app's themes is active, instead of a plain OS popup. Below 640px wide, the Rows table switches from a horizontally-scrolling table to a stack of labelled cards, so editing rows on a phone no longer means scrolling sideways through a dozen columns. A search box appears above the table once it has more than 8 rows, filtering by Name/Serial Number/Asset Tag. Importing a CSV via "Import Populated CSV for Editing" now reads extra per-row columns (like Phones &amp; Telephony's Extension) instead of dropping them. Keyboard focus now gets a themed outline everywhere (inputs, selects, buttons) instead of only the theme picker. The persistence-failure warning banner, which only ever showed once and could be dismissed, now has a companion &mdash; a small "Not saving" cue next to the row count &mdash; that keeps showing up on every failed save even after the banner's gone. And the header's five separate always-visible controls (Leave Feedback, What's New, Help, Install App, Theme) are now behind a single gear icon top-right, opening a "Settings &amp; Help" popout instead of cluttering the header directly.</p>
@@ -586,6 +596,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.0.0"></script>
+  <script type="module" src="js/app.js?v=2.1.0"></script>
 </body>
 </html>

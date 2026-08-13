@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.0.0';
-import { buildCsv, downloadCsv } from './csv.js?v=2.0.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.0.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.0.0';
-import { iconSvg } from './icons.js?v=2.0.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.1.0';
+import { buildCsv, downloadCsv } from './csv.js?v=2.1.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.1.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.1.0';
+import { iconSvg } from './icons.js?v=2.1.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1030,6 +1030,20 @@ function isRowInvalid(assetType, row, col) {
   return !String(row[col.key] ?? '').trim();
 }
 
+// The red border on a missing-required-field input/select is a purely
+// visual cue — without this, a screen reader user tabbing through the
+// table gets no indication a field is invalid at all. Centralized here so
+// every one of the (input/select) x (initial render/on-change) call sites
+// below sets both consistently instead of the class alone.
+function setFieldInvalid(el, isInvalid) {
+  el.classList.toggle('invalid', isInvalid);
+  if (isInvalid) {
+    el.setAttribute('aria-invalid', 'true');
+  } else {
+    el.removeAttribute('aria-invalid');
+  }
+}
+
 function countRowsMissingFields(assetType, rows) {
   return rows.reduce((count, row) => {
     const rowMissing = assetType.columns.some((c) => isRowInvalid(assetType, row, c));
@@ -1056,8 +1070,37 @@ function refreshDuplicateWarnings(state) {
     if (!input) continue;
     const serial = String(row.serialNumber ?? '').trim();
     const otherCount = serial ? (counts.get(serial) || 1) - 1 : 0;
-    input.classList.toggle('duplicate', otherCount > 0);
-    input.title = otherCount > 0 ? `Duplicate serial number — also used on ${otherCount} other row${otherCount === 1 ? '' : 's'}.` : '';
+    const isDuplicate = otherCount > 0;
+    const message = isDuplicate
+      ? `Duplicate serial number — also used on ${otherCount} other row${otherCount === 1 ? '' : 's'}.`
+      : '';
+    input.classList.toggle('duplicate', isDuplicate);
+    input.title = message;
+
+    // The .duplicate class/title above is a hover-only, sighted-user cue —
+    // this is the same warning exposed to a screen reader via the field's
+    // own accessible description, discovered on focus rather than relying
+    // on a separate announcement.
+    let desc = tr.querySelector('.dup-desc');
+    if (isDuplicate) {
+      if (!desc) {
+        desc = document.createElement('span');
+        desc.className = 'dup-desc sr-only';
+        desc.id = `dup-desc-${row.id}`;
+        input.insertAdjacentElement('afterend', desc);
+      }
+      desc.textContent = message;
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', desc.id);
+    } else {
+      // Only clear aria-invalid if setFieldInvalid() (see above) isn't
+      // also flagging this same field invalid for a missing-required-value
+      // reason — the .invalid class is what setFieldInvalid toggles, so
+      // it's the source of truth for whether that's still the case.
+      if (!input.classList.contains('invalid')) input.removeAttribute('aria-invalid');
+      input.removeAttribute('aria-describedby');
+      if (desc) desc.remove();
+    }
   }
 }
 
@@ -1231,10 +1274,10 @@ function renderTable(assetType, state) {
       if (col.key === 'assetState') {
         const select = buildAssetStateSelect(row[col.key]);
         select.dataset.key = col.key;
-        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        setFieldInvalid(select, isRowInvalid(assetType, row, col));
         select.addEventListener('change', () => {
           row[col.key] = select.value;
-          select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+          setFieldInvalid(select, isRowInvalid(assetType, row, col));
           persist(activeTypeId, state);
         });
         td.appendChild(select);
@@ -1246,7 +1289,7 @@ function renderTable(assetType, state) {
         const select = buildCompanySelect(row[col.key]);
         select.dataset.key = col.key;
         select.title = select.value;
-        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        setFieldInvalid(select, isRowInvalid(assetType, row, col));
         select.addEventListener('change', () => {
           row.company = select.value;
           row.location = locationOptionsForCompany(select.value)[0] || '';
@@ -1262,11 +1305,11 @@ function renderTable(assetType, state) {
         const select = buildLocationSelect(row.company, row[col.key]);
         select.dataset.key = col.key;
         select.title = select.value;
-        if (isRowInvalid(assetType, row, col)) select.classList.add('invalid');
+        setFieldInvalid(select, isRowInvalid(assetType, row, col));
         select.addEventListener('change', () => {
           row.location = select.value;
           select.title = select.value;
-          select.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+          setFieldInvalid(select, isRowInvalid(assetType, row, col));
           persist(activeTypeId, state);
         });
         td.appendChild(select);
@@ -1284,7 +1327,7 @@ function renderTable(assetType, state) {
       // columns) without hovering being the only way to read it — dates and
       // numbers are never long enough for this to matter.
       if (col.input === 'text') input.title = input.value;
-      if (isRowInvalid(assetType, row, col)) input.classList.add('invalid');
+      setFieldInvalid(input, isRowInvalid(assetType, row, col));
 
       let ambiguousIcon = null;
       let nameWrap = null;
@@ -1302,7 +1345,7 @@ function renderTable(assetType, state) {
 
       input.addEventListener('input', () => {
         row[col.key] = input.value;
-        input.classList.toggle('invalid', isRowInvalid(assetType, row, col));
+        setFieldInvalid(input, isRowInvalid(assetType, row, col));
         if (col.key === 'name' && row._ambiguousName) {
           row._ambiguousName = false;
           input.classList.remove('ambiguous');
