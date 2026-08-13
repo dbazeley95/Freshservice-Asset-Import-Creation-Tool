@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.1.0';
-import { buildCsv, downloadCsv } from './csv.js?v=2.1.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.1.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.1.0';
-import { iconSvg } from './icons.js?v=2.1.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.2.1';
+import { buildCsv, downloadCsv } from './csv.js?v=2.2.1';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.2.1';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.2.1';
+import { iconSvg } from './icons.js?v=2.2.1';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1648,12 +1648,22 @@ function wireInfoDialog(dialog, openers, closeBtn) {
   });
 }
 
+// Two openers, one dialog: the icon-only cog in the header (visible below
+// 900px, where the side nav is an off-canvas drawer) and the labelled
+// button pinned above the asset-type list in the side nav (visible at
+// 900px+, see the min-width rule in styles.css). Only one of the two is
+// ever actually visible at a given width — CSS handles that — so both
+// just open the same #settings-dialog regardless of which was clicked.
 const settingsMenuBtn = document.getElementById('settings-menu-btn');
+const settingsMenuBtnNav = document.getElementById('settings-menu-btn-nav');
 const settingsDialogClose = document.getElementById('settings-dialog-close');
-if (settingsMenuBtn && els.settingsDialog && settingsDialogClose) {
-  document.getElementById('settings-menu-btn-icon').innerHTML = iconSvg('settings');
+if ((settingsMenuBtn || settingsMenuBtnNav) && els.settingsDialog && settingsDialogClose) {
+  const settingsMenuBtnIcon = document.getElementById('settings-menu-btn-icon');
+  if (settingsMenuBtnIcon) settingsMenuBtnIcon.innerHTML = iconSvg('settings');
+  const settingsMenuBtnNavIcon = document.getElementById('settings-menu-btn-nav-icon');
+  if (settingsMenuBtnNavIcon) settingsMenuBtnNavIcon.innerHTML = iconSvg('settings');
   document.getElementById('settings-dialog-close-icon').innerHTML = iconSvg('close');
-  wireInfoDialog(els.settingsDialog, [settingsMenuBtn], settingsDialogClose);
+  wireInfoDialog(els.settingsDialog, [settingsMenuBtn, settingsMenuBtnNav], settingsDialogClose);
 }
 
 const helpBtn = document.getElementById('help-btn');
