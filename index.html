@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.1.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.1.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.1.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.2.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.1.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.1.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2.2.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,17 +73,16 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.1.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.1.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.0</button>
           <span class="compiled-date">Compiled 12 Aug 2026</span>
         </div>
+        <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
       </div>
     </div>
-
-    <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
   </header>
 
   <!-- Hidden until js/app.js's persist() actually hits a saveState() failure
@@ -126,11 +125,37 @@
     </button>
     <div id="nav-backdrop" class="nav-backdrop"></div>
 
-    <nav id="type-tabs" class="side-nav" aria-label="Asset type"></nav>
+    <!-- Only #type-tabs is dynamically re-rendered (js/app.js's renderTabs())
+         — this wrapper and the settings button inside it are static, so
+         nothing here needs to survive being rebuilt on every render. The
+         button is desktop-only (see the min-width: 900px rule in
+         styles.css); below that the header's own icon-only cog is what's
+         visible instead, since the side nav itself is an off-canvas drawer
+         there rather than an always-visible column. Both buttons open the
+         same #settings-dialog. -->
+    <div class="side-nav-col">
+      <button
+        id="settings-menu-btn-nav"
+        type="button"
+        class="nav-settings-btn"
+        aria-haspopup="dialog"
+        aria-controls="settings-dialog"
+      >
+        <span id="settings-menu-btn-nav-icon" class="tab-icon" aria-hidden="true"></span>
+        Settings &amp; Help
+      </button>
+      <nav id="type-tabs" class="side-nav" aria-label="Asset type"></nav>
+    </div>
 
     <div class="app-main">
       <main id="main-content" tabindex="-1">
-        <p id="type-description" class="type-description"></p>
+        <!-- Own card rather than folded into General below — it describes
+             the whole workflow (General, Hardware Specific, Bulk Add,
+             Download CSV all get a mention), not just the General section
+             specifically. -->
+        <section class="panel intro-panel" aria-label="About this asset type">
+          <p id="type-description" class="type-description"></p>
+        </section>
 
         <section id="coming-soon-panel" class="panel" aria-labelledby="coming-soon-heading" hidden>
           <h2 id="coming-soon-heading">Coming soon</h2>
@@ -341,6 +366,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.2.0</span><h3 class="changelog-title">A Wider, Less Cluttered Layout</h3></div>
+        <p>Four layout changes to cut down on blank space and scrolling on desktop: (1) the page uses more of a wide monitor's width now (1600px instead of 1400px), and forms stay a comfortable, readable width even as their panels stretch wider &mdash; the Rows table and the "Add Assets of Another Product" preview both benefit the most, showing more columns before needing to scroll sideways; (2) the subtitle under the logo now lives inside the header's brand box instead of its own full-width line below it, saving a row of vertical space; (3) at 900px and wider, the gear icon moves out of the header and into a labelled "Settings &amp; Help" button pinned above the Asset Type list in the sidebar &mdash; narrower than that, it's back in the header, since the sidebar itself is a hidden drawer there rather than an always-visible column; (4) the "Fill in General and Hardware Specific details&hellip;" intro text now sits in its own small card above General instead of loose on the page, since it describes the whole workflow rather than General specifically.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.1.0</span><h3 class="changelog-title">Accessibility Pass and a Fresher Light Theme</h3></div>
         <p>Five improvements from an accessibility and visual-freshness review: (1) the row count, the "missing required fields" count, and the "Not saving" persistence cue now announce themselves to screen readers as they change, instead of updating silently; a duplicate serial number or a missing required field is now exposed to screen readers too (aria-invalid plus a description), not just as a red border only a sighted user would notice; (2) a "Skip to main content" link (the first Tab stop on the page, invisible until focused) lets keyboard and screen reader users jump straight past the header and the full Asset Type menu instead of tabbing through all of it every page load; (3) dialogs and the row-search/bulk-edit/persistence status bars now fade and slide in instead of snapping into view instantly, respecting reduced-motion preferences; (4) an actual contrast audit against every theme turned up three real WCAG AA failures &mdash; Windows 3.1's muted text on its teal background, the XP header's white subtitle against its lightest gradient stop, and Dark theme's red "Clear All Rows" button text &mdash; all fixed without changing how any theme reads at a glance; (5) Light theme's background is a soft cool blue-gray now instead of a dull khaki-beige, and panels/dialogs in Light and Dark both get a subtle shadow for actual depth instead of a border alone &mdash; the five retro skins (Vista/Classic Mac/XP/Windows 3.1/Matrix) are untouched by both changes, each already has its own deliberate look.</p>
@@ -596,6 +625,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.1.0"></script>
+  <script type="module" src="js/app.js?v=2.2.0"></script>
 </body>
 </html>
