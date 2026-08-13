@@ -1188,12 +1188,6 @@ main {
   grid-column: 1 / -1;
 }
 
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 .field label {
   font-size: 0.8rem;
   font-weight: 600;
