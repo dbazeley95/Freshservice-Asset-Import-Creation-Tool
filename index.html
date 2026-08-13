@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.2" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.2" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.2.2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.3" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.3" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.2.3" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.2" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.3" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.2.2" />
+  <link rel="stylesheet" href="css/styles.css?v=2.2.3" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.2" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.3" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.2</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.3</button>
           <span class="compiled-date">Compiled 13 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
@@ -367,6 +367,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.2.3</span><h3 class="changelog-title">No More Dead Space in General/Hardware Specific/Bulk Add</h3></div>
+        <p>The width cap from the last layout round was on the fields themselves, not the card around them — so on a wide monitor, General and Hardware Specific still stretched full width as empty cards with all their actual fields squeezed into the left ~900px, leaving a wide dead strip on the right. The cap now applies to the card itself instead, so it ends where its fields end. The Rows table and the "Add Assets of Another Product" preview table are untouched and still use the full width, same as before.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.2.2</span><h3 class="changelog-title">Manufacturer Next to Product</h3></div>
         <p>Manufacturer (the filter that narrows Product's suggestions) used to sit stacked directly above Product in its own tall cell, leaving Cost/Asset State/Acquisition Date beside it looking oddly short by comparison. It's now just the field immediately before Product in the row &mdash; same relationship, normal row height, less wasted space.</p>
       </div>
@@ -633,6 +637,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.2.2"></script>
+  <script type="module" src="js/app.js?v=2.2.3"></script>
 </body>
 </html>

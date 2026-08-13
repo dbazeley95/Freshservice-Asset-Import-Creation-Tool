@@ -1103,6 +1103,19 @@ main {
   margin-bottom: 1.5rem;
 }
 
+/* General/Hardware Specific/Bulk Add's content is a .form-grid (see
+   below) — capping just the grid and leaving the .panel itself full width
+   (an earlier attempt) meant the panel box still stretched the full
+   column width with the capped grid floating in the left ~900px of it,
+   leaving a wide dead strip on the right for anyone on a big monitor. Far
+   less awkward for the panel itself to end where its content does — the
+   Rows table and the "Add Assets of Another Product" preview table (the
+   two sections that actually benefit from the wider column) don't use
+   .form-grid, so they're untouched by this and still stretch full width. */
+.panel:has(.form-grid) {
+  max-width: 960px;
+}
+
 /* A border alone reads flat on Light/Dark — a little elevation gives
    panels actual depth against the page instead of just an outline.
    (.info-dialog/.modal-box aren't included here: they already carry their
@@ -1131,19 +1144,15 @@ main {
   margin: 0.25rem 0 1rem;
 }
 
-/* Capped rather than left to fill the panel — .panel itself still stretches
-   to the full column width (so every card down the page lines up on the
-   same left/right edges as the now-wider Rows table), but on a wide
-   desktop monitor an uncapped auto-fill grid would stretch a 2-field
-   section like General across the whole panel, leaving Company/Location
-   absurdly wide instead of just... two fields. 900px keeps roughly the
-   same column count/density this already had before the shell widened. */
+/* No max-width here — the parent .panel (see .panel:has(.form-grid)
+   above) is what's capped now, so this just fills whatever width that
+   gives it. auto-fill still keeps individual fields from stretching past
+   minmax's 200px floor into an unreadably-wide single column. */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem 1.25rem;
   align-items: start;
-  max-width: 900px;
 }
 
 #bulk-preview-wrap:not(:empty) {
