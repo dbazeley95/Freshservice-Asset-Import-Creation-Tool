@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.2.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.1" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.2.1" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.2.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2.2.1" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,12 +73,12 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.1" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.0</button>
-          <span class="compiled-date">Compiled 12 Aug 2026</span>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.1</button>
+          <span class="compiled-date">Compiled 13 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
       </div>
@@ -367,6 +367,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.2.1</span><h3 class="changelog-title">Compiled Date Fix</h3></div>
+        <p>The Compiled date next to the version badge was stuck on 12 Aug through the last three releases &mdash; bumped to match.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.2.0</span><h3 class="changelog-title">A Wider, Less Cluttered Layout</h3></div>
         <p>Four layout changes to cut down on blank space and scrolling on desktop: (1) the page uses more of a wide monitor's width now (1600px instead of 1400px), and forms stay a comfortable, readable width even as their panels stretch wider &mdash; the Rows table and the "Add Assets of Another Product" preview both benefit the most, showing more columns before needing to scroll sideways; (2) the subtitle under the logo now lives inside the header's brand box instead of its own full-width line below it, saving a row of vertical space; (3) at 900px and wider, the gear icon moves out of the header and into a labelled "Settings &amp; Help" button pinned above the Asset Type list in the sidebar &mdash; narrower than that, it's back in the header, since the sidebar itself is a hidden drawer there rather than an always-visible column; (4) the "Fill in General and Hardware Specific details&hellip;" intro text now sits in its own small card above General instead of loose on the page, since it describes the whole workflow rather than General specifically.</p>
       </div>
@@ -625,6 +629,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.2.0"></script>
+  <script type="module" src="js/app.js?v=2.2.1"></script>
 </body>
 </html>
