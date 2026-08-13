@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.2.1';
-import { buildCsv, downloadCsv } from './csv.js?v=2.2.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.2.1';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.2.1';
-import { iconSvg } from './icons.js?v=2.2.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.2.2';
+import { buildCsv, downloadCsv } from './csv.js?v=2.2.2';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.2.2';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.2.2';
+import { iconSvg } from './icons.js?v=2.2.2';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -578,19 +578,14 @@ function renderHardwareForm(assetType, state) {
   for (const col of hardwareColumns(assetType)) {
     const wrap = buildDefaultField(col, assetType, state, suggestions, modelPresets);
 
-    // Manufacturer sits directly above Product, stacked in the same grid
-    // cell — it exists purely to narrow Product's suggestions, so the two
-    // stay visually paired rather than Manufacturer living on its own.
+    // Manufacturer sits immediately before Product as its own grid item
+    // (previously stacked directly above it in a shared cell) — it exists
+    // purely to narrow Product's suggestions, and sitting right next to it
+    // in the row still reads as related without the row growing to double
+    // height just to fit both.
     if (col.key === 'product') {
       const manufacturerField = renderManufacturerFilterField(assetType, state);
-      if (manufacturerField) {
-        const group = document.createElement('div');
-        group.className = 'field-group';
-        group.appendChild(manufacturerField);
-        group.appendChild(wrap);
-        els.hardwareForm.appendChild(group);
-        continue;
-      }
+      if (manufacturerField) els.hardwareForm.appendChild(manufacturerField);
     }
 
     els.hardwareForm.appendChild(wrap);
