@@ -789,16 +789,14 @@ body {
   white-space: nowrap;
 }
 
-/* Now a third line inside .brand-text (title, version row, subtitle)
-   rather than its own full-width row below the whole header — folding it
-   into the header bar this way saves a whole row of vertical space.
-   Capped narrower than the brand-box would otherwise need, so a full
-   sentence wraps onto two lines instead of forcing the box (and the
-   centered header it sits in) much wider than the title/version row
-   actually need. */
+/* A third line inside .brand-text (title, version row, subtitle). Capped
+   wide on purpose — letting the merged subtitle text (which grew once the
+   footer notice folded into it) wrap onto just two lines instead of four
+   is what lets the whole header bar sit low and wide instead of tall and
+   narrow. */
 .subtitle {
   margin: 0;
-  max-width: 26rem;
+  max-width: 60rem;
   color: var(--text-muted);
   font-size: 0.85rem;
   text-align: left;

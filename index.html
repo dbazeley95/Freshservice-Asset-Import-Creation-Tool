@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.4.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.1" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.4.1" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.4.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2.4.1" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.1" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.1</button>
           <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
@@ -361,6 +361,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.4.1</span><h3 class="changelog-title">Header Bar Now Uses Its Full Width</h3></div>
+        <p>The header bar from 2.4.0 was still only about a third as wide as the side nav and panels below it, with the merged subtitle text wrapping onto four lines and making the bar taller than it needed to be. The subtitle can now use roughly double the width, so the same text wraps onto two lines instead of four and the whole header bar sits noticeably shorter as a result.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.4.0</span><h3 class="changelog-title">A Real Header Bar, and Less to Read Before You Start</h3></div>
         <p>The header now has its own full-width background bar on Desktop, spanning the same column as the side nav and panels below it instead of floating as a bare title over the page background &mdash; and the app icon is a little bigger inside it. The required-field note ("* marks a required field") and the local-storage notice that used to sit in a separate footer at the very bottom of the page have both been folded into the intro card at the top, so there's one place to read the "how this works" summary instead of three separate notices scattered around the page.</p>
@@ -648,6 +652,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.4.0"></script>
+  <script type="module" src="js/app.js?v=2.4.1"></script>
 </body>
 </html>
