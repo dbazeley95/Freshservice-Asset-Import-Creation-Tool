@@ -1701,7 +1701,7 @@ const openFreshserviceIcon = document.getElementById('open-freshservice-icon');
 if (openFreshserviceIcon) openFreshserviceIcon.innerHTML = iconSvg('externalLink');
 els.openFreshserviceBtn.onclick = () => window.open(FRESHSERVICE_IMPORT_URL, '_blank', 'noopener');
 
-const FEEDBACK_EMAIL = 'danielbazeley95@gmail.com';
+const FEEDBACK_EMAIL = 'd.bazeley@xaviercet.org.uk';
 const feedbackLink = document.getElementById('feedback-link');
 if (feedbackLink) {
   const version = document.querySelector('.version-badge')?.textContent?.trim() || '';
