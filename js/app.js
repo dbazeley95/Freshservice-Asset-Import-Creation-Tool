@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.2.4';
-import { buildCsv, downloadCsv } from './csv.js?v=2.2.4';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.2.4';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.2.4';
-import { iconSvg } from './icons.js?v=2.2.4';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.4.1';
+import { buildCsv, downloadCsv } from './csv.js?v=2.4.1';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.4.1';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.4.1';
+import { iconSvg } from './icons.js?v=2.4.1';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -87,6 +87,26 @@ let selectedRowIds = new Set();
 // destroy the per-device data they exist to hold.
 function bulkEditableColumns(assetType) {
   return defaultColumns(assetType).filter((c) => c.key !== 'location');
+}
+
+// Warranty Expiry Date = Acquisition Date + Warranty (In Months) — whenever
+// both are known, there's nothing left to decide, so this is computed
+// rather than left for someone to work out and type in by hand. Date.UTC
+// (not `new Date(dateString)`, which parses YYYY-MM-DD as UTC midnight but
+// then every other operation on it runs in local time) keeps the whole
+// calculation in one timezone throughout, so it can't land on the wrong
+// day for anyone west of UTC. Returns '' — not today's date or some other
+// fallback — whenever either input is missing/invalid, so callers can
+// treat a falsy result as "nothing to fill in yet" and leave whatever's
+// already there alone.
+function computeWarrantyExpiry(acquisitionDate, warrantyMonths) {
+  const months = Math.round(Number(warrantyMonths));
+  if (!acquisitionDate || !Number.isFinite(months) || months <= 0) return '';
+  const [y, m, d] = acquisitionDate.split('-').map(Number);
+  if (!y || !m || !d) return '';
+  const expiry = new Date(Date.UTC(y, m - 1, d));
+  expiry.setUTCMonth(expiry.getUTCMonth() + months);
+  return expiry.toISOString().slice(0, 10);
 }
 
 let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || 'desktop_pc';
@@ -310,6 +330,12 @@ function applyModelPresetFields(assetType, state, preset) {
     state.defaults[key] = value;
     if (targetCol.input === 'text' && value) addSuggestion(key, String(value));
   }
+  // A preset commonly carries its own Warranty (In Months) — recompute
+  // Warranty Expiry Date here too, not just on direct field edits below,
+  // so picking a preset fills it in immediately rather than leaving it to
+  // whatever Acquisition Date/Warranty happened to already be set.
+  const presetExpiry = computeWarrantyExpiry(state.defaults.acquisitionDate, state.defaults.warranty);
+  if (presetExpiry) state.defaults.warrantyExpiry = presetExpiry;
   persist(activeTypeId, state);
   renderHardwareForm(assetType, state);
   refreshBulkPreview(assetType, state);
@@ -548,6 +574,27 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     state.defaults[col.key] = input.value;
     debouncedPersist(activeTypeId, state);
     refreshBulkPreview(assetType, state);
+
+    // Acquisition Date + Warranty (In Months) fully determines Warranty
+    // Expiry Date — recompute and fill it in directly (bypassing its own
+    // input event) whenever either ingredient changes, rather than making
+    // someone work the date out and type it in by hand. Looked up by id
+    // instead of captured in a closure since all three fields are built
+    // independently by this same function, one column at a time.
+    if (col.key === 'acquisitionDate' || col.key === 'warranty') {
+      const acqInput = document.getElementById('def-acquisitionDate');
+      const warrantyInput = document.getElementById('def-warranty');
+      const expiryInput = document.getElementById('def-warrantyExpiry');
+      if (acqInput && warrantyInput && expiryInput) {
+        const computed = computeWarrantyExpiry(acqInput.value, warrantyInput.value);
+        if (computed) {
+          expiryInput.value = computed;
+          state.defaults.warrantyExpiry = computed;
+          debouncedPersist(activeTypeId, state);
+          refreshBulkPreview(assetType, state);
+        }
+      }
+    }
   });
   input.addEventListener('change', () => {
     if (col.input !== 'text' || !input.value.trim()) return;
@@ -1348,6 +1395,25 @@ function renderTable(assetType, state) {
         }
         if (col.input === 'text') input.title = input.value;
         if (col.key === 'serialNumber') refreshDuplicateWarnings(state);
+
+        // Same Acquisition Date + Warranty (In Months) -> Warranty Expiry
+        // Date auto-fill as the Hardware Specific defaults panel (see
+        // buildDefaultField), just scoped to this row's own three fields
+        // via tr instead of global ids, since every row has its own copy.
+        if (col.key === 'acquisitionDate' || col.key === 'warranty') {
+          const acqInput = tr.querySelector('input[data-key="acquisitionDate"]');
+          const warrantyInput = tr.querySelector('input[data-key="warranty"]');
+          const expiryInput = tr.querySelector('input[data-key="warrantyExpiry"]');
+          if (acqInput && warrantyInput && expiryInput) {
+            const computed = computeWarrantyExpiry(acqInput.value, warrantyInput.value);
+            if (computed) {
+              expiryInput.value = computed;
+              row.warrantyExpiry = computed;
+              setFieldInvalid(expiryInput, false);
+            }
+          }
+        }
+
         debouncedPersist(activeTypeId, state);
       });
       input.addEventListener('change', () => {
@@ -1403,30 +1469,42 @@ function renderTable(assetType, state) {
 const MAX_PRODUCT_TYPES = 10;
 
 function wireToolbar(assetType, state) {
+  // Moves whatever's currently pasted in the Bulk Add textarea into real
+  // rows — the same thing the "Add Assets of Another Product" button does,
+  // factored out so Download CSV (see below) can call it too. Without
+  // this, pasting serials and going straight to Download without clicking
+  // Add first would silently leave that pasted batch out of the file
+  // entirely — easy to miss, since nothing about Download itself hints
+  // that there's unadded text sitting above it. Returns false only when
+  // the product cap blocked it (a modal already explains why); an empty
+  // textarea is not a failure, it's just nothing to do.
+  async function addPendingBulkRows() {
+    const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
+    const rows = buildRowsFromText(assetType, state, text);
+    if (rows.length === 0) return true;
+
+    const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
+    const newProduct = state.defaults.product;
+    if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
+      await showModal({
+        message: `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`,
+      });
+      return false;
+    }
+
+    for (const row of rows) {
+      row.id = newRowId();
+      state.rows.push(row);
+    }
+    if (bulkSerialsTextarea) bulkSerialsTextarea.value = '';
+    els.bulkPreviewWrap.innerHTML = '';
+    persist(activeTypeId, state);
+    renderTable(assetType, state);
+    return true;
+  }
+
   if (els.addRowsBtn) {
-    els.addRowsBtn.onclick = async () => {
-      const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
-      const rows = buildRowsFromText(assetType, state, text);
-      if (rows.length === 0) return;
-
-      const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
-      const newProduct = state.defaults.product;
-      if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
-        await showModal({
-          message: `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`,
-        });
-        return;
-      }
-
-      for (const row of rows) {
-        row.id = newRowId();
-        state.rows.push(row);
-      }
-      if (bulkSerialsTextarea) bulkSerialsTextarea.value = '';
-      els.bulkPreviewWrap.innerHTML = '';
-      persist(activeTypeId, state);
-      renderTable(assetType, state);
-    };
+    els.addRowsBtn.onclick = () => addPendingBulkRows();
   }
 
   if (els.importEditBtn && els.importEditFile) {
@@ -1470,6 +1548,9 @@ function wireToolbar(assetType, state) {
   };
 
   els.downloadBtn.onclick = async () => {
+    const ok = await addPendingBulkRows();
+    if (!ok) return;
+
     if (state.rows.length === 0) {
       await showModal({ message: 'Add at least one row before downloading.' });
       return;
