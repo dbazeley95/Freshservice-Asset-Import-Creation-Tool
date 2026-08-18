@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.6.0';
-import { buildCsv, downloadCsv } from './csv.js?v=2.6.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.6.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.6.0';
-import { iconSvg } from './icons.js?v=2.6.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.7.0';
+import { buildCsv, downloadCsv } from './csv.js?v=2.7.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.7.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.7.0';
+import { iconSvg } from './icons.js?v=2.7.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -377,15 +377,63 @@ function manufacturerForProduct(assetType, product) {
   return match ? match.manufacturer : null;
 }
 
-function warrantyLookupVendorForRow(assetType, row) {
-  const manufacturer = manufacturerForProduct(assetType, row.product);
+function warrantyLookupVendorForProduct(assetType, product) {
+  const manufacturer = manufacturerForProduct(assetType, product);
   return manufacturer ? WARRANTY_LOOKUP_VENDORS[manufacturer] || null : null;
 }
 
-// Fills Acquisition Date/Warranty (In Months)/Warranty Expiry Date on one
-// row from lookup.xcet.uk's warranty API, which normalizes every vendor it
+function warrantyLookupVendorForRow(assetType, row) {
+  return warrantyLookupVendorForProduct(assetType, row.product);
+}
+
+// Calls lookup.xcet.uk's warranty API, which normalizes every vendor it
 // supports to the same {shipDate, warrantyMonths, warrantyEndDate} shape —
 // see that site's js/app.js for the vendor-specific lookups this proxies.
+// Returns { ok: true, result, vendorLabel } or { ok: false, message } —
+// callers decide what to do with either (a themed modal for the per-row
+// button below, an inline dialog error for the defaults-panel popout).
+async function fetchWarrantyInfo(vendor, serial) {
+  const vendorLabel = vendor === 'dell' ? 'Dell' : 'Apple';
+  try {
+    const url = `${WARRANTY_LOOKUP_BASE}/${vendor}?tags=${encodeURIComponent(serial)}`;
+    const res = await fetch(url);
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data) {
+      return { ok: false, message: `${vendorLabel} warranty lookup failed (HTTP ${res.status}). Try again later.` };
+    }
+
+    const result = (data.results || [])[0];
+    if (!result || !result.valid) {
+      return { ok: false, message: (result && result.error) || `${vendorLabel} has no record of serial number "${serial}".` };
+    }
+
+    return { ok: true, result, vendorLabel };
+  } catch (err) {
+    return { ok: false, message: 'Could not reach the warranty lookup service. Check your connection and try again.' };
+  }
+}
+
+// Shared by the per-row button (target: a row) and the defaults-panel
+// popout (target: state.defaults) — both use the same three column keys.
+function applyWarrantyResult(target, result) {
+  let updated = false;
+  if (result.shipDate) {
+    target.acquisitionDate = result.shipDate;
+    updated = true;
+  }
+  if (result.warrantyMonths !== null && result.warrantyMonths !== undefined) {
+    target.warranty = result.warrantyMonths;
+    updated = true;
+  }
+  if (result.warrantyEndDate) {
+    target.warrantyExpiry = result.warrantyEndDate;
+    updated = true;
+  }
+  return updated;
+}
+
+// Fills Acquisition Date/Warranty (In Months)/Warranty Expiry Date on one
+// row from a Look up Warranty click in the Rows table.
 async function runWarrantyLookup(assetType, state, row, vendor) {
   const serial = (row.serialNumber || '').trim();
   if (!serial) {
@@ -393,46 +441,19 @@ async function runWarrantyLookup(assetType, state, row, vendor) {
     return;
   }
 
-  const vendorLabel = vendor === 'dell' ? 'Dell' : 'Apple';
-  try {
-    const url = `${WARRANTY_LOOKUP_BASE}/${vendor}?tags=${encodeURIComponent(serial)}`;
-    const res = await fetch(url);
-    const data = await res.json().catch(() => null);
-    if (!res.ok || !data) {
-      await showModal({ message: `${vendorLabel} warranty lookup failed (HTTP ${res.status}). Try again later.` });
-      return;
-    }
-
-    const result = (data.results || [])[0];
-    if (!result || !result.valid) {
-      await showModal({ message: (result && result.error) || `${vendorLabel} has no record of serial number "${serial}".` });
-      return;
-    }
-
-    let updated = false;
-    if (result.shipDate) {
-      row.acquisitionDate = result.shipDate;
-      updated = true;
-    }
-    if (result.warrantyMonths !== null && result.warrantyMonths !== undefined) {
-      row.warranty = result.warrantyMonths;
-      updated = true;
-    }
-    if (result.warrantyEndDate) {
-      row.warrantyExpiry = result.warrantyEndDate;
-      updated = true;
-    }
-
-    if (!updated) {
-      await showModal({ message: `${vendorLabel} didn't return any warranty dates for "${serial}".` });
-      return;
-    }
-
-    persist(activeTypeId, state);
-    renderTable(assetType, state);
-  } catch (err) {
-    await showModal({ message: 'Could not reach the warranty lookup service. Check your connection and try again.' });
+  const outcome = await fetchWarrantyInfo(vendor, serial);
+  if (!outcome.ok) {
+    await showModal({ message: outcome.message });
+    return;
   }
+
+  if (!applyWarrantyResult(row, outcome.result)) {
+    await showModal({ message: `${outcome.vendorLabel} didn't return any warranty dates for "${serial}".` });
+    return;
+  }
+
+  persist(activeTypeId, state);
+  renderTable(assetType, state);
 }
 
 // Manufacturer filter narrows the Product field's suggestions below —
@@ -716,8 +737,40 @@ function renderHardwareForm(assetType, state) {
       if (manufacturerField) els.hardwareForm.appendChild(manufacturerField);
     }
 
+    // Sits right before the three fields it fills, so the button reads as
+    // a shortcut for them specifically rather than a general action for
+    // the whole panel — only shown once Product resolves to a vendor
+    // lookup.xcet.uk actually supports (see warrantyLookupVendorForProduct).
+    if (col.key === 'acquisitionDate') {
+      const lookupTrigger = renderWarrantyLookupTrigger(assetType, state);
+      if (lookupTrigger) els.hardwareForm.appendChild(lookupTrigger);
+    }
+
     els.hardwareForm.appendChild(wrap);
   }
+}
+
+function renderWarrantyLookupTrigger(assetType, state) {
+  const vendor = warrantyLookupVendorForProduct(assetType, state.defaults.product);
+  if (!vendor) return null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'field warranty-lookup-trigger-field';
+  // A blank (not sr-only) spacer, purely to push the button down to line
+  // up with the actual fields beside it, which all have a label above
+  // their input — an sr-only one here would just have a screen reader
+  // announce "Look up Warranty" twice in a row, right before the button
+  // of the same name.
+  const spacer = document.createElement('span');
+  spacer.setAttribute('aria-hidden', 'true');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'header-btn';
+  btn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('search')}</span> Look up Warranty`;
+  btn.addEventListener('click', () => openWarrantyLookupDialog(assetType, state, vendor));
+  wrap.appendChild(spacer);
+  wrap.appendChild(btn);
+  return wrap;
 }
 
 // A real <select> (not a text input) for Asset State — it's a closed set
@@ -1819,6 +1872,91 @@ if (warrantyLookupLink) {
   document.getElementById('warranty-lookup-link-icon').innerHTML = iconSvg('externalLink');
   warrantyLookupLink.addEventListener('click', () => {
     if (els.settingsDialog) els.settingsDialog.close();
+  });
+}
+
+// ---------- Warranty Lookup popout (defaults panel) ----------
+
+// Set by openWarrantyLookupDialog and read by the form's submit handler —
+// there's exactly one of these dialogs shared across every asset type, so
+// it needs to be told which state/vendor it's currently working with
+// rather than baking that into the (static) dialog markup.
+let warrantyLookupContext = null;
+
+const warrantyLookupDialog = document.getElementById('warranty-lookup-dialog');
+const warrantyLookupDialogClose = document.getElementById('warranty-lookup-dialog-close');
+const warrantyLookupForm = document.getElementById('warranty-lookup-form');
+const warrantyLookupHint = document.getElementById('warranty-lookup-dialog-hint');
+const warrantyLookupSerialInput = document.getElementById('warranty-lookup-serial');
+const warrantyLookupErrorEl = document.getElementById('warranty-lookup-dialog-error');
+const warrantyLookupSubmitBtn = document.getElementById('warranty-lookup-submit');
+const warrantyLookupCancelBtn = document.getElementById('warranty-lookup-cancel');
+
+function showWarrantyLookupDialogError(message) {
+  if (!warrantyLookupErrorEl) return;
+  warrantyLookupErrorEl.textContent = message;
+  warrantyLookupErrorEl.hidden = false;
+}
+
+function openWarrantyLookupDialog(assetType, state, vendor) {
+  if (!warrantyLookupDialog) return;
+  warrantyLookupContext = { assetType, state, vendor };
+  const vendorLabel = vendor === 'dell' ? 'Dell' : 'Apple';
+  if (warrantyLookupHint) {
+    warrantyLookupHint.textContent = `Looks up a ${vendorLabel} serial number/service tag and fills in Acquisition Date, Warranty (In Months), and Warranty Expiry Date below. Only applies to rows you add after this — it won't change rows already in the table.`;
+  }
+  if (warrantyLookupSerialInput) warrantyLookupSerialInput.value = '';
+  if (warrantyLookupErrorEl) warrantyLookupErrorEl.hidden = true;
+  warrantyLookupDialog.showModal();
+  if (warrantyLookupSerialInput) warrantyLookupSerialInput.focus();
+}
+
+if (warrantyLookupSubmitBtn) {
+  const warrantyLookupSubmitIcon = document.getElementById('warranty-lookup-submit-icon');
+  if (warrantyLookupSubmitIcon) warrantyLookupSubmitIcon.innerHTML = iconSvg('search');
+}
+if (warrantyLookupDialogClose) {
+  const warrantyLookupDialogCloseIcon = document.getElementById('warranty-lookup-dialog-close-icon');
+  if (warrantyLookupDialogCloseIcon) warrantyLookupDialogCloseIcon.innerHTML = iconSvg('close');
+}
+// No opener passed here — this dialog is only ever opened via
+// openWarrantyLookupDialog above (it needs the assetType/state/vendor
+// context that a plain click listener can't carry), but wireInfoDialog's
+// close-button/backdrop-click handling applies just the same.
+wireInfoDialog(warrantyLookupDialog, [], warrantyLookupDialogClose);
+if (warrantyLookupCancelBtn) {
+  warrantyLookupCancelBtn.addEventListener('click', () => warrantyLookupDialog.close());
+}
+if (warrantyLookupForm) {
+  warrantyLookupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!warrantyLookupContext) return;
+    const { assetType, state, vendor } = warrantyLookupContext;
+    const serial = (warrantyLookupSerialInput ? warrantyLookupSerialInput.value : '').trim();
+    if (warrantyLookupErrorEl) warrantyLookupErrorEl.hidden = true;
+
+    if (!serial) {
+      showWarrantyLookupDialogError('Enter a Serial Number or Service Tag.');
+      return;
+    }
+
+    warrantyLookupSubmitBtn.disabled = true;
+    const outcome = await fetchWarrantyInfo(vendor, serial);
+    warrantyLookupSubmitBtn.disabled = false;
+
+    if (!outcome.ok) {
+      showWarrantyLookupDialogError(outcome.message);
+      return;
+    }
+    if (!applyWarrantyResult(state.defaults, outcome.result)) {
+      showWarrantyLookupDialogError(`${outcome.vendorLabel} didn't return any warranty dates for "${serial}".`);
+      return;
+    }
+
+    warrantyLookupDialog.close();
+    persist(activeTypeId, state);
+    renderHardwareForm(assetType, state);
+    refreshBulkPreview(assetType, state);
   });
 }
 
