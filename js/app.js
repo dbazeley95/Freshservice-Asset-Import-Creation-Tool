@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.5.0';
-import { buildCsv, downloadCsv } from './csv.js?v=2.5.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.5.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.5.0';
-import { iconSvg } from './icons.js?v=2.5.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.6.0';
+import { buildCsv, downloadCsv } from './csv.js?v=2.6.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.6.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.6.0';
+import { iconSvg } from './icons.js?v=2.6.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -353,6 +353,86 @@ function filteredModelPresets(modelPresets, manufacturerFilter) {
 function productCatalogOptions(modelPresets, manufacturerFilter) {
   const names = filteredModelPresets(modelPresets, manufacturerFilter).map((p) => p.fields.product);
   return [...new Set(names)].sort((a, b) => a.localeCompare(b));
+}
+
+// ---------- Warranty Lookup (lookup.xcet.uk) ----------
+
+// Only vendors that site actually proxies live data for today — HP/Lenovo/
+// SMART Tech are either "coming soon" or just link out to the
+// manufacturer's own site there, so there's nothing for this app to call
+// yet. Keyed by manufacturer name (as it appears in catalog.js) -> that
+// site's vendor id.
+const WARRANTY_LOOKUP_VENDORS = { Dell: 'dell', Apple: 'apple' };
+const WARRANTY_LOOKUP_BASE = 'https://lookup.xcet.uk/api/warranty';
+
+// There's no per-row Manufacturer field to read directly (see
+// renderManufacturerFilterField above — it's a Product-suggestion filter,
+// not a saved column), so this infers it the same way that filter does:
+// by matching the row's Product text against the catalog entry that has
+// that exact product name.
+function manufacturerForProduct(assetType, product) {
+  if (!product) return null;
+  const presets = MODEL_PRESETS[assetType.id] || [];
+  const match = presets.find((p) => p.fields.product.trim().toLowerCase() === product.trim().toLowerCase());
+  return match ? match.manufacturer : null;
+}
+
+function warrantyLookupVendorForRow(assetType, row) {
+  const manufacturer = manufacturerForProduct(assetType, row.product);
+  return manufacturer ? WARRANTY_LOOKUP_VENDORS[manufacturer] || null : null;
+}
+
+// Fills Acquisition Date/Warranty (In Months)/Warranty Expiry Date on one
+// row from lookup.xcet.uk's warranty API, which normalizes every vendor it
+// supports to the same {shipDate, warrantyMonths, warrantyEndDate} shape —
+// see that site's js/app.js for the vendor-specific lookups this proxies.
+async function runWarrantyLookup(assetType, state, row, vendor) {
+  const serial = (row.serialNumber || '').trim();
+  if (!serial) {
+    await showModal({ message: 'Add a Serial Number for this row before looking up its warranty.' });
+    return;
+  }
+
+  const vendorLabel = vendor === 'dell' ? 'Dell' : 'Apple';
+  try {
+    const url = `${WARRANTY_LOOKUP_BASE}/${vendor}?tags=${encodeURIComponent(serial)}`;
+    const res = await fetch(url);
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data) {
+      await showModal({ message: `${vendorLabel} warranty lookup failed (HTTP ${res.status}). Try again later.` });
+      return;
+    }
+
+    const result = (data.results || [])[0];
+    if (!result || !result.valid) {
+      await showModal({ message: (result && result.error) || `${vendorLabel} has no record of serial number "${serial}".` });
+      return;
+    }
+
+    let updated = false;
+    if (result.shipDate) {
+      row.acquisitionDate = result.shipDate;
+      updated = true;
+    }
+    if (result.warrantyMonths !== null && result.warrantyMonths !== undefined) {
+      row.warranty = result.warrantyMonths;
+      updated = true;
+    }
+    if (result.warrantyEndDate) {
+      row.warrantyExpiry = result.warrantyEndDate;
+      updated = true;
+    }
+
+    if (!updated) {
+      await showModal({ message: `${vendorLabel} didn't return any warranty dates for "${serial}".` });
+      return;
+    }
+
+    persist(activeTypeId, state);
+    renderTable(assetType, state);
+  } catch (err) {
+    await showModal({ message: 'Could not reach the warranty lookup service. Check your connection and try again.' });
+  }
 }
 
 // Manufacturer filter narrows the Product field's suggestions below —
@@ -1436,6 +1516,26 @@ function renderTable(assetType, state) {
     }
 
     const tdActions = document.createElement('td');
+
+    const lookupVendor = warrantyLookupVendorForRow(assetType, row);
+    if (lookupVendor) {
+      const lookupBtn = document.createElement('button');
+      lookupBtn.type = 'button';
+      lookupBtn.className = 'icon-btn';
+      lookupBtn.title = `Look up warranty from ${lookupVendor === 'dell' ? 'Dell' : 'Apple'} (fills in Acquisition Date, Warranty, and Warranty Expiry Date)`;
+      lookupBtn.setAttribute('aria-label', lookupBtn.title);
+      lookupBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('search')}</span>`;
+      lookupBtn.addEventListener('click', async () => {
+        lookupBtn.disabled = true;
+        try {
+          await runWarrantyLookup(assetType, state, row, lookupVendor);
+        } finally {
+          lookupBtn.disabled = false;
+        }
+      });
+      tdActions.appendChild(lookupBtn);
+    }
+
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'icon-btn danger';
