@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.1.0';
-import { buildCsv, downloadCsv } from './csv.js?v=3.1.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.1.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.1.0';
-import { iconSvg } from './icons.js?v=3.1.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.2.0';
+import { buildCsv, downloadCsv } from './csv.js?v=3.2.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.2.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.2.0';
+import { iconSvg } from './icons.js?v=3.2.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -492,11 +492,18 @@ function rowNeedsWarrantyLookup(assetType, row) {
 // WARRANTY_LOOKUP_BATCH_SIZE serials per call, then matches each result
 // back to its row by Serial Number.
 async function runBulkWarrantyLookup(assetType, state) {
-  const eligible = state.rows.filter((row) => rowNeedsWarrantyLookup(assetType, row));
+  // Scoped to the checked rows (the same checkboxes bulk-edit uses) when
+  // any are selected — lets a lookup target just the batch you just added
+  // instead of always touching every eligible row in the table. With
+  // nothing selected, it falls back to every eligible row, same as before.
+  const scopedToSelection = selectedRowIds.size > 0;
+  const candidateRows = scopedToSelection ? state.rows.filter((row) => selectedRowIds.has(row.id)) : state.rows;
+  const eligible = candidateRows.filter((row) => rowNeedsWarrantyLookup(assetType, row));
   if (eligible.length === 0) {
     await showModal({
-      message:
-        'No rows are eligible for Warranty Lookup right now — a row needs a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing.',
+      message: scopedToSelection
+        ? 'None of the selected rows are eligible for Warranty Lookup right now — a row needs a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing.'
+        : 'No rows are eligible for Warranty Lookup right now — a row needs a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing.',
     });
     return;
   }
@@ -538,7 +545,7 @@ async function runBulkWarrantyLookup(assetType, state) {
   persist(activeTypeId, state);
   renderTable(assetType, state);
 
-  const parts = [`Updated ${updatedCount} of ${eligible.length} row(s).`];
+  const parts = [`Updated ${updatedCount} of ${eligible.length} ${scopedToSelection ? 'selected ' : ''}row(s).`];
   if (notFound.length > 0) parts.push(`No match for: ${notFound.join(', ')}.`);
   if (failedVendors.length > 0) parts.push(`Lookup failed for ${failedVendors.join(', ')} — try again later.`);
   await showModal({ message: parts.join(' ') });
@@ -1668,10 +1675,12 @@ function renderTable(assetType, state) {
       lookupBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('search')}</span>`;
       lookupBtn.addEventListener('click', async () => {
         lookupBtn.disabled = true;
+        lookupBtn.classList.add('is-loading');
         try {
           await runWarrantyLookup(assetType, state, row, lookupVendor);
         } finally {
           lookupBtn.disabled = false;
+          lookupBtn.classList.remove('is-loading');
         }
       });
       tdActions.appendChild(lookupBtn);
@@ -1753,11 +1762,14 @@ function wireToolbar(assetType, state) {
 
   if (els.lookupWarrantyAllBtn) {
     els.lookupWarrantyAllBtn.onclick = async () => {
+      const originalHtml = els.lookupWarrantyAllBtn.innerHTML;
       els.lookupWarrantyAllBtn.disabled = true;
+      els.lookupWarrantyAllBtn.innerHTML = 'Looking up…';
       try {
         await runBulkWarrantyLookup(assetType, state);
       } finally {
         els.lookupWarrantyAllBtn.disabled = false;
+        els.lookupWarrantyAllBtn.innerHTML = originalHtml;
       }
     };
   }
@@ -2042,9 +2054,12 @@ if (warrantyLookupForm) {
       return;
     }
 
+    const originalSubmitHtml = warrantyLookupSubmitBtn.innerHTML;
     warrantyLookupSubmitBtn.disabled = true;
+    warrantyLookupSubmitBtn.innerHTML = 'Looking up…';
     const outcome = await fetchWarrantyInfo(vendor, serial);
     warrantyLookupSubmitBtn.disabled = false;
+    warrantyLookupSubmitBtn.innerHTML = originalSubmitHtml;
 
     if (!outcome.ok) {
       showWarrantyLookupDialogError(outcome.message);
