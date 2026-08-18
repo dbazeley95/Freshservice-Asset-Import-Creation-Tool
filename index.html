@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.2.4" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.2.4" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.2.4" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.3.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.3.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.3.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.2.4" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.3.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.2.4" />
+  <link rel="stylesheet" href="css/styles.css?v=2.3.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.2.4" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.3.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.2.4</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.3.0</button>
           <span class="compiled-date">Compiled 13 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
@@ -367,6 +367,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.3.0</span><h3 class="changelog-title">Warranty Expiry Date Now Calculates Itself</h3></div>
+        <p>Warranty Expiry Date now fills itself in as soon as Acquisition Date and Warranty (In Months) are both known &mdash; there's nothing left to work out by hand once you have both. Works no matter which order you fill them in, and works from picking a Product preset that carries its own warranty length (e.g. a 12-month or 48-month model) just as well as typing both fields yourself. Every row in the Rows table calculates its own independently, so editing one row's Acquisition Date or Warranty afterwards only updates that row. Still a normal, directly editable field afterwards &mdash; this fills it in rather than locking it, so an unusual warranty term can still be typed over the calculated value.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.2.4</span><h3 class="changelog-title">Every Card the Same Width Again</h3></div>
         <p>The 960px cap from the last release fixed the dead space inside General/Hardware Specific/Bulk Add, but left them visibly narrower than the intro card and the Rows table next to them. Removed the cap &mdash; every card is back to the same full width. Individual fields don't stretch to fill the extra room (auto-fill leaves a short section's unused columns empty rather than blowing up Company/Location to fill them), so a wide monitor mostly just means Hardware Specific fits more fields per row before wrapping.</p>
       </div>
@@ -641,6 +645,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.2.4"></script>
+  <script type="module" src="js/app.js?v=2.3.0"></script>
 </body>
 </html>
