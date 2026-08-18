@@ -1495,12 +1495,6 @@ export const MODEL_PRESETS = {
       fields: { product: "Optiplex 7000 SFF", warranty: 48 },
     },
     {
-      id: "optiplex-7020",
-      label: "OptiPlex 7020",
-      manufacturer: "Dell",
-      fields: { product: "OptiPlex 7020", warranty: 48 },
-    },
-    {
       id: "optiplex-7440-aio",
       label: "OptiPlex 7440 AIO",
       manufacturer: "Dell",
@@ -1523,12 +1517,6 @@ export const MODEL_PRESETS = {
       label: "OptiPlex SFF 7010",
       manufacturer: "Dell",
       fields: { product: "OptiPlex SFF 7010", warranty: 48 },
-    },
-    {
-      id: "optiplex-sff-7021",
-      label: "Optiplex SFF 7021",
-      manufacturer: "Dell",
-      fields: { product: "Optiplex SFF 7021", warranty: 48 },
     },
     {
       id: "optiplex-sff-7022",
