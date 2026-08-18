@@ -683,11 +683,14 @@ body {
 /* Its own bordered/background bar (like .panel) rather than a transparent
    strip, so on Desktop it visually reads as a full-width header spanning
    the same 1600px column as the side nav + panels below it, instead of
-   just the .brand-box card floating on the bare page background. */
+   just the .brand-box card floating on the bare page background. A top
+   margin (not just padding) so the bar's own border sits below the very
+   top of the browser viewport with a sliver of page background showing
+   above it, rather than its top edge touching the top of the page. */
 .app-header {
-  padding: 2.25rem 1.5rem 1.25rem;
+  padding: 1.5rem;
   max-width: 1600px;
-  margin: 0 auto;
+  margin: 1.5rem auto 0;
   text-align: center;
   background: var(--panel-bg);
   border: 1px solid var(--border);

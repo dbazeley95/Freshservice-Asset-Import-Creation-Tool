@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.2" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.2" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.4.2" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.4" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.4" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.4.4" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.2" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.4.2" />
+  <link rel="stylesheet" href="css/styles.css?v=2.4.4" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.2" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.4" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.2</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.4</button>
           <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
@@ -361,6 +361,14 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.4.4</span><h3 class="changelog-title">Header Bar Floats Instead of Touching the Top</h3></div>
+        <p>2.4.2's extra top padding sat inside the header bar's own border, so the bar's edge still touched the very top of the browser with nothing visible above it. It's now a margin outside the border instead, so a sliver of page background shows above the bar and it reads as floating rather than pinned to the top edge.</p>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.4.3</span><h3 class="changelog-title">Two Discontinued OptiPlex Models Removed</h3></div>
+        <p>OptiPlex 7020 and Optiplex SFF 7021 have been removed from the Product catalog. Any rows already downloaded or in progress with those Products set are unaffected &mdash; this only changes what shows up as a suggestion going forward.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.4.2</span><h3 class="changelog-title">One Header Card Instead of Two, and Dates Read Left to Right</h3></div>
         <p>The header bar and the title card inside it used the same background colour with no visible seam between them, so widening the card in 2.4.1 just made it look like a smaller box floating inside a bigger one with dead space on both sides. The title card now fills the header bar directly &mdash; one box, centred, the same width as the side nav and panels below it &mdash; with a bit more breathing room above it. Date fields (Acquisition Date, Warranty Expiry Date, End of Life) also now display as YYYY-MM-DD instead of MM/DD/YYYY in Chromium-based browsers (Chrome, Edge); Firefox and Safari still follow their own locale, since there's no browser-independent way to force it.</p>
@@ -656,6 +664,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.4.2"></script>
+  <script type="module" src="js/app.js?v=2.4.4"></script>
 </body>
 </html>
