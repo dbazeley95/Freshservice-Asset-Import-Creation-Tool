@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.3.0';
-import { buildCsv, downloadCsv } from './csv.js?v=2.3.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.3.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.3.0';
-import { iconSvg } from './icons.js?v=2.3.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.3.1';
+import { buildCsv, downloadCsv } from './csv.js?v=2.3.1';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.3.1';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.3.1';
+import { iconSvg } from './icons.js?v=2.3.1';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1469,30 +1469,42 @@ function renderTable(assetType, state) {
 const MAX_PRODUCT_TYPES = 10;
 
 function wireToolbar(assetType, state) {
+  // Moves whatever's currently pasted in the Bulk Add textarea into real
+  // rows — the same thing the "Add Assets of Another Product" button does,
+  // factored out so Download CSV (see below) can call it too. Without
+  // this, pasting serials and going straight to Download without clicking
+  // Add first would silently leave that pasted batch out of the file
+  // entirely — easy to miss, since nothing about Download itself hints
+  // that there's unadded text sitting above it. Returns false only when
+  // the product cap blocked it (a modal already explains why); an empty
+  // textarea is not a failure, it's just nothing to do.
+  async function addPendingBulkRows() {
+    const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
+    const rows = buildRowsFromText(assetType, state, text);
+    if (rows.length === 0) return true;
+
+    const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
+    const newProduct = state.defaults.product;
+    if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
+      await showModal({
+        message: `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`,
+      });
+      return false;
+    }
+
+    for (const row of rows) {
+      row.id = newRowId();
+      state.rows.push(row);
+    }
+    if (bulkSerialsTextarea) bulkSerialsTextarea.value = '';
+    els.bulkPreviewWrap.innerHTML = '';
+    persist(activeTypeId, state);
+    renderTable(assetType, state);
+    return true;
+  }
+
   if (els.addRowsBtn) {
-    els.addRowsBtn.onclick = async () => {
-      const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
-      const rows = buildRowsFromText(assetType, state, text);
-      if (rows.length === 0) return;
-
-      const existingProducts = new Set(state.rows.map((r) => r.product).filter(Boolean));
-      const newProduct = state.defaults.product;
-      if (newProduct && !existingProducts.has(newProduct) && existingProducts.size >= MAX_PRODUCT_TYPES) {
-        await showModal({
-          message: `This export already has ${MAX_PRODUCT_TYPES} different products in it. Download it and start a new export before adding another.`,
-        });
-        return;
-      }
-
-      for (const row of rows) {
-        row.id = newRowId();
-        state.rows.push(row);
-      }
-      if (bulkSerialsTextarea) bulkSerialsTextarea.value = '';
-      els.bulkPreviewWrap.innerHTML = '';
-      persist(activeTypeId, state);
-      renderTable(assetType, state);
-    };
+    els.addRowsBtn.onclick = () => addPendingBulkRows();
   }
 
   if (els.importEditBtn && els.importEditFile) {
@@ -1536,6 +1548,9 @@ function wireToolbar(assetType, state) {
   };
 
   els.downloadBtn.onclick = async () => {
+    const ok = await addPendingBulkRows();
+    if (!ok) return;
+
     if (state.rows.length === 0) {
       await showModal({ message: 'Add at least one row before downloading.' });
       return;
