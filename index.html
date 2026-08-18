@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3.0.1" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=3.0.1" />
-  <link rel="manifest" href="manifest.webmanifest?v=3.0.1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3.1.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=3.1.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=3.1.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3.0.1" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3.1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=3.0.1" />
+  <link rel="stylesheet" href="css/styles.css?v=3.1.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=3.0.1" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=3.1.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v3.0.1</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v3.1.0</button>
           <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server, aside from a Serial Number sent to Warranty Lookup if you use it &mdash; everything else stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
@@ -213,6 +213,14 @@
                 Not saving
               </span>
               <div class="spacer"></div>
+              <button
+                id="lookup-warranty-all-btn"
+                type="button"
+                title="Looks up every Dell/Apple row still missing Acquisition Date, Warranty, or Warranty Expiry Date — sends their Serial Numbers to lookup.xcet.uk"
+              >
+                <span id="lookup-warranty-all-icon" class="tab-icon" aria-hidden="true"></span>
+                Look up Warranty for All Rows
+              </button>
               <button id="import-edit-btn" type="button" class="primary">
                 <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
                 Import Populated CSV for Editing
@@ -347,13 +355,13 @@
 
       <h3>7. Download CSV</h3>
       <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import. If any rows are missing required fields, a red count stays next to the row total in <strong>Rows</strong> until they're fixed &mdash; not just a one-time warning when you click Download. Once you've downloaded, an <strong>Open Freshservice to Import</strong> button appears alongside it &mdash; it opens the Freshservice CMDB Items list in a new tab, which is where Freshservice's own Import button lives (it's a popup, not a page of its own, so this is as close as a link can get you).</p>
-      <img class="help-screenshot" src="assets/help/rows-download.webp" width="998" height="384" alt="The Rows table with two rows, each with a Look up Warranty and Delete button, and the Download CSV button below." loading="lazy" />
+      <img class="help-screenshot" src="assets/help/rows-download.webp" width="998" height="438" alt="The Rows table toolbar with Look up Warranty for All Rows, Import, and Clear All Rows, plus two rows each with their own Look up Warranty and Delete button, and the Download CSV button below." loading="lazy" />
 
       <h3>Editing an existing export</h3>
       <p><strong>Import Populated CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
 
       <h3>Warranty Lookup</h3>
-      <p>A row whose Product matches a known Dell or Apple model &mdash; and Hardware Specific's shared defaults, the same way &mdash; gets a <strong>Look up Warranty</strong> button. Give it a Serial Number/Service Tag and it fills in Acquisition Date, Warranty (In Months), and Warranty Expiry Date for you. This is the one place a Serial Number leaves this browser: it's sent to <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a>, a separate tool, to look that information up. More manufacturers may be added there over time.</p>
+      <p>A row whose Product matches a known Dell or Apple model &mdash; and Hardware Specific's shared defaults, the same way &mdash; gets a <strong>Look up Warranty</strong> button. Give it a Serial Number/Service Tag and it fills in Acquisition Date, Warranty (In Months), and Warranty Expiry Date for you. <strong>Look up Warranty for All Rows</strong>, above the Rows table, does the same for every eligible row at once &mdash; any row with a Dell/Apple Product, a Serial Number, and at least one of those three fields still missing. Rows that already have all three are left alone, so it's safe to run again after adding more rows. This is the one place a Serial Number leaves this browser: it's sent to <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a>, a separate tool, to look that information up. More manufacturers may be added there over time.</p>
       <img class="help-screenshot" src="assets/help/warranty-lookup.webp" width="560" height="314" alt="The Look up Warranty popout, asking for a Serial Number or Service Tag before filling in the three warranty fields." loading="lazy" />
 
       <h3>Your data</h3>
@@ -406,6 +414,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">3.1.0</span><h3 class="changelog-title">Warranty Lookup for All Rows at Once</h3></div>
+        <p>A new <strong>Look up Warranty for All Rows</strong> button above the Rows table looks up every eligible row in one go, instead of clicking each row's own button one at a time. "Eligible" means a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing &mdash; rows that already have all three are left untouched, so it's safe to run again after adding more rows. Requests are batched up to 20 serials per call (lookup.xcet.uk's own limit) and split by manufacturer, so a big export doesn't turn into dozens of individual round trips. The summary afterwards says how many rows were updated and lists any serials it couldn't find or that failed to look up.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">3.0.1</span><h3 class="changelog-title">Screenshots in Help and Release Notes</h3></div>
         <p>Every step of the Help guide now has a real screenshot alongside its explanation &mdash; Pick an asset type, Fill in General, Fill in Hardware Specific, Bulk Add from Serial Numbers, Add Assets of Another Product, Download CSV, and the new Warranty Lookup section. The latest Release Notes entry gets one too. Screenshots are always captured in Light theme regardless of which theme you're actually using, the same way one reference image is easier to keep accurate than seven theme variants of each.</p>
@@ -722,6 +734,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=3.0.1"></script>
+  <script type="module" src="js/app.js?v=3.1.0"></script>
 </body>
 </html>

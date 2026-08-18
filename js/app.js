@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.0.1';
-import { buildCsv, downloadCsv } from './csv.js?v=3.0.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.0.1';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.0.1';
-import { iconSvg } from './icons.js?v=3.0.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.1.0';
+import { buildCsv, downloadCsv } from './csv.js?v=3.1.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.1.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.1.0';
+import { iconSvg } from './icons.js?v=3.1.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -29,6 +29,7 @@ const els = {
   downloadBtn: document.getElementById('download-btn'),
   openFreshserviceBtn: document.getElementById('open-freshservice-btn'),
   clearRowsBtn: document.getElementById('clear-rows-btn'),
+  lookupWarrantyAllBtn: document.getElementById('lookup-warranty-all-btn'),
   importEditBtn: document.getElementById('import-edit-btn'),
   importEditFile: document.getElementById('import-edit-file'),
   addRowsBtn: document.getElementById('add-rows-btn'),
@@ -392,25 +393,44 @@ function warrantyLookupVendorForRow(assetType, row) {
 // Returns { ok: true, result, vendorLabel } or { ok: false, message } —
 // callers decide what to do with either (a themed modal for the per-row
 // button below, an inline dialog error for the defaults-panel popout).
-async function fetchWarrantyInfo(vendor, serial) {
+// lookup.xcet.uk accepts up to 20 tags in one call (see its own "Up to 20
+// service tags at a time" hint) — runBulkWarrantyLookup below chunks to
+// this size so one big export doesn't get sent as a single oversized
+// request.
+const WARRANTY_LOOKUP_BATCH_SIZE = 20;
+
+// Lower-level call shared by both fetchWarrantyInfo (single serial) and
+// runBulkWarrantyLookup (many at once) — everything above the raw
+// {ok, results/message} shape is the same either way.
+async function fetchWarrantyResults(vendor, tags) {
   const vendorLabel = vendor === 'dell' ? 'Dell' : 'Apple';
   try {
-    const url = `${WARRANTY_LOOKUP_BASE}/${vendor}?tags=${encodeURIComponent(serial)}`;
+    const url = `${WARRANTY_LOOKUP_BASE}/${vendor}?tags=${encodeURIComponent(tags.join(','))}`;
     const res = await fetch(url);
     const data = await res.json().catch(() => null);
     if (!res.ok || !data) {
-      return { ok: false, message: `${vendorLabel} warranty lookup failed (HTTP ${res.status}). Try again later.` };
+      return { ok: false, vendorLabel, message: `${vendorLabel} warranty lookup failed (HTTP ${res.status}). Try again later.` };
     }
-
-    const result = (data.results || [])[0];
-    if (!result || !result.valid) {
-      return { ok: false, message: (result && result.error) || `${vendorLabel} has no record of serial number "${serial}".` };
-    }
-
-    return { ok: true, result, vendorLabel };
+    return { ok: true, vendorLabel, results: data.results || [] };
   } catch (err) {
-    return { ok: false, message: 'Could not reach the warranty lookup service. Check your connection and try again.' };
+    return { ok: false, vendorLabel, message: 'Could not reach the warranty lookup service. Check your connection and try again.' };
   }
+}
+
+async function fetchWarrantyInfo(vendor, serial) {
+  const outcome = await fetchWarrantyResults(vendor, [serial]);
+  if (!outcome.ok) return outcome;
+
+  const result = outcome.results[0];
+  if (!result || !result.valid) {
+    return {
+      ok: false,
+      vendorLabel: outcome.vendorLabel,
+      message: (result && result.error) || `${outcome.vendorLabel} has no record of serial number "${serial}".`,
+    };
+  }
+
+  return { ok: true, result, vendorLabel: outcome.vendorLabel };
 }
 
 // Shared by the per-row button (target: a row) and the defaults-panel
@@ -454,6 +474,74 @@ async function runWarrantyLookup(assetType, state, row, vendor) {
 
   persist(activeTypeId, state);
   renderTable(assetType, state);
+}
+
+// A row still counts as "needs a lookup" if any of the three fields is
+// missing, not just all three — e.g. someone typed an Acquisition Date by
+// hand but never got to Warranty. Re-running this on a row that already
+// has all three filled in leaves it alone rather than silently
+// overwriting a manual edit.
+function rowNeedsWarrantyLookup(assetType, row) {
+  if (!warrantyLookupVendorForRow(assetType, row)) return false;
+  if (!(row.serialNumber || '').trim()) return false;
+  return !row.acquisitionDate || !row.warranty || !row.warrantyExpiry;
+}
+
+// Looks up every eligible row in the Rows table at once, instead of one
+// row at a time — groups them by vendor and batches up to
+// WARRANTY_LOOKUP_BATCH_SIZE serials per call, then matches each result
+// back to its row by Serial Number.
+async function runBulkWarrantyLookup(assetType, state) {
+  const eligible = state.rows.filter((row) => rowNeedsWarrantyLookup(assetType, row));
+  if (eligible.length === 0) {
+    await showModal({
+      message:
+        'No rows are eligible for Warranty Lookup right now — a row needs a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing.',
+    });
+    return;
+  }
+
+  const rowsByVendor = new Map();
+  for (const row of eligible) {
+    const vendor = warrantyLookupVendorForRow(assetType, row);
+    if (!rowsByVendor.has(vendor)) rowsByVendor.set(vendor, []);
+    rowsByVendor.get(vendor).push(row);
+  }
+
+  let updatedCount = 0;
+  const notFound = [];
+  const failedVendors = [];
+
+  for (const [vendor, rows] of rowsByVendor) {
+    for (let i = 0; i < rows.length; i += WARRANTY_LOOKUP_BATCH_SIZE) {
+      const chunk = rows.slice(i, i + WARRANTY_LOOKUP_BATCH_SIZE);
+      const outcome = await fetchWarrantyResults(
+        vendor,
+        chunk.map((row) => row.serialNumber.trim())
+      );
+      if (!outcome.ok) {
+        failedVendors.push(outcome.vendorLabel);
+        continue;
+      }
+      for (const row of chunk) {
+        const serial = row.serialNumber.trim();
+        const result = outcome.results.find((r) => (r.tag || '').trim().toLowerCase() === serial.toLowerCase());
+        if (result && result.valid && applyWarrantyResult(row, result)) {
+          updatedCount += 1;
+        } else {
+          notFound.push(serial);
+        }
+      }
+    }
+  }
+
+  persist(activeTypeId, state);
+  renderTable(assetType, state);
+
+  const parts = [`Updated ${updatedCount} of ${eligible.length} row(s).`];
+  if (notFound.length > 0) parts.push(`No match for: ${notFound.join(', ')}.`);
+  if (failedVendors.length > 0) parts.push(`Lookup failed for ${failedVendors.join(', ')} — try again later.`);
+  await showModal({ message: parts.join(' ') });
 }
 
 // Manufacturer filter narrows the Product field's suggestions below —
@@ -1663,6 +1751,17 @@ function wireToolbar(assetType, state) {
     els.addRowsBtn.onclick = () => addPendingBulkRows();
   }
 
+  if (els.lookupWarrantyAllBtn) {
+    els.lookupWarrantyAllBtn.onclick = async () => {
+      els.lookupWarrantyAllBtn.disabled = true;
+      try {
+        await runBulkWarrantyLookup(assetType, state);
+      } finally {
+        els.lookupWarrantyAllBtn.disabled = false;
+      }
+    };
+  }
+
   if (els.importEditBtn && els.importEditFile) {
     els.importEditBtn.onclick = () => els.importEditFile.click();
     els.importEditFile.onchange = async () => {
@@ -1771,6 +1870,9 @@ function renderAll() {
   renderTable(assetType, state);
   wireToolbar(assetType, state);
 }
+
+const lookupWarrantyAllIcon = document.getElementById('lookup-warranty-all-icon');
+if (lookupWarrantyAllIcon) lookupWarrantyAllIcon.innerHTML = iconSvg('search');
 
 const importEditIcon = document.getElementById('import-edit-icon');
 if (importEditIcon) importEditIcon.innerHTML = iconSvg('upload');
