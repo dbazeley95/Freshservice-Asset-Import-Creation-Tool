@@ -470,19 +470,6 @@
   font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;
 }
 
-/* --text-muted (#333333) is legible against a panel's light gray
-   background (6.94:1) but not against the teal --bg directly — no gray
-   muted enough to still look "muted" clears 4.5:1 against this teal, so
-   the few things that sit on bare --bg rather than inside a .panel (the
-   required-field legend, the type description above the panels, the
-   footer) use full --text here instead of --text-muted specifically for
-   this theme. */
-[data-theme='win31'] .required-legend,
-[data-theme='win31'] .type-description,
-[data-theme='win31'] .app-footer {
-  color: var(--text);
-}
-
 [data-theme='win31'] .app-header {
   background: #000080;
   color: #ffffff;
@@ -684,11 +671,19 @@ body {
   line-height: 1.4;
 }
 
+/* Its own bordered/background bar (like .panel) rather than a transparent
+   strip, so on Desktop it visually reads as a full-width header spanning
+   the same 1600px column as the side nav + panels below it, instead of
+   just the .brand-box card floating on the bare page background. */
 .app-header {
   padding: 1.5rem 1.5rem 1rem;
   max-width: 1600px;
   margin: 0 auto;
   text-align: center;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .header-actions {
@@ -739,8 +734,8 @@ body {
 }
 
 .brand-logo {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   object-fit: contain;
   border-radius: 22%;
   flex-shrink: 0;
@@ -1088,8 +1083,9 @@ main {
   padding: 1rem 0 3rem;
 }
 
-/* Now the sole content of its own .intro-panel card (see index.html) —
-   the panel's own padding provides the spacing this used to set itself. */
+/* Lives in its own .intro-panel card alongside .required-legend (see
+   index.html) — the panel's own padding provides the spacing this used to
+   set itself. */
 .type-description {
   color: var(--text-muted);
   margin: 0;
@@ -1213,9 +1209,9 @@ main {
 }
 
 .required-legend {
-  margin: 0 0 1rem;
+  margin: 0.5rem 0 0;
   color: var(--text-muted);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 input,
@@ -1790,12 +1786,6 @@ tbody td [data-key='product'] {
   padding: 2rem 1rem;
   text-align: center;
   color: var(--text-muted);
-}
-
-.app-footer {
-  padding: 0 0 2rem;
-  color: var(--text-muted);
-  font-size: 0.8rem;
 }
 
 .header-btn {

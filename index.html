@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.3.1" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.3.1" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.3.1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.4.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.3.1" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.3.1" />
+  <link rel="stylesheet" href="css/styles.css?v=2.4.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,14 +73,14 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.3.1" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.3.1</button>
-          <span class="compiled-date">Compiled 13 Aug 2026</span>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.0</button>
+          <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
-        <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays on this device.</p>
+        <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
       </div>
     </div>
   </header>
@@ -155,6 +155,7 @@
              specifically. -->
         <section class="panel intro-panel" aria-label="About this asset type">
           <p id="type-description" class="type-description"></p>
+          <p class="required-legend"><span class="required-marker">*</span> marks a required field &mdash; Freshservice needs it to import the row.</p>
         </section>
 
         <section id="coming-soon-panel" class="panel" aria-labelledby="coming-soon-heading" hidden>
@@ -163,8 +164,6 @@
         </section>
 
         <div id="active-sections">
-          <p class="required-legend"><span class="required-marker">*</span> marks a required field &mdash; Freshservice needs it to import the row.</p>
-
           <section class="panel" aria-labelledby="general-heading">
             <h2 id="general-heading">General</h2>
             <p class="hint">Which site this batch belongs to. Pick a Company from every known site &mdash; Location narrows to just that site's own sub-locations, defaulting to the site itself until you pick something more specific. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
@@ -257,10 +256,6 @@
           </section>
         </div>
       </main>
-
-      <footer class="app-footer">
-        <p>All data lives only in this browser's local storage on this device. Closing the tab does not lose your work, but clearing site data will.</p>
-      </footer>
     </div>
   </div>
 
@@ -366,6 +361,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.4.0</span><h3 class="changelog-title">A Real Header Bar, and Less to Read Before You Start</h3></div>
+        <p>The header now has its own full-width background bar on Desktop, spanning the same column as the side nav and panels below it instead of floating as a bare title over the page background &mdash; and the app icon is a little bigger inside it. The required-field note ("* marks a required field") and the local-storage notice that used to sit in a separate footer at the very bottom of the page have both been folded into the intro card at the top, so there's one place to read the "how this works" summary instead of three separate notices scattered around the page.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.3.1</span><h3 class="changelog-title">Download No Longer Loses an Unadded Paste</h3></div>
         <p>Pasting serials into Bulk Add and going straight to Download CSV without clicking "Add Assets of Another Product" first used to either block on "Add at least one row before downloading" (if the Rows table was otherwise empty) or, worse, silently leave that pasted batch out of the file entirely (if it wasn't empty). Download CSV now adds whatever's currently pasted in Bulk Add before it does anything else, exactly as if "Add Assets of Another Product" had been clicked first &mdash; the 10-product-per-export cap still applies and still stops it with the same explanation if it's hit.</p>
@@ -649,6 +648,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.3.1"></script>
+  <script type="module" src="js/app.js?v=2.4.0"></script>
 </body>
 </html>
