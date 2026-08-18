@@ -1215,6 +1215,14 @@ main {
   color: var(--text-muted);
 }
 
+/* Matches .field label's line-height so the Look up Warranty button lines
+   up with the actual input fields beside it in the grid, each of which
+   has a label above their input that this field doesn't need. */
+.warranty-lookup-trigger-field span[aria-hidden] {
+  display: block;
+  height: 1rem;
+}
+
 .bulk-serials-header {
   display: flex;
   align-items: center;
@@ -1487,7 +1495,13 @@ button.small {
   font-size: 0.8rem;
 }
 
-button.icon-btn.danger {
+/* Scoped to the Rows table specifically (rather than every .icon-btn
+   everywhere, e.g. the persistence-warning banner's dismiss button, which
+   has its own look) — shape/size only, colour comes from .danger
+   (button.danger, above) or the plain neutral button background, so this
+   one rule covers both Delete (danger-red) and Look up Warranty (neutral)
+   without duplicating it. */
+#table-wrap button.icon-btn {
   width: 2rem;
   height: 2rem;
   padding: 0;
@@ -1495,7 +1509,7 @@ button.icon-btn.danger {
   flex-shrink: 0;
 }
 
-button.icon-btn.danger .tab-icon {
+#table-wrap button.icon-btn .tab-icon {
   width: 0.85rem;
   height: 0.85rem;
 }
@@ -2016,6 +2030,27 @@ tbody td [data-key='product'] {
   padding: 0.5rem 1.25rem 1.5rem;
   overflow-y: auto;
   max-height: calc(min(82vh, 640px) - 3.5rem);
+}
+
+.warranty-lookup-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 0;
+}
+
+.warranty-lookup-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.warranty-lookup-dialog-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
 }
 
 .help-dialog-body h3 {

@@ -17,6 +17,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // Cross-origin requests (e.g. the Warranty Lookup calls to
+  // lookup.xcet.uk) are left alone entirely — this cache exists to make
+  // this app's own assets available offline, not to intercept or cache
+  // responses from another site's API.
+  if (new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {
