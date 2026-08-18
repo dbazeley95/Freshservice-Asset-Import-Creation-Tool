@@ -2075,6 +2075,20 @@ tbody td [data-key='product'] {
   font-size: 0.88rem;
 }
 
+/* Screenshots in the Help guide and Release Notes are always captured in
+   Light theme (see the WebP files under assets/help/) regardless of which
+   theme is actually active — a single consistent reference image reads
+   better than trying to keep 7 theme variants of each in sync. */
+.help-screenshot {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5rem 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 .help-dialog-body code,
 .changelog-body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
