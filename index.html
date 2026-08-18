@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.4.4" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.4.4" />
-  <link rel="manifest" href="manifest.webmanifest?v=2.4.4" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=2.5.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=2.5.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=2.5.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.4.4" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=2.5.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=2.4.4" />
+  <link rel="stylesheet" href="css/styles.css?v=2.5.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.4.4" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=2.5.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.4.4</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v2.5.0</button>
           <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server &mdash; everything stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
@@ -285,6 +285,10 @@
         <span id="feedback-link-icon" class="tab-icon" aria-hidden="true"></span>
         Leave Feedback
       </a>
+      <a id="warranty-lookup-link" class="header-btn" href="https://lookup.xcet.uk/" target="_blank" rel="noopener">
+        <span id="warranty-lookup-link-icon" class="tab-icon" aria-hidden="true"></span>
+        Warranty Lookup
+      </a>
       <button id="release-notes-btn" type="button" class="header-btn" aria-haspopup="dialog" aria-controls="release-notes-dialog">
         <span id="release-notes-btn-icon" class="tab-icon" aria-hidden="true"></span>
         What's New
@@ -361,6 +365,10 @@
          version badge bumps — this list is the whole point of the Release
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
+      <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">2.5.0</span><h3 class="changelog-title">Warranty Lookup Link, and a Plain Square Header Bar</h3></div>
+        <p>A "Warranty Lookup" item in the Settings &amp; Help menu opens <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a> in a new tab &mdash; a separate tool for looking up manufacturer warranty information by serial number or service tag, kept as its own site so this app's "nothing leaves your browser" design doesn't change. The header bar is also back to a plain rectangle: no rounded corners and no gap above it, sitting flush against the top of the page rather than floating or curved.</p>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">2.4.4</span><h3 class="changelog-title">Header Bar Floats Instead of Touching the Top</h3></div>
         <p>2.4.2's extra top padding sat inside the header bar's own border, so the bar's edge still touched the very top of the browser with nothing visible above it. It's now a margin outside the border instead, so a sliver of page background shows above the bar and it reads as floating rather than pinned to the top edge.</p>
@@ -664,6 +672,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=2.4.4"></script>
+  <script type="module" src="js/app.js?v=2.5.0"></script>
 </body>
 </html>
