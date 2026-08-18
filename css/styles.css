@@ -2335,3 +2335,20 @@ tbody td [data-key='product'] {
     }
   }
 }
+
+/* The per-row Look up Warranty button is icon-only, so there's no text to
+   swap to "Looking up…" the way the toolbar/popout buttons do below —
+   this spins the same magnifying-glass icon instead, as the busy
+   indicator. Reduced-motion users just get the plain disabled button with
+   no spin, same as before this existed. */
+@media (prefers-reduced-motion: no-preference) {
+  .icon-btn.is-loading .tab-icon {
+    animation: warranty-lookup-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes warranty-lookup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
