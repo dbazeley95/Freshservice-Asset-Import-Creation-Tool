@@ -380,7 +380,7 @@
    or better while still reading as the same Luna-blue XP gradient. */
 [data-theme='xp'] .app-header {
   background: linear-gradient(to bottom, #3f74ad 0%, #265693 45%, #1d4b80 50%, #2e639d 100%);
-  border-radius: 10px 10px 0 0;
+  border-radius: 0;
   border: 1px solid #1a4a80;
 }
 
@@ -680,21 +680,20 @@ body {
   line-height: 1.4;
 }
 
-/* Its own bordered/background bar (like .panel) rather than a transparent
-   strip, so on Desktop it visually reads as a full-width header spanning
-   the same 1600px column as the side nav + panels below it, instead of
-   just the .brand-box card floating on the bare page background. A top
-   margin (not just padding) so the bar's own border sits below the very
-   top of the browser viewport with a sliver of page background showing
-   above it, rather than its top edge touching the top of the page. */
+/* Its own bordered/background bar (like .panel, but square rather than
+   rounded) rather than a transparent strip, so on Desktop it visually
+   reads as a full-width header spanning the same 1600px column as the
+   side nav + panels below it, instead of just the .brand-box card
+   floating on the bare page background. No top margin and no border-
+   radius — a plain rectangle starting right at the top of the page. */
 .app-header {
   padding: 1.5rem;
   max-width: 1600px;
-  margin: 1.5rem auto 0;
+  margin: 0 auto;
   text-align: center;
   background: var(--panel-bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 

@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.4.4';
-import { buildCsv, downloadCsv } from './csv.js?v=2.4.4';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.4.4';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.4.4';
-import { iconSvg } from './icons.js?v=2.4.4';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.5.0';
+import { buildCsv, downloadCsv } from './csv.js?v=2.5.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.5.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.5.0';
+import { iconSvg } from './icons.js?v=2.5.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1710,6 +1710,14 @@ if (feedbackLink) {
   feedbackLink.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
   document.getElementById('feedback-link-icon').innerHTML = iconSvg('mail');
   feedbackLink.addEventListener('click', () => {
+    if (els.settingsDialog) els.settingsDialog.close();
+  });
+}
+
+const warrantyLookupLink = document.getElementById('warranty-lookup-link');
+if (warrantyLookupLink) {
+  document.getElementById('warranty-lookup-link-icon').innerHTML = iconSvg('externalLink');
+  warrantyLookupLink.addEventListener('click', () => {
     if (els.settingsDialog) els.settingsDialog.close();
   });
 }
