@@ -289,6 +289,15 @@
   border-radius: 0;
 }
 
+/* .brand-box lost its shared border when .app-header took over the outer
+   border/shadow (see styles.css's .brand-box comment) — Mac's striped
+   header background isn't --panel-bg, so its white card still needs a
+   border of its own to read as a distinct window rather than bleeding
+   into the stripes. */
+[data-theme='mac'] .brand-box {
+  border: 1px solid #000000;
+}
+
 [data-theme='mac'] .info-dialog {
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.6);
 }
@@ -676,7 +685,7 @@ body {
    the same 1600px column as the side nav + panels below it, instead of
    just the .brand-box card floating on the bare page background. */
 .app-header {
-  padding: 1.5rem 1.5rem 1rem;
+  padding: 2.25rem 1.5rem 1.25rem;
   max-width: 1600px;
   margin: 0 auto;
   text-align: center;
@@ -721,15 +730,20 @@ body {
   }
 }
 
+/* No border/shadow of its own (unlike a .panel) — .app-header already
+   supplies those for the bar as a whole, and since both use the same
+   --panel-bg, a second bordered box here would just nest a barely-visible
+   outline-within-an-outline instead of reading as one card. Themes whose
+   header background isn't --panel-bg (Classic Mac's pinstripes, XP/
+   Windows 3.1's colour bars) still need this solid background to keep the
+   brand text readable, so that part stays in the shared rule. */
 .brand-box {
   display: inline-flex;
   align-items: center;
   gap: 0.85rem;
   padding: 0.6rem 1.35rem;
-  border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--panel-bg);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   text-align: left;
 }
 
@@ -1038,11 +1052,23 @@ body {
 
   /* The header's icon-only cog is only needed on narrower widths, where
      the side nav is an off-canvas drawer rather than an always-visible
-     column — .nav-settings-btn (shown below) replaces it here. Still an
-     explicit 1fr grid column in .app-header even with nothing in it, so
-     the brand box stays centered exactly as before. */
+     column — .nav-settings-btn (shown below) replaces it here. */
   .header-actions {
     display: none;
+  }
+
+  /* With the cog gone, .brand-box is the header's only content — let it
+     span the full header width (matching the side nav + panels below)
+     instead of just hugging its own text, and center that text within
+     the extra room instead of leaving it hugging the left edge. */
+  .app-header {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-box {
+    grid-column: 1;
+    width: 100%;
+    justify-content: center;
   }
 
   /* Sizing/position that used to live on .side-nav directly moved up here

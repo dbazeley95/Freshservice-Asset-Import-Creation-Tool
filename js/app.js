@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.4.1';
-import { buildCsv, downloadCsv } from './csv.js?v=2.4.1';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.4.1';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.4.1';
-import { iconSvg } from './icons.js?v=2.4.1';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=2.4.2';
+import { buildCsv, downloadCsv } from './csv.js?v=2.4.2';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=2.4.2';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=2.4.2';
+import { iconSvg } from './icons.js?v=2.4.2';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -557,6 +557,7 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
   input.id = `def-${col.key}`;
   input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
   if (col.input === 'number') input.step = 'any';
+  if (col.input === 'date') input.lang = 'sv-SE';
   input.value = state.defaults[col.key] ?? '';
   wrap.appendChild(input);
 
@@ -1163,6 +1164,7 @@ function renderBulkEditValueWidget(col, currentValue) {
     widget = document.createElement('input');
     widget.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
     if (col.input === 'number') widget.step = 'any';
+    if (col.input === 'date') widget.lang = 'sv-SE';
     widget.value = currentValue ?? '';
   }
   widget.id = 'bulk-edit-value';
@@ -1362,6 +1364,7 @@ function renderTable(assetType, state) {
       const input = document.createElement('input');
       input.type = col.input === 'date' ? 'date' : col.input === 'number' ? 'number' : 'text';
       if (col.input === 'number') input.step = 'any';
+      if (col.input === 'date') input.lang = 'sv-SE';
       input.value = row[col.key] ?? '';
       input.dataset.key = col.key;
       // A title showing the full value covers Product/Processor/etc. (any
