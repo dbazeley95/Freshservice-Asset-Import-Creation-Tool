@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.3.0';
-import { buildCsv, downloadCsv } from './csv.js?v=3.3.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.3.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.3.0';
-import { iconSvg } from './icons.js?v=3.3.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.4.0';
+import { buildCsv, downloadCsv } from './csv.js?v=3.4.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.4.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.4.0';
+import { iconSvg } from './icons.js?v=3.4.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -860,7 +860,7 @@ function renderWarrantyLookupTrigger(assetType, state) {
   spacer.setAttribute('aria-hidden', 'true');
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'header-btn';
+  btn.className = 'lookup';
   btn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('search')}</span> Look up Warranty`;
   btn.addEventListener('click', () => openWarrantyLookupDialog(assetType, state, vendor));
   wrap.appendChild(spacer);
@@ -1669,7 +1669,7 @@ function renderTable(assetType, state) {
     if (lookupVendor) {
       const lookupBtn = document.createElement('button');
       lookupBtn.type = 'button';
-      lookupBtn.className = 'icon-btn';
+      lookupBtn.className = 'icon-btn lookup';
       lookupBtn.title = `Look up warranty from ${lookupVendor === 'dell' ? 'Dell' : 'Apple'} — sends this row's Serial Number to lookup.xcet.uk and fills in Acquisition Date, Warranty, and Warranty Expiry Date`;
       lookupBtn.setAttribute('aria-label', lookupBtn.title);
       lookupBtn.innerHTML = `<span class="tab-icon" aria-hidden="true">${iconSvg('search')}</span>`;
