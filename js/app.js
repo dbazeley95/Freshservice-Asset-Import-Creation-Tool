@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.2.0';
-import { buildCsv, downloadCsv } from './csv.js?v=3.2.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.2.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.2.0';
-import { iconSvg } from './icons.js?v=3.2.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.3.0';
+import { buildCsv, downloadCsv } from './csv.js?v=3.3.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.3.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.3.0';
+import { iconSvg } from './icons.js?v=3.3.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -1757,7 +1757,24 @@ function wireToolbar(assetType, state) {
   }
 
   if (els.addRowsBtn) {
-    els.addRowsBtn.onclick = () => addPendingBulkRows();
+    els.addRowsBtn.onclick = async () => {
+      const text = bulkSerialsTextarea ? bulkSerialsTextarea.value : '';
+      if (!text.trim()) {
+        await showModal({ message: 'Paste at least one line into Assets (one per line) before adding.' });
+        return;
+      }
+      const previewRows = buildRowsFromText(assetType, state, text);
+      const missing = countRowsMissingFields(assetType, previewRows);
+      if (missing > 0) {
+        const ok = await showModal({
+          message: `${missing} of ${previewRows.length} row(s) will be missing required fields (highlighted in red in the preview above) — usually a Shared Default like Company or Product hasn't been filled in yet. Add anyway?`,
+          okText: 'Add Anyway',
+          cancelText: 'Cancel',
+        });
+        if (!ok) return;
+      }
+      await addPendingBulkRows();
+    };
   }
 
   if (els.lookupWarrantyAllBtn) {
