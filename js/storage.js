@@ -3,6 +3,7 @@
 const VERSION = 'v1';
 const stateKey = (typeId) => `fsai:${VERSION}:state:${typeId}`;
 const SUGGESTIONS_KEY = `fsai:${VERSION}:suggestions`;
+const LAST_GENERAL_KEY = `fsai:${VERSION}:last-general`;
 
 export function loadState(typeId) {
   try {
@@ -40,6 +41,28 @@ export function loadSuggestions() {
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
+  }
+}
+
+// Company/Location as last set in ANY asset type's Shared Defaults — used
+// to prefill a type the first time it's visited (see emptyState() in
+// app.js), so a multi-type import session doesn't mean re-picking the same
+// site on every tab. Only read when a type has no saved state of its own
+// yet; once a type has been touched, its own saved defaults always win.
+export function loadLastGeneral() {
+  try {
+    const raw = localStorage.getItem(LAST_GENERAL_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLastGeneral(general) {
+  try {
+    localStorage.setItem(LAST_GENERAL_KEY, JSON.stringify(general));
+  } catch {
+    /* ignore */
   }
 }
 

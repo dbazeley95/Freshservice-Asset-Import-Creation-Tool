@@ -4,11 +4,11 @@
 // up to 10 minutes after a new version deploys, even though index.html
 // itself (and its own ?v=) came through fresh. Bump every ?v= here to match
 // the version badge whenever any of these files change.
-import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.4.0';
-import { buildCsv, downloadCsv } from './csv.js?v=3.4.0';
-import { loadState, saveState, clearState, loadSuggestions, addSuggestion } from './storage.js?v=3.4.0';
-import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.4.0';
-import { iconSvg } from './icons.js?v=3.4.0';
+import { ASSET_TYPES, ASSET_STATE_SUGGESTIONS, defaultColumns, generalColumns, hardwareColumns, extraRowColumns } from './templates.js?v=3.5.0';
+import { buildCsv, downloadCsv } from './csv.js?v=3.5.0';
+import { loadState, saveState, clearState, loadSuggestions, addSuggestion, loadLastGeneral, saveLastGeneral } from './storage.js?v=3.5.0';
+import { SITE_PRESETS, LOCATIONS_BY_COMPANY, MODEL_PRESETS } from './catalog.js?v=3.5.0';
+import { iconSvg } from './icons.js?v=3.5.0';
 
 const ACTIVE_TYPE_KEY = 'fsai:v1:activeType';
 
@@ -110,13 +110,55 @@ function computeWarrantyExpiry(acquisitionDate, warrantyMonths) {
   return expiry.toISOString().slice(0, 10);
 }
 
+// Replacement-cycle length (years) used to suggest End of Life from
+// Acquisition Date, by asset type — deliberately incomplete: only types
+// with a real number from the school get one, everything else is left for
+// End of Life to be filled in by hand same as before this existed. Laptop
+// isn't a flat number — it depends on how much RAM the model has (a
+// higher-spec laptop gets kept longer) — see defaultLifespanYears below.
+const DEFAULT_LIFESPAN_YEARS = {
+  desktop_pc: 7,
+  // iPads: typically 7 years, but some individual models have their own
+  // shorter Apple-imposed support window — this flat number is a starting
+  // point only, not a per-model lookup (no per-model data for that yet).
+  tablet: 7,
+};
+
+function defaultLifespanYears(assetType, fields) {
+  if (assetType.id === 'laptop_pc') {
+    const memory = Number(fields.memory);
+    if (!Number.isFinite(memory) || memory <= 0) return null;
+    return memory <= 8 ? 5 : 6;
+  }
+  return DEFAULT_LIFESPAN_YEARS[assetType.id] ?? null;
+}
+
+// Same UTC-safe date math as computeWarrantyExpiry above, but adding whole
+// years instead of months. Returns '' whenever there's nothing to suggest
+// yet, same convention as computeWarrantyExpiry.
+function computeEndOfLife(acquisitionDate, years) {
+  if (!acquisitionDate || !Number.isFinite(years) || years <= 0) return '';
+  const [y, m, d] = acquisitionDate.split('-').map(Number);
+  if (!y || !m || !d) return '';
+  const eol = new Date(Date.UTC(y, m - 1, d));
+  eol.setUTCFullYear(eol.getUTCFullYear() + years);
+  return eol.toISOString().slice(0, 10);
+}
+
 let activeTypeId = localStorage.getItem(ACTIVE_TYPE_KEY) || 'desktop_pc';
 let idCounter = 0;
 const newRowId = () => `r${Date.now()}_${idCounter++}`;
 
 function emptyState() {
+  // A type visited for the first time inherits Company/Location from
+  // whatever type was last edited, rather than starting blank — a single
+  // import session is almost always one site, so this saves re-picking the
+  // same two fields on every tab switch. Only applies before this type has
+  // ever been saved; loadState() winning over emptyState() in getState()
+  // means a type's own prior values always take precedence after that.
+  const lastGeneral = loadLastGeneral();
   return {
-    defaults: {},
+    defaults: lastGeneral ? { company: lastGeneral.company || '', location: lastGeneral.location || '' } : {},
     rows: [],
   };
 }
@@ -729,6 +771,7 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
       state.defaults.company = select.value;
       state.defaults.location = locationOptionsForCompany(select.value)[0] || '';
       persist(activeTypeId, state);
+      saveLastGeneral({ company: state.defaults.company, location: state.defaults.location });
       renderGeneralForm(assetType, state);
       refreshAssetTagHint(state);
       refreshBulkPreview(assetType, state);
@@ -743,6 +786,7 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
     select.addEventListener('change', () => {
       state.defaults.location = select.value;
       persist(activeTypeId, state);
+      saveLastGeneral({ company: state.defaults.company, location: state.defaults.location });
       refreshBulkPreview(assetType, state);
     });
     wrap.appendChild(select);
@@ -787,6 +831,28 @@ function buildDefaultField(col, assetType, state, suggestions, modelPresets) {
         if (computed) {
           expiryInput.value = computed;
           state.defaults.warrantyExpiry = computed;
+          debouncedPersist(activeTypeId, state);
+          refreshBulkPreview(assetType, state);
+        }
+      }
+    }
+
+    // End of Life gets a one-time starting suggestion from Acquisition
+    // Date, using this asset type's default replacement cycle (see
+    // defaultLifespanYears) — unlike Warranty Expiry above, this never
+    // overwrites a value already there, since End of Life is a judgment
+    // call this is only offering a starting guess for, not a strict
+    // function of the other fields. Laptop's cycle also depends on Memory
+    // (GB), hence checking that column too.
+    if ((col.key === 'acquisitionDate' || col.key === 'memory') && !state.defaults.endOfLife) {
+      const acqInput = document.getElementById('def-acquisitionDate');
+      const eolInput = document.getElementById('def-endOfLife');
+      if (acqInput && eolInput) {
+        const years = defaultLifespanYears(assetType, state.defaults);
+        const computedEol = computeEndOfLife(acqInput.value, years);
+        if (computedEol) {
+          eolInput.value = computedEol;
+          state.defaults.endOfLife = computedEol;
           debouncedPersist(activeTypeId, state);
           refreshBulkPreview(assetType, state);
         }
@@ -1322,6 +1388,21 @@ function countRowsMissingFields(assetType, rows) {
   }, 0);
 }
 
+// Which required columns are actually empty, across all the given rows —
+// so a "rows are missing required fields" warning can name them instead of
+// just counting them, saving a hunt through Hardware Specific to find
+// which of ~20 required fields was the one left blank. Column order (not
+// alphabetical), deduped across rows.
+function missingFieldHeadersForRows(assetType, rows) {
+  const headers = new Set();
+  for (const row of rows) {
+    for (const col of assetType.columns) {
+      if (isRowInvalid(assetType, row, col)) headers.add(col.header);
+    }
+  }
+  return [...headers];
+}
+
 // A serial pasted or typed twice creates two rows that look identical to
 // Freshservice — flag it (not block it, same philosophy as the ambiguous-
 // name warning) rather than let it silently through to a failed or
@@ -1645,6 +1726,23 @@ function renderTable(assetType, state) {
           }
         }
 
+        // Same fill-if-empty End of Life starting suggestion as the
+        // Hardware Specific defaults panel (see buildDefaultField), scoped
+        // to this row's own fields.
+        if ((col.key === 'acquisitionDate' || col.key === 'memory') && !row.endOfLife) {
+          const acqInput = tr.querySelector('input[data-key="acquisitionDate"]');
+          const eolInput = tr.querySelector('input[data-key="endOfLife"]');
+          if (acqInput && eolInput) {
+            const years = defaultLifespanYears(assetType, row);
+            const computedEol = computeEndOfLife(acqInput.value, years);
+            if (computedEol) {
+              eolInput.value = computedEol;
+              row.endOfLife = computedEol;
+              setFieldInvalid(eolInput, false);
+            }
+          }
+        }
+
         debouncedPersist(activeTypeId, state);
       });
       input.addEventListener('change', () => {
@@ -1766,8 +1864,9 @@ function wireToolbar(assetType, state) {
       const previewRows = buildRowsFromText(assetType, state, text);
       const missing = countRowsMissingFields(assetType, previewRows);
       if (missing > 0) {
+        const missingHeaders = missingFieldHeadersForRows(assetType, previewRows);
         const ok = await showModal({
-          message: `${missing} of ${previewRows.length} row(s) will be missing required fields (highlighted in red in the preview above) — usually a Shared Default like Company or Product hasn't been filled in yet. Add anyway?`,
+          message: `${missing} of ${previewRows.length} row(s) will be missing: ${missingHeaders.join(', ')} (highlighted in red in the preview above). Add anyway?`,
           okText: 'Add Anyway',
           cancelText: 'Cancel',
         });
@@ -1841,8 +1940,9 @@ function wireToolbar(assetType, state) {
     }
     const missing = countRowsMissingFields(assetType, state.rows);
     if (missing > 0) {
+      const missingHeaders = missingFieldHeadersForRows(assetType, state.rows);
       const ok = await showModal({
-        message: `${missing} row(s) are missing required fields (highlighted in red). Download anyway?`,
+        message: `${missing} row(s) are missing: ${missingHeaders.join(', ')} (highlighted in red). Download anyway?`,
         okText: 'Download Anyway',
         cancelText: 'Cancel',
       });

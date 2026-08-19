@@ -29,15 +29,15 @@
        independent of any server cache-control header, so a same-URL icon
        swap can go unnoticed indefinitely without a ?v= bump forcing a
        genuinely new URL. -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3.4.0" />
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=3.4.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=3.4.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3.5.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=3.5.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=3.5.0" />
   <meta name="theme-color" content="#142146" />
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3.4.0" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3.5.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=3.4.0" />
+  <link rel="stylesheet" href="css/styles.css?v=3.5.0" />
 </head>
 <body>
   <!-- Invisible until focused (first Tab stop on the page) — lets a
@@ -73,11 +73,11 @@
     </div>
 
     <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=3.4.0" alt="Freshservice Asset Import Leverage System app icon" />
+      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=3.5.0" alt="Freshservice Asset Import Leverage System app icon" />
       <div class="brand-text">
         <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
         <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v3.4.0</button>
+          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v3.5.0</button>
           <span class="compiled-date">Compiled 18 Aug 2026</span>
         </div>
         <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server, aside from a Serial Number sent to Warranty Lookup if you use it &mdash; everything else stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
@@ -416,6 +416,10 @@
          Notes button, so a build that doesn't add one defeats it. -->
     <div class="changelog-body">
       <div class="changelog-entry">
+        <div class="changelog-entry-head"><span class="changelog-version">3.5.0</span><h3 class="changelog-title">Less Retyping, Clearer Warnings, and a Starting Guess for End of Life</h3></div>
+        <p>Three usability fixes. Company and Location now carry over the first time you switch to an asset type you haven't touched yet in this session &mdash; a multi-type import is almost always one site, so this saves re-picking the same two fields on every tab. The "missing required fields" warnings (Add Assets of Another Product and Download CSV) now name the actual fields that are empty instead of just counting them. And End of Life gets a one-time starting suggestion from Acquisition Date for Desktop (7 years), Laptop (5 years for 8GB RAM, 6 for more), and iPads/Tablets (7 years, model-specific overrides not yet handled) &mdash; it's a starting point only, so it never overwrites a value you've already typed in; other asset types are unaffected for now.</p>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-entry-head"><span class="changelog-version">3.4.0</span><h3 class="changelog-title">Look up Warranty Buttons Now Match the Rest</h3></div>
         <p>All three Look up Warranty buttons &mdash; Hardware Specific's, each row's own in the Rows table, and Look up Warranty for All Rows above it &mdash; are now a filled sherbet yellow with the same corner rounding as every other button, instead of a mix of an oddly pill-shaped nav-style button, an unfilled outline, and a plain neutral one. Same yellow across every theme, including the Vista/XP glass gradients, Mac's bordered look, and Matrix's glow.</p>
       </div>
@@ -747,6 +751,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/app.js?v=3.4.0"></script>
+  <script type="module" src="js/app.js?v=3.5.0"></script>
 </body>
 </html>
