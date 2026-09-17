@@ -3,754 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Freshservice Asset Import Leverage System</title>
-  <meta name="description" content="Build Freshservice asset import CSVs in your browser. Nothing is uploaded or stored on a server." />
-  <!-- Applies a saved explicit-override theme before first paint, inline
-       and blocking (not the deferred module in js/app.js) so there's no
-       flash of the wrong theme while that loads. "System" (the default)
-       leaves no data-theme attribute, so css/styles.css's
-       prefers-color-scheme media query decides instead — this script only
-       ever runs for the explicit overrides (kept in sync with the list in
-       js/app.js's THEME_VALUES). -->
-  <script>
-    (function () {
-      var THEME_VALUES = ['light', 'dark', 'vista', 'mac', 'xp', 'win31', 'matrix'];
-      var theme = localStorage.getItem('fsai:v1:theme');
-      if (THEME_VALUES.indexOf(theme) !== -1) {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-    })();
-  </script>
-  <!-- ?v= busts GitHub Pages' CDN cache (max-age=600) on deploy, matching
-       the version badge whenever css/js/manifest/icon files change. This
-       matters even more for the favicon/apple-touch-icon/manifest icon
-       links below than for css/js — browsers cache favicons by URL far
-       more stubbornly than normal page assets, sometimes for days,
-       independent of any server cache-control header, so a same-URL icon
-       swap can go unnoticed indefinitely without a ?v= bump forcing a
-       genuinely new URL. -->
+  <title>Freshservice Asset Import Leverage System — Moved</title>
+  <meta name="description" content="This tool has been merged into Bart — redirecting to bart.xcet.uk." />
+  <!-- Fallback for anyone with JS disabled; the script below fires first
+       for everyone else, showing the explanation below for a moment
+       before sending them on. -->
+  <meta http-equiv="refresh" content="6;url=https://bart.xcet.uk/" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3.5.0" />
   <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=3.5.0" />
-  <link rel="manifest" href="manifest.webmanifest?v=3.5.0" />
   <meta name="theme-color" content="#142146" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png?v=3.5.0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="FS Asset Import" />
-  <link rel="stylesheet" href="css/styles.css?v=3.5.0" />
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #eef1f7;
+      color: #142146;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #14161a;
+        color: #e8eaed;
+      }
+      .card {
+        background: #1c1f26 !important;
+        border-color: #333844 !important;
+      }
+      .btn {
+        background: #607ed2 !important;
+        color: #0b0e14 !important;
+      }
+    }
+    .card {
+      max-width: 30rem;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #dbe0ea;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      text-align: center;
+    }
+    .icon {
+      width: 3rem;
+      height: 3rem;
+      margin: 0 auto 1rem;
+      display: block;
+      border-radius: 10px;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0 0 0.75rem;
+    }
+    p {
+      margin: 0 0 1.25rem;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #142146;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+    }
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+    .note {
+      margin-top: 1.25rem;
+      margin-bottom: 0;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+  </style>
 </head>
 <body>
-  <!-- Invisible until focused (first Tab stop on the page) — lets a
-       keyboard/screen-reader user jump straight past the header and the
-       full Asset Type side-nav list to the actual form, instead of having
-       to tab through all of it every single page load. -->
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-  <!-- Matrix theme's falling-character rain — hidden by default, shown and
-       animated only while that theme is active (see js/app.js). Fixed +
-       negative z-index so it sits behind every panel and never affects
-       layout or scroll height. -->
-  <canvas id="matrix-rain" aria-hidden="true"></canvas>
-  <header class="app-header">
-    <div class="header-actions">
-      <!-- Everything that used to live here directly (Leave Feedback,
-           What's New, Help, Install App, Theme) now lives inside
-           #settings-dialog instead — see js/app.js for the wiring. Kept as
-           real .header-btn/.theme-select-wrap elements there rather than a
-           new menu-item style, so every theme's existing button styling
-           (Vista/Mac/XP/Windows 3.1/Matrix all restyle those two classes
-           globally, not just inside the header) applies with no extra
-           per-theme CSS needed. -->
-      <button
-        id="settings-menu-btn"
-        type="button"
-        class="header-btn icon-only"
-        aria-haspopup="dialog"
-        aria-controls="settings-dialog"
-        aria-label="Settings and help"
-      >
-        <span id="settings-menu-btn-icon" class="tab-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-
-    <div class="brand-box">
-      <img class="brand-logo" src="assets/icons/icon-maskable-512.png?v=3.5.0" alt="Freshservice Asset Import Leverage System app icon" />
-      <div class="brand-text">
-        <h1 class="brand-title"><span class="brand-initial">F</span>reshservice <span class="brand-initial">A</span>sset <span class="brand-initial">I</span>mport <span class="brand-initial">L</span>everage <span class="brand-initial">S</span>ystem</h1>
-        <div class="version-row">
-          <button id="version-badge-btn" type="button" class="version-badge" aria-haspopup="dialog" aria-controls="release-notes-dialog">v3.5.0</button>
-          <span class="compiled-date">Compiled 18 Aug 2026</span>
-        </div>
-        <p class="subtitle">Build asset import CSVs for Freshservice, right in your browser. Nothing is uploaded or stored on a server, aside from a Serial Number sent to Warranty Lookup if you use it &mdash; everything else stays in this browser's local storage on this device. Closing the tab won't lose your work, but clearing site data will.</p>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hidden until js/app.js's persist() actually hits a saveState() failure
-       (quota exceeded, private browsing, etc.) — see storage.js. Shown once
-       per session and left up rather than auto-dismissed, since the
-       underlying cause (out of storage, private mode) doesn't resolve
-       itself, and losing track of "my edits aren't being saved" is exactly
-       the failure this exists to prevent. -->
-  <div id="persistence-warning" class="persistence-warning" role="alert" hidden>
-    <span id="persistence-warning-icon" class="tab-icon" aria-hidden="true"></span>
-    <span id="persistence-warning-text"></span>
-    <button id="persistence-warning-close" type="button" class="icon-btn" aria-label="Dismiss">
-      <span id="persistence-warning-close-icon" class="tab-icon" aria-hidden="true"></span>
-    </button>
+  <div class="card">
+    <img class="icon" src="assets/icons/icon-maskable-512.png?v=3.5.0" alt="" />
+    <h1>This tool has moved</h1>
+    <p>
+      The Freshservice Asset Import Leverage System has been merged into
+      <strong>Bart</strong>, our new asset management tool. Use the link
+      below to carry on there.
+    </p>
+    <a class="btn" href="https://bart.xcet.uk/">Go to Bart &rarr;</a>
+    <p class="note">Redirecting you automatically in a few seconds&hellip;</p>
   </div>
-
-  <!-- One reusable dialog for every confirm()/alert() in the app (see
-       showModal() in js/app.js) — themed via the same CSS custom
-       properties every panel already uses, so it matches whichever of the
-       7 themes is active without any theme-specific markup here. Hidden by
-       default; showModal() fills in the message/buttons and un-hides it. -->
-  <div id="modal-overlay" class="modal-overlay" hidden>
-    <div id="modal-box" class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="modal-message">
-      <p id="modal-message"></p>
-      <div class="modal-actions">
-        <button id="modal-cancel-btn" type="button"></button>
-        <button id="modal-ok-btn" type="button"></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="app-shell">
-    <button id="nav-toggle" type="button" class="nav-toggle" aria-expanded="false" aria-controls="type-tabs">
-      <span id="nav-toggle-icon" class="tab-icon" aria-hidden="true"></span>
-      <span class="nav-toggle-text">
-        <span class="nav-toggle-label">Asset Type</span>
-        <span id="nav-toggle-value" class="nav-toggle-value"></span>
-      </span>
-      <span id="nav-toggle-chevron" class="tab-icon nav-toggle-chevron" aria-hidden="true"></span>
-    </button>
-    <div id="nav-backdrop" class="nav-backdrop"></div>
-
-    <!-- Only #type-tabs is dynamically re-rendered (js/app.js's renderTabs())
-         — this wrapper and the settings button inside it are static, so
-         nothing here needs to survive being rebuilt on every render. The
-         button is desktop-only (see the min-width: 900px rule in
-         styles.css); below that the header's own icon-only cog is what's
-         visible instead, since the side nav itself is an off-canvas drawer
-         there rather than an always-visible column. Both buttons open the
-         same #settings-dialog. -->
-    <div class="side-nav-col">
-      <button
-        id="settings-menu-btn-nav"
-        type="button"
-        class="nav-settings-btn"
-        aria-haspopup="dialog"
-        aria-controls="settings-dialog"
-      >
-        <span id="settings-menu-btn-nav-icon" class="tab-icon" aria-hidden="true"></span>
-        Settings &amp; Help
-      </button>
-      <nav id="type-tabs" class="side-nav" aria-label="Asset type"></nav>
-    </div>
-
-    <div class="app-main">
-      <main id="main-content" tabindex="-1">
-        <!-- Own card rather than folded into General below — it describes
-             the whole workflow (General, Hardware Specific, Bulk Add,
-             Download CSV all get a mention), not just the General section
-             specifically. -->
-        <section class="panel intro-panel" aria-label="About this asset type">
-          <p id="type-description" class="type-description"></p>
-          <p class="required-legend"><span class="required-marker">*</span> marks a required field &mdash; Freshservice needs it to import the row.</p>
-        </section>
-
-        <section id="coming-soon-panel" class="panel" aria-labelledby="coming-soon-heading" hidden>
-          <h2 id="coming-soon-heading">Coming soon</h2>
-          <p id="coming-soon-message" class="hint"></p>
-        </section>
-
-        <div id="active-sections">
-          <section class="panel" aria-labelledby="general-heading">
-            <h2 id="general-heading">General</h2>
-            <p class="hint">Which site this batch belongs to. Pick a Company from every known site &mdash; Location narrows to just that site's own sub-locations, defaulting to the site itself until you pick something more specific. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
-            <div id="general-form" class="form-grid"></div>
-          </section>
-
-          <section class="panel" aria-labelledby="hardware-heading">
-            <h2 id="hardware-heading">Hardware Specific</h2>
-            <p class="hint">What the hardware itself is. Copied onto new rows when you add them; each row can still be edited individually afterwards.</p>
-            <div id="hardware-form" class="form-grid"></div>
-          </section>
-
-          <section class="panel" aria-labelledby="bulk-heading">
-            <h2 id="bulk-heading">Bulk Add from Serial Numbers</h2>
-            <div id="bulk-form" class="form-grid"></div>
-          </section>
-
-          <section class="panel" aria-labelledby="add-product-heading">
-            <h2 id="add-product-heading">Add Assets of Another Product</h2>
-            <p class="hint">Adds the assets pasted above into the Rows table below, using the current Hardware Specific details as their Product. Change Product/Hardware Specific and click this again to add another product to the same export &mdash; up to 10 different products per export.</p>
-            <div id="bulk-preview-wrap"></div>
-            <button id="add-rows-btn" type="button" class="primary">
-              <span id="add-rows-icon" class="tab-icon" aria-hidden="true"></span>
-              Add Assets of Another Product
-            </button>
-          </section>
-
-          <section class="panel" aria-labelledby="table-heading">
-            <div class="table-toolbar">
-              <h2 id="table-heading">Rows</h2>
-              <span id="row-count" class="row-count" aria-live="polite"></span>
-              <span id="invalid-row-count" class="row-count-invalid" aria-live="polite" hidden></span>
-              <!-- The persistence-warning banner near the top of the page only
-                   ever shows once and can be dismissed — this is the cue that
-                   keeps reappearing on every failed save afterwards, so
-                   dismissing the banner once doesn't mean "never warn me
-                   again" if it's still actually failing (see persist() in
-                   js/app.js). -->
-              <span
-                id="persistence-cue"
-                class="persistence-cue"
-                title="Your changes still aren't being saved on this device right now — download a CSV before closing this tab."
-                aria-live="polite"
-                hidden
-              >
-                <span id="persistence-cue-icon" class="tab-icon" aria-hidden="true"></span>
-                Not saving
-              </span>
-              <div class="spacer"></div>
-              <button
-                id="lookup-warranty-all-btn"
-                type="button"
-                class="lookup"
-                title="Looks up every Dell/Apple row still missing Acquisition Date, Warranty, or Warranty Expiry Date — or just the checked rows, if any are checked. Sends their Serial Numbers to lookup.xcet.uk"
-              >
-                <span id="lookup-warranty-all-icon" class="tab-icon" aria-hidden="true"></span>
-                Look up Warranty for All Rows
-              </button>
-              <button id="import-edit-btn" type="button" class="primary">
-                <span id="import-edit-icon" class="tab-icon" aria-hidden="true"></span>
-                Import Populated CSV for Editing
-              </button>
-              <input id="import-edit-file" type="file" accept=".csv,text/csv" hidden />
-              <button id="clear-rows-btn" type="button" class="danger">
-                <span id="clear-rows-icon" class="tab-icon" aria-hidden="true"></span>
-                Clear All Rows
-              </button>
-            </div>
-            <!-- Filters which rows are shown below, not the underlying data —
-                 the full set still downloads/exports regardless of what's
-                 filtered out of view. Hidden entirely until there's more
-                 than a handful of rows to actually need filtering (see
-                 js/app.js). -->
-            <div id="row-search-wrap" class="row-search-wrap" hidden>
-              <label for="row-search" class="sr-only">Filter rows</label>
-              <input id="row-search" type="search" placeholder="Filter by Name, Serial Number, or Asset Tag&hellip;" />
-            </div>
-            <!-- Only appears once at least one row is checked (see js/app.js)
-                 — lets one field's value be stamped onto every selected row
-                 at once, e.g. marking 30 rows Retired via Asset State instead
-                 of editing each one by hand. -->
-            <div id="bulk-edit-wrap" class="bulk-edit-wrap" hidden>
-              <span id="bulk-edit-count" class="bulk-edit-count"></span>
-              <label for="bulk-edit-field" class="sr-only">Field to set</label>
-              <select id="bulk-edit-field"></select>
-              <span id="bulk-edit-value-wrap"></span>
-              <button id="bulk-edit-apply-btn" type="button" class="small">Apply to Selected</button>
-              <button id="bulk-edit-clear-btn" type="button" class="small">Clear Selection</button>
-            </div>
-            <div id="table-wrap" class="table-wrap"></div>
-            <button id="download-btn" type="button" class="success">
-              <span id="download-icon" class="tab-icon" aria-hidden="true"></span>
-              Download CSV
-            </button>
-            <button id="open-freshservice-btn" type="button" class="primary" hidden>
-              <span id="open-freshservice-icon" class="tab-icon" aria-hidden="true"></span>
-              Open Freshservice to Import
-            </button>
-          </section>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <dialog id="settings-dialog" class="info-dialog" aria-labelledby="settings-dialog-title">
-    <div class="info-dialog-header">
-      <h2 id="settings-dialog-title">Settings &amp; Help</h2>
-      <button id="settings-dialog-close" type="button" class="info-dialog-close" aria-label="Close">
-        <span id="settings-dialog-close-icon" class="tab-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-    <div class="settings-menu-body">
-      <div class="theme-select-wrap">
-        <span id="theme-select-icon" class="tab-icon" aria-hidden="true"></span>
-        <label for="theme-select" class="sr-only">Theme</label>
-        <select id="theme-select" class="theme-select">
-          <option value="system">Theme: System</option>
-          <option value="light">Theme: Light</option>
-          <option value="dark">Theme: Dark</option>
-          <option value="vista">Theme: Vista</option>
-          <option value="mac">Theme: Classic Mac</option>
-          <option value="xp">Theme: XP</option>
-          <option value="win31">Theme: Windows 3.1</option>
-          <option value="matrix">Theme: Matrix</option>
-        </select>
-      </div>
-      <a id="feedback-link" class="header-btn" href="#">
-        <span id="feedback-link-icon" class="tab-icon" aria-hidden="true"></span>
-        Leave Feedback
-      </a>
-      <a id="warranty-lookup-link" class="header-btn" href="https://lookup.xcet.uk/" target="_blank" rel="noopener">
-        <span id="warranty-lookup-link-icon" class="tab-icon" aria-hidden="true"></span>
-        Warranty Lookup
-      </a>
-      <button id="release-notes-btn" type="button" class="header-btn" aria-haspopup="dialog" aria-controls="release-notes-dialog">
-        <span id="release-notes-btn-icon" class="tab-icon" aria-hidden="true"></span>
-        What's New
-      </button>
-      <button id="help-btn" type="button" class="header-btn" aria-haspopup="dialog" aria-controls="help-dialog">
-        <span id="help-btn-icon" class="tab-icon" aria-hidden="true"></span>
-        Help
-      </button>
-      <button id="install-app-btn" type="button" class="header-btn" hidden>
-        <span id="install-app-icon" class="tab-icon" aria-hidden="true"></span>
-        Install App
-      </button>
-    </div>
-  </dialog>
-
-  <dialog id="help-dialog" class="info-dialog" aria-labelledby="help-dialog-title">
-    <div class="info-dialog-header">
-      <h2 id="help-dialog-title">Help Guide</h2>
-      <button id="help-dialog-close" type="button" class="info-dialog-close" aria-label="Close help">
-        <span id="help-dialog-close-icon" class="tab-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-    <div class="help-dialog-body">
-      <h3>Theme</h3>
-      <p>The <strong>Theme</strong> dropdown (in this Settings &amp; Help menu, opened from the gear icon top-right) switches between System (follows your OS/browser setting), Light, Dark, and five retro skins &mdash; Vista, Classic Mac, XP, Windows 3.1, and Matrix &mdash; each a full visual reskin rather than just a color swap. Matrix also animates a dimmed, throttled falling-character canvas behind everything; it pauses when the tab isn't visible and skips entirely if you have reduced motion enabled system-wide. Your choice is remembered and applied before the page paints on your next visit.</p>
-
-      <h3>1. Pick an asset type</h3>
-      <p>Use the menu on the left (or the "Asset Type" button on mobile) to choose what you're importing &mdash; Monitor, Laptop, Desktop, iPads / Tablets, Interactive Touchscreen, Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, Docking Stations, or Other Devices. A note at the bottom of the list points at <strong>Leave Feedback</strong> for requesting any type that isn't here yet.</p>
-      <img class="help-screenshot" src="assets/help/sidebar.webp" width="230" height="845" alt="The Asset Type sidebar, with Desktop selected among Monitor, Laptop, and the other asset types." loading="lazy" />
-
-      <h3>2. Fill in General</h3>
-      <p><strong>Company</strong> and <strong>Location</strong> are both dropdowns, not free text. Company lists every known site; picking one narrows Location down to just that site's own sub-locations, defaulting to the site's own name until you pick something more specific. These are copied onto every row you add, and each row can still be edited individually afterwards.</p>
-      <img class="help-screenshot" src="assets/help/general.webp" width="998" height="192" alt="The General panel, with Company and Location dropdowns both set to Cardinal Newman." loading="lazy" />
-
-      <h3>3. Fill in Hardware Specific</h3>
-      <p>Fields marked with a red <strong>*</strong> are required. Start typing in <strong>Product</strong> to see suggestions, or narrow them first with the <strong>Manufacturer</strong> dropdown above it. Picking a known product auto-fills its Warranty and other specs.</p>
-      <img class="help-screenshot" src="assets/help/hardware.webp" width="998" height="337" alt="The Hardware Specific panel with a Dell OptiPlex 7000 SFF selected as Product, Warranty auto-filled to 48 months, and a Look up Warranty button." loading="lazy" />
-
-      <h3>4. Bulk Add from Serial Numbers</h3>
-      <p>Paste one asset per line into the box:</p>
-      <ul>
-        <li>A bare serial number &mdash; the Name will default to the Asset Tag</li>
-        <li><code>Name, Serial</code> (or paste two columns from a spreadsheet) to set the name yourself</li>
-      </ul>
-      <p>Asset types with an extra per-device field (currently Phones &amp; Telephony's Extension) accept it as a trailing value on the same line &mdash; <code>Name, Serial, Extension</code> &mdash; instead of one shared value copied onto every row; leave it off a line if you don't have it yet.</p>
-      <p>Or click <strong>Import CSV</strong> to load a Name/Serial file directly &mdash; use <strong>Download Template CSV</strong> first if you're not sure of the format.</p>
-      <p>If a bare-serial line shows up alongside <code>Name, Serial</code> lines, it's marked with <span class="ambiguous-icon-inline">&#9888;</span> in the preview and Rows table &mdash; usually a forgotten comma, so double-check the Name before downloading. Editing that row's Name clears the warning.</p>
-      <img class="help-screenshot" src="assets/help/bulk-add.webp" width="998" height="282" alt="The Bulk Add from Serial Numbers box with a bare serial on one line and a Name, Serial pair on the next." loading="lazy" />
-
-      <h3>5. Asset Tag</h3>
-      <p>Generated automatically as <code>&lt;site code&gt;-&lt;serial&gt;</code> from the Company you've selected &mdash; you never type it by hand.</p>
-
-      <h3>6. Add Assets of Another Product</h3>
-      <p>Its live preview shows exactly what clicking the button will add to the <strong>Rows</strong> table below. Rows accumulate rather than replacing what's there &mdash; to mix another product into the same export, change the Product/Hardware Specific details above and click <strong>Add Assets of Another Product</strong> again before downloading. Each export can hold up to 10 different products; you can fine-tune any field per row afterwards.</p>
-      <img class="help-screenshot" src="assets/help/add-product.webp" width="998" height="407" alt="The Add Assets of Another Product panel showing a live preview table of two rows about to be added." loading="lazy" />
-
-      <h3>7. Download CSV</h3>
-      <p>Produces a CSV with the exact column order Freshservice expects for the selected asset type, ready to import. If any rows are missing required fields, a red count stays next to the row total in <strong>Rows</strong> until they're fixed &mdash; not just a one-time warning when you click Download. Once you've downloaded, an <strong>Open Freshservice to Import</strong> button appears alongside it &mdash; it opens the Freshservice CMDB Items list in a new tab, which is where Freshservice's own Import button lives (it's a popup, not a page of its own, so this is as close as a link can get you).</p>
-      <img class="help-screenshot" src="assets/help/rows-download.webp" width="998" height="438" alt="The Rows table toolbar with Look up Warranty for All Rows, Import, and Clear All Rows, plus two rows each with their own Look up Warranty and Delete button, and the Download CSV button below." loading="lazy" />
-
-      <h3>Editing an existing export</h3>
-      <p><strong>Import Populated CSV for Editing</strong>, above the Rows table, loads a full CSV &mdash; every column, not just Name/Serial &mdash; straight into the table so you can tweak an export you already made and re-download it. It matches columns by header text, so unrecognised columns are ignored and missing ones are left blank; imported rows are added alongside whatever's already there.</p>
-
-      <h3>Warranty Lookup</h3>
-      <p>A row whose Product matches a known Dell or Apple model &mdash; and Hardware Specific's shared defaults, the same way &mdash; gets a <strong>Look up Warranty</strong> button. Give it a Serial Number/Service Tag and it fills in Acquisition Date, Warranty (In Months), and Warranty Expiry Date for you. <strong>Look up Warranty for All Rows</strong>, above the Rows table, does the same for every eligible row at once &mdash; any row with a Dell/Apple Product, a Serial Number, and at least one of those three fields still missing. Check specific rows first (the same checkboxes used for bulk-editing a field) to look up just those instead of the whole table. Rows that already have all three are left alone, so it's safe to run again after adding more rows. This is the one place a Serial Number leaves this browser: it's sent to <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a>, a separate tool, to look that information up. More manufacturers may be added there over time.</p>
-      <img class="help-screenshot" src="assets/help/warranty-lookup.webp" width="560" height="314" alt="The Look up Warranty popout, asking for a Serial Number or Service Tag before filling in the three warranty fields." loading="lazy" />
-
-      <h3>Your data</h3>
-      <p>Everything stays in this browser's local storage on this device &mdash; nothing is uploaded anywhere, except a Serial Number you submit to <strong>Look up Warranty</strong> (see above). Closing the tab is safe; clearing site data is not.</p>
-
-      <h3>Found a bug or have an idea?</h3>
-      <p>Use the <strong>Leave Feedback</strong> item in the Settings &amp; Help menu (the gear icon top-right) to email it straight through.</p>
-    </div>
-  </dialog>
-
-  <!-- Opened from the "Look up Warranty" button that appears in Hardware
-       Specific once Product resolves to a manufacturer lookup.xcet.uk
-       supports (see js/app.js's warrantyLookupVendorForProduct) — there's
-       no Serial Number field to read on this panel (it's a 'row' column,
-       not a shared default), so this asks for one instead of reading it
-       from a field, then fills Acquisition Date/Warranty/Warranty Expiry
-       Date on the defaults themselves. -->
-  <dialog id="warranty-lookup-dialog" class="info-dialog" aria-labelledby="warranty-lookup-dialog-title">
-    <div class="info-dialog-header">
-      <h2 id="warranty-lookup-dialog-title">Look up Warranty</h2>
-      <button id="warranty-lookup-dialog-close" type="button" class="info-dialog-close" aria-label="Close">
-        <span id="warranty-lookup-dialog-close-icon" class="tab-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-    <form id="warranty-lookup-form" class="warranty-lookup-dialog-body">
-      <p id="warranty-lookup-dialog-hint" class="hint"></p>
-      <div class="field">
-        <label for="warranty-lookup-serial">Serial Number / Service Tag</label>
-        <input id="warranty-lookup-serial" type="text" autocomplete="off" />
-      </div>
-      <p id="warranty-lookup-dialog-error" class="warranty-lookup-error" role="alert" hidden></p>
-      <div class="warranty-lookup-dialog-actions">
-        <button id="warranty-lookup-submit" type="submit" class="primary">
-          <span id="warranty-lookup-submit-icon" class="tab-icon" aria-hidden="true"></span>
-          Look Up and Fill In
-        </button>
-        <button id="warranty-lookup-cancel" type="button">Cancel</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="release-notes-dialog" class="info-dialog" aria-labelledby="release-notes-title">
-    <div class="info-dialog-header">
-      <h2 id="release-notes-title">Release Notes</h2>
-      <button id="release-notes-close" type="button" class="info-dialog-close" aria-label="Close release notes">
-        <span id="release-notes-close-icon" class="tab-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-    <!-- Add a new .changelog-entry here, newest first, every time the
-         version badge bumps — this list is the whole point of the Release
-         Notes button, so a build that doesn't add one defeats it. -->
-    <div class="changelog-body">
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.5.0</span><h3 class="changelog-title">Less Retyping, Clearer Warnings, and a Starting Guess for End of Life</h3></div>
-        <p>Three usability fixes. Company and Location now carry over the first time you switch to an asset type you haven't touched yet in this session &mdash; a multi-type import is almost always one site, so this saves re-picking the same two fields on every tab. The "missing required fields" warnings (Add Assets of Another Product and Download CSV) now name the actual fields that are empty instead of just counting them. And End of Life gets a one-time starting suggestion from Acquisition Date for Desktop (7 years), Laptop (5 years for 8GB RAM, 6 for more), and iPads/Tablets (7 years, model-specific overrides not yet handled) &mdash; it's a starting point only, so it never overwrites a value you've already typed in; other asset types are unaffected for now.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.4.0</span><h3 class="changelog-title">Look up Warranty Buttons Now Match the Rest</h3></div>
-        <p>All three Look up Warranty buttons &mdash; Hardware Specific's, each row's own in the Rows table, and Look up Warranty for All Rows above it &mdash; are now a filled sherbet yellow with the same corner rounding as every other button, instead of a mix of an oddly pill-shaped nav-style button, an unfilled outline, and a plain neutral one. Same yellow across every theme, including the Vista/XP glass gradients, Mac's bordered look, and Matrix's glow.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.3.0</span><h3 class="changelog-title">A Warning Before Adding Assets That Aren't Ready</h3></div>
-        <p><strong>Add Assets of Another Product</strong> now speaks up instead of failing quietly. Click it with nothing pasted into Assets and it tells you to paste something first, rather than doing nothing with no explanation. Click it while required Shared Defaults are still empty (Company, Product, Asset State, and the rest) and it warns how many rows will come in missing those fields &mdash; the same check Download CSV already does &mdash; before you commit to adding them, with the option to add anyway if that's intentional.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.2.0</span><h3 class="changelog-title">Warranty Lookup Feels Faster, and Can Target Just What You've Checked</h3></div>
-        <p>All three Look up Warranty entry points now show a busy state while a lookup is running instead of just quietly disabling &mdash; the per-row button spins, and the toolbar/popout buttons switch to "Looking up&hellip;" until it's done. <strong>Look up Warranty for All Rows</strong> also now respects the Rows table's checkboxes: check specific rows first (the same ones bulk-edit uses) and it only looks up those, instead of always hitting every eligible row in the table; leave nothing checked and it works exactly as before.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.1.0</span><h3 class="changelog-title">Warranty Lookup for All Rows at Once</h3></div>
-        <p>A new <strong>Look up Warranty for All Rows</strong> button above the Rows table looks up every eligible row in one go, instead of clicking each row's own button one at a time. "Eligible" means a Dell or Apple Product, a Serial Number, and at least one of Acquisition Date/Warranty (In Months)/Warranty Expiry Date still missing &mdash; rows that already have all three are left untouched, so it's safe to run again after adding more rows. Requests are batched up to 20 serials per call (lookup.xcet.uk's own limit) and split by manufacturer, so a big export doesn't turn into dozens of individual round trips. The summary afterwards says how many rows were updated and lists any serials it couldn't find or that failed to look up.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.0.1</span><h3 class="changelog-title">Screenshots in Help and Release Notes</h3></div>
-        <p>Every step of the Help guide now has a real screenshot alongside its explanation &mdash; Pick an asset type, Fill in General, Fill in Hardware Specific, Bulk Add from Serial Numbers, Add Assets of Another Product, Download CSV, and the new Warranty Lookup section. The latest Release Notes entry gets one too. Screenshots are always captured in Light theme regardless of which theme you're actually using, the same way one reference image is easier to keep accurate than seven theme variants of each.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">3.0.0</span><h3 class="changelog-title">Warranty Lookup for Dell and Apple</h3></div>
-        <p>A row whose Product matches a Dell or Apple entry in the catalog now gets a <strong>Look up Warranty</strong> button in the Rows table, next to Delete &mdash; give it that row's Serial Number and it fills in Acquisition Date, Warranty (In Months), and Warranty Expiry Date directly, no more copying dates across by hand. Hardware Specific gets the same button next to Acquisition Date for the shared defaults: since there's no Serial Number field up there, it opens a small popout asking for one instead, useful when adding several units of the same model at once, since every row added afterwards from Bulk Add picks up the result automatically (it only affects rows added after using it, not ones already in the table). Either way, a row with an unrecognised Product, or no Serial Number yet, just doesn't show the button &mdash; or explains what's missing if you click it anyway. This is the one place a Serial Number leaves your browser: it's sent to <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a>, a separate tool, to look up that information; more manufacturers may be added there later. A "Warranty Lookup" item in the Settings &amp; Help menu also opens that site directly in a new tab. Also fixed this app's service worker so it only caches its own files &mdash; it was previously intercepting every request including these lookups, which not only served no purpose but silently broke them.</p>
-        <img class="help-screenshot" src="assets/help/hardware.webp" width="998" height="337" alt="Hardware Specific with a Dell OptiPlex 7000 SFF selected, Warranty auto-filled to 48 months, and the new Look up Warranty button." loading="lazy" />
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.5.0</span><h3 class="changelog-title">Warranty Lookup Link, and a Plain Square Header Bar</h3></div>
-        <p>A "Warranty Lookup" item in the Settings &amp; Help menu opens <a href="https://lookup.xcet.uk/" target="_blank" rel="noopener">lookup.xcet.uk</a> in a new tab &mdash; a separate tool for looking up manufacturer warranty information by serial number or service tag, kept as its own site so this app's "nothing leaves your browser" design doesn't change. The header bar is also back to a plain rectangle: no rounded corners and no gap above it, sitting flush against the top of the page rather than floating or curved.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.4.4</span><h3 class="changelog-title">Header Bar Floats Instead of Touching the Top</h3></div>
-        <p>2.4.2's extra top padding sat inside the header bar's own border, so the bar's edge still touched the very top of the browser with nothing visible above it. It's now a margin outside the border instead, so a sliver of page background shows above the bar and it reads as floating rather than pinned to the top edge.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.4.3</span><h3 class="changelog-title">Two Discontinued OptiPlex Models Removed</h3></div>
-        <p>OptiPlex 7020 and Optiplex SFF 7021 have been removed from the Product catalog. Any rows already downloaded or in progress with those Products set are unaffected &mdash; this only changes what shows up as a suggestion going forward.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.4.2</span><h3 class="changelog-title">One Header Card Instead of Two, and Dates Read Left to Right</h3></div>
-        <p>The header bar and the title card inside it used the same background colour with no visible seam between them, so widening the card in 2.4.1 just made it look like a smaller box floating inside a bigger one with dead space on both sides. The title card now fills the header bar directly &mdash; one box, centred, the same width as the side nav and panels below it &mdash; with a bit more breathing room above it. Date fields (Acquisition Date, Warranty Expiry Date, End of Life) also now display as YYYY-MM-DD instead of MM/DD/YYYY in Chromium-based browsers (Chrome, Edge); Firefox and Safari still follow their own locale, since there's no browser-independent way to force it.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.4.1</span><h3 class="changelog-title">Header Bar Now Uses Its Full Width</h3></div>
-        <p>The header bar from 2.4.0 was still only about a third as wide as the side nav and panels below it, with the merged subtitle text wrapping onto four lines and making the bar taller than it needed to be. The subtitle can now use roughly double the width, so the same text wraps onto two lines instead of four and the whole header bar sits noticeably shorter as a result.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.4.0</span><h3 class="changelog-title">A Real Header Bar, and Less to Read Before You Start</h3></div>
-        <p>The header now has its own full-width background bar on Desktop, spanning the same column as the side nav and panels below it instead of floating as a bare title over the page background &mdash; and the app icon is a little bigger inside it. The required-field note ("* marks a required field") and the local-storage notice that used to sit in a separate footer at the very bottom of the page have both been folded into the intro card at the top, so there's one place to read the "how this works" summary instead of three separate notices scattered around the page.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.3.1</span><h3 class="changelog-title">Download No Longer Loses an Unadded Paste</h3></div>
-        <p>Pasting serials into Bulk Add and going straight to Download CSV without clicking "Add Assets of Another Product" first used to either block on "Add at least one row before downloading" (if the Rows table was otherwise empty) or, worse, silently leave that pasted batch out of the file entirely (if it wasn't empty). Download CSV now adds whatever's currently pasted in Bulk Add before it does anything else, exactly as if "Add Assets of Another Product" had been clicked first &mdash; the 10-product-per-export cap still applies and still stops it with the same explanation if it's hit.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.3.0</span><h3 class="changelog-title">Warranty Expiry Date Now Calculates Itself</h3></div>
-        <p>Warranty Expiry Date now fills itself in as soon as Acquisition Date and Warranty (In Months) are both known &mdash; there's nothing left to work out by hand once you have both. Works no matter which order you fill them in, and works from picking a Product preset that carries its own warranty length (e.g. a 12-month or 48-month model) just as well as typing both fields yourself. Every row in the Rows table calculates its own independently, so editing one row's Acquisition Date or Warranty afterwards only updates that row. Still a normal, directly editable field afterwards &mdash; this fills it in rather than locking it, so an unusual warranty term can still be typed over the calculated value.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.2.4</span><h3 class="changelog-title">Every Card the Same Width Again</h3></div>
-        <p>The 960px cap from the last release fixed the dead space inside General/Hardware Specific/Bulk Add, but left them visibly narrower than the intro card and the Rows table next to them. Removed the cap &mdash; every card is back to the same full width. Individual fields don't stretch to fill the extra room (auto-fill leaves a short section's unused columns empty rather than blowing up Company/Location to fill them), so a wide monitor mostly just means Hardware Specific fits more fields per row before wrapping.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.2.3</span><h3 class="changelog-title">No More Dead Space in General/Hardware Specific/Bulk Add</h3></div>
-        <p>The width cap from the last layout round was on the fields themselves, not the card around them — so on a wide monitor, General and Hardware Specific still stretched full width as empty cards with all their actual fields squeezed into the left ~900px, leaving a wide dead strip on the right. The cap now applies to the card itself instead, so it ends where its fields end. The Rows table and the "Add Assets of Another Product" preview table are untouched and still use the full width, same as before.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.2.2</span><h3 class="changelog-title">Manufacturer Next to Product</h3></div>
-        <p>Manufacturer (the filter that narrows Product's suggestions) used to sit stacked directly above Product in its own tall cell, leaving Cost/Asset State/Acquisition Date beside it looking oddly short by comparison. It's now just the field immediately before Product in the row &mdash; same relationship, normal row height, less wasted space.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.2.1</span><h3 class="changelog-title">Compiled Date Fix</h3></div>
-        <p>The Compiled date next to the version badge was stuck on 12 Aug through the last three releases &mdash; bumped to match.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.2.0</span><h3 class="changelog-title">A Wider, Less Cluttered Layout</h3></div>
-        <p>Four layout changes to cut down on blank space and scrolling on desktop: (1) the page uses more of a wide monitor's width now (1600px instead of 1400px), and forms stay a comfortable, readable width even as their panels stretch wider &mdash; the Rows table and the "Add Assets of Another Product" preview both benefit the most, showing more columns before needing to scroll sideways; (2) the subtitle under the logo now lives inside the header's brand box instead of its own full-width line below it, saving a row of vertical space; (3) at 900px and wider, the gear icon moves out of the header and into a labelled "Settings &amp; Help" button pinned above the Asset Type list in the sidebar &mdash; narrower than that, it's back in the header, since the sidebar itself is a hidden drawer there rather than an always-visible column; (4) the "Fill in General and Hardware Specific details&hellip;" intro text now sits in its own small card above General instead of loose on the page, since it describes the whole workflow rather than General specifically.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.1.0</span><h3 class="changelog-title">Accessibility Pass and a Fresher Light Theme</h3></div>
-        <p>Five improvements from an accessibility and visual-freshness review: (1) the row count, the "missing required fields" count, and the "Not saving" persistence cue now announce themselves to screen readers as they change, instead of updating silently; a duplicate serial number or a missing required field is now exposed to screen readers too (aria-invalid plus a description), not just as a red border only a sighted user would notice; (2) a "Skip to main content" link (the first Tab stop on the page, invisible until focused) lets keyboard and screen reader users jump straight past the header and the full Asset Type menu instead of tabbing through all of it every page load; (3) dialogs and the row-search/bulk-edit/persistence status bars now fade and slide in instead of snapping into view instantly, respecting reduced-motion preferences; (4) an actual contrast audit against every theme turned up three real WCAG AA failures &mdash; Windows 3.1's muted text on its teal background, the XP header's white subtitle against its lightest gradient stop, and Dark theme's red "Clear All Rows" button text &mdash; all fixed without changing how any theme reads at a glance; (5) Light theme's background is a soft cool blue-gray now instead of a dull khaki-beige, and panels/dialogs in Light and Dark both get a subtle shadow for actual depth instead of a border alone &mdash; the five retro skins (Vista/Classic Mac/XP/Windows 3.1/Matrix) are untouched by both changes, each already has its own deliberate look.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">2.0.0</span><h3 class="changelog-title">Bulk Editing, Themed Dialogs, a Mobile-Friendly Rows Table, and One Settings &amp; Help Menu</h3></div>
-        <p>The biggest update yet, in one release: the Rows table now has a checkbox on every row (plus a select-all in the header) so one field &mdash; Asset State, Cost, Warranty, whatever &mdash; can be stamped onto every selected row at once instead of editing each one by hand (e.g. marking 30 rows Retired in one go). Every browser alert()/confirm() (delete a row, Clear All Rows, the 10-product cap, CSV import errors, downloading with missing fields) is now a themed dialog matching whichever of the app's themes is active, instead of a plain OS popup. Below 640px wide, the Rows table switches from a horizontally-scrolling table to a stack of labelled cards, so editing rows on a phone no longer means scrolling sideways through a dozen columns. A search box appears above the table once it has more than 8 rows, filtering by Name/Serial Number/Asset Tag. Importing a CSV via "Import Populated CSV for Editing" now reads extra per-row columns (like Phones &amp; Telephony's Extension) instead of dropping them. Keyboard focus now gets a themed outline everywhere (inputs, selects, buttons) instead of only the theme picker. The persistence-failure warning banner, which only ever showed once and could be dismissed, now has a companion &mdash; a small "Not saving" cue next to the row count &mdash; that keeps showing up on every failed save even after the banner's gone. And the header's five separate always-visible controls (Leave Feedback, What's New, Help, Install App, Theme) are now behind a single gear icon top-right, opening a "Settings &amp; Help" popout instead of cluttering the header directly.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.11.0</span><h3 class="changelog-title">Data-Safety and Rows Table Fixes</h3></div>
-        <p>Four fixes from a deeper review of the Rows table: (1) a save to this device failing silently (storage full, private browsing) now shows a clear warning rather than risking edits vanishing on reload with no trace; (2) deleting a single row now asks for confirmation, matching Clear All Rows, instead of removing it on one click with no undo; (3) a Serial Number that matches another row's is now flagged (amber, with a tooltip explaining why) instead of silently allowed through; (4) Company, Location, and Product were truncating unreadably in the table ("St Albans" showing as "St Al") &mdash; widened those columns and added tooltips showing the full value on every text field in the table.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.10.1</span><h3 class="changelog-title">iPads / Tablets Header Fix</h3></div>
-        <p>iPads / Tablets used "Display Name" instead of "Name" for its first column &mdash; every other type uses "Name", and this one should too.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.10.0</span><h3 class="changelog-title">UPS, and One Consistent Field Order Everywhere</h3></div>
-        <p>UPS is now a fully working tab &mdash; the standard column set plus a Manufacturer filter (APC, Eaton; models pending). Every asset type's fields now follow the exact same order (Name, Company, Location, Asset Tag, Product, Serial Number, Cost, Asset State, Acquisition Date, Warranty (In Months), Warranty Expiry Date, End of Life, then any type-specific extras) &mdash; End of Life had drifted to the wrong spot on a couple of recently-added types, and five older ones (Monitor, Touchscreen, Laptop, Desktop, iPads/Tablets) were missing Warranty Expiry Date entirely; both are fixed now. Under the hood, every template is now built from one shared field list instead of being hand-typed per type, so this kind of drift can't happen again.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.9.0</span><h3 class="changelog-title">Projectors, and Manufacturer Filters Across More Types</h3></div>
-        <p>Projectors is now a fully working tab with the standard column set (Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, Warranty Expiry Date) and a Manufacturer filter (Epson, BenQ, ViewSonic &mdash; models pending). Also caught up Phones &amp; Telephony, Network Switches, Servers, and Docking Stations, which previously only had one catalogued manufacturer each (so the filter never appeared): Phones adds Yealink (T54W, T30P) and Fanvil (X5U, X4U); Network Switches adds Dell, TP-Link, and UniFi alongside the existing Aruba/HPe; Servers adds Dell and Stone alongside HP; Docking Stations adds Lenovo alongside Dell.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.8.1</span><h3 class="changelog-title">TV / Digital Signage Manufacturer Filter</h3></div>
-        <p>TV / Digital Signage was missing the Manufacturer filter above Product that every other catalogued type has. Added known manufacturers (LG, Samsung, Philips, Clevertouch) as placeholder entries &mdash; model names are still pending, so each just reads "(model TBC)" until the real model is confirmed and swapped in.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.8.0</span><h3 class="changelog-title">TV / Digital Signage</h3></div>
-        <p>TV / Digital Signage is now a fully working tab &mdash; Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, Warranty Expiry Date, and Screen Size (In Inches), the same way Monitor has its own Monitor Size field.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.7.0</span><h3 class="changelog-title">Moved to a New Domain</h3></div>
-        <p>Moved hosting to a new domain.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.6.0</span><h3 class="changelog-title">Company and Location Are Now Both Dropdowns</h3></div>
-        <p>Company and Location are no longer free text &mdash; both are closed dropdowns now, in the Defaults panel and per row in the Rows table alike. Picking a Company narrows Location down to just that site's own sub-locations (generated from a Freshservice Locations export), defaulting to the site itself until you pick something more specific; changing Company resets Location back to that default, since a previously-picked sub-location almost never still applies once the option list underneath it has changed. Also removed the dropdown arrow from Processor and every other typed-history-only field (added broadly in 1.5.1) &mdash; it's kept only on Product now, the one field actually backed by a real curated catalog; an arrow on a field that's just remembered whatever you've typed before was misleading.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.5.2</span><h3 class="changelog-title">Dropdown Arrow Size Fix</h3></div>
-        <p>The dropdown arrow added in 1.5.1 to Company/Product/suggestion fields was noticeably chunkier than the native arrow on a real <code>&lt;select&gt;</code> like Manufacturer or Asset State, right next to it in the same form. Shrunk it down to match.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.5.1</span><h3 class="changelog-title">Dropdown Arrow on Company/Product/Suggestion Fields</h3></div>
-        <p>Company, Product, and every other suggestion-backed field now show a small dropdown arrow, matching what a native <code>&lt;select&gt;</code> like Asset State already shows for free &mdash; without it, these fields read as ordinary free text with no hint they have a list to open. Also fixed the Compiled date, which hadn't been bumped for a day.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.5.0</span><h3 class="changelog-title">Docking Stations, and a Way to Request New Types</h3></div>
-        <p>Docking Stations is now a fully working tab with the standard column set (Name, Company, Location, Asset Tag, Product, Serial Number, Cost, Asset State, Acquisition Date, Warranty (In Months), Warranty Expiry Date, End of Life) &mdash; the last "Coming soon" placeholder is gone; every real Freshservice Asset Type now has a template. In its place, a non-clickable note at the bottom of the Asset Type menu points at <strong>Leave Feedback</strong> for requesting any type that shows up in a future export and isn't here yet.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.4.3</span><h3 class="changelog-title">Sidebar Icons Left-Aligned Again</h3></div>
-        <p>Found the actual cause of the sidebar's centering issue: a global rule centers icon+text in every button (correct for Download CSV, Add Assets of Another Product, etc.), and the side nav's tabs are buttons too, so they'd been silently inheriting that centering for a while now &mdash; invisible for short single-line labels, but visibly inconsistent for two-line ones like Interactive Touchscreen and Docking Stations. Tabs are back to a proper left-aligned list, matching every other nav item regardless of label length.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.4.2</span><h3 class="changelog-title">Company Dropdown Restored</h3></div>
-        <p>Company now has a dropdown of every known site again &mdash; click in to see the full list, or type to filter it. This was a real dropdown (a native <code>&lt;select&gt;</code>) once, dropped in v0.8.0 in favor of free text with typed-history suggestions only; it's back now using the same reliable combobox already used for Product, rather than the old native select. Typing a site not yet in the list is still remembered for next time. Location stays exactly as it's been &mdash; auto-filled from a matching site but always freely editable, since it's expected to grow to hundreds of values that don't each need a catalog entry.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.4.1</span><h3 class="changelog-title">Open Freshservice Button Width Fix</h3></div>
-        <p>"Open Freshservice to Import" was narrower than Download CSV above it &mdash; it never got the full-width sizing added for Download CSV, so it fell back to default content-width and only looked full-width by coincidence (wrapping onto its own line below Download CSV's own full-width box). Both buttons now share the same width rule explicitly.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.4.0</span><h3 class="changelog-title">Matrix Theme</h3></div>
-        <p>A sixth Theme option: a black/green terminal skin (monospace type, glowing outline buttons) with a falling-character canvas animating behind everything. Kept deliberately restrained since it's the first animated theme &mdash; dimmed and throttled well below 60fps, paused automatically whenever the tab isn't visible, and skipped entirely under <code>prefers-reduced-motion</code>, so it stays background ambience rather than competing with actually using the app.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.3.1</span><h3 class="changelog-title">Breathing Room Below the Header</h3></div>
-        <p>The sidebar and the mobile "Asset Type" toggle were sitting flush against the header's bottom edge with no gap, most visible against a themed header border/pattern like Classic Mac's pinstripes. Added top padding so both sit clearly below it instead of touching the line.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.3.0</span><h3 class="changelog-title">Classic Mac, XP &amp; Windows 3.1 Themes</h3></div>
-        <p>Three more retro Theme options: Classic Mac (System 7's black/white chrome and pinstriped title bar), XP (the "Luna" blue gradient title bar and glossy-but-flat buttons), and Windows 3.1 (a teal desktop, gray panels, and the classic Win16 3D bevel). All keep the same blue/red/green button color coding, just restyled per theme. Also fixed a Vista bug where the Theme dropdown showed a stray white box behind its own text.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.2.0</span><h3 class="changelog-title">Vista Theme</h3></div>
-        <p>Added Vista as a fourth Theme option &mdash; a proper retro skin (Windows Vista's "Aero Glass" look) rather than a palette swap: translucent blurred panels over a blue gradient desktop, and glossy gradient buttons that keep their blue/red/green color coding. Picked the same way as Light/Dark, and overrides your OS setting the same way too.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.1.0</span><h3 class="changelog-title">Theme Selector</h3></div>
-        <p>A new Theme dropdown in the header (System/Light/Dark) lets you override the color scheme instead of only following your OS/browser setting. Your choice is remembered and applied before the page paints on your next visit, so there's no flash of the wrong theme. First step toward more theme options planned for later.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">1.0.0</span><h3 class="changelog-title">Out of Beta</h3></div>
-        <p>Dropped the "beta" tag &mdash; every asset type has a working template, the workflow's been used and refined through dozens of iterations, and the install/icon/caching issues found along the way are fixed. Added a Compiled date next to the version badge so it's clear at a glance how current a given screenshot or bug report is.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.7</span><h3 class="changelog-title">Icon Cache-Busting Fix</h3></div>
-        <p>The browser tab (favicon), Home Screen, and PWA install icon files kept the same filenames across every recent icon redesign, so browsers that had already cached an older version had no reason to notice the new one &mdash; favicons are cached far more stubbornly than normal page assets, sometimes for days. All icon/manifest links now carry the same <code>?v=</code> cache-busting already used for CSS/JS, so icon updates take effect immediately going forward.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.6</span><h3 class="changelog-title">Simplified Icon: Monitor Only</h3></div>
-        <p>Dropped the tower from every icon (Home Screen, PWA install, favicon, header) and kept just the monitor with the Xavier CET logo in its screen. With no tower competing for space, the screen &mdash; and the logo inside it &mdash; is noticeably bigger and clearer at every size, including the true 16px size most browsers actually render tab icons at.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.5</span><h3 class="changelog-title">Favicon Matches the Full App Icon</h3></div>
-        <p>Swapped the logo-only favicon for the full computer+logo icon, matching Home Screen/PWA install everywhere. It's a little softer at the very smallest browser-tab size than a bare logo mark would be, but consistent across every touchpoint.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.4</span><h3 class="changelog-title">Header Icon</h3></div>
-        <p>The header now shows the same computer+logo app icon (rounded into a small badge) instead of the bare Xavier CET logo &mdash; reads clearly in both light and dark mode since it carries its own navy background.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.3</span><h3 class="changelog-title">Logo Favicon</h3></div>
-        <p>The browser tab icon is now the Xavier CET logo instead of a generic computer emoji. It's the logo alone rather than the fuller computer+logo app icon, since that composition turned out too detailed to read at true favicon size (16px) &mdash; a single bold mark holds up much better that small.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.2</span><h3 class="changelog-title">Logo in the App Icon's Screen</h3></div>
-        <p>The Xavier CET logo now sits inside the computer glyph's monitor screen on the installable app icon, tying the tool's icon back to the org brand while keeping the distinct computer shape.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.1</span><h3 class="changelog-title">App Icon Redesign</h3></div>
-        <p>The installable app icon is now a 2D line-glyph computer &mdash; the same style and glyph used for Desktop in the side menu &mdash; instead of the org logo, so it stands out more distinctly as this tool on a home screen or taskbar.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.16.0</span><h3 class="changelog-title">Installable as an App</h3></div>
-        <p>This can now be pinned/installed like a native app. On Chrome/Edge (desktop or Android), a new "Install App" button appears in the header once the browser decides the site qualifies &mdash; click it to add a standalone, taskbar/home-screen-pinnable copy with its own icon. Safari (iOS/macOS) has no equivalent button since it doesn't support a programmatic install prompt, but Add to Home Screen from the Share sheet now uses a proper app icon and name there too.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.15.1</span><h3 class="changelog-title">Hardware Specific Field Order</h3></div>
-        <p>Wi-Fi Access Points, Network Switches, Phones &amp; Telephony, Printers &amp; Copiers, Servers, and Other Devices now end with Acquisition Date, Warranty (In Months), Warranty Expiry Date, then End of Life &mdash; in that order, both in the Hardware Specific panel and the downloaded CSV. Product, Cost, and Asset State keep their existing positions near the top.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.15.0</span><h3 class="changelog-title">Open Freshservice to Import</h3></div>
-        <p>A new "Open Freshservice to Import" button appears next to Download CSV as soon as you've downloaded a file, opening the Freshservice CMDB Items list in a new tab so you're one click from the Import button (Freshservice's own Import is a JS popup rather than its own page, so this is the closest a link can get you).</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.14.1</span><h3 class="changelog-title">Product Catalog Tidy-Up</h3></div>
-        <p>Synced the Product catalog with a fresh Freshservice export: Printers &amp; Copiers' two e-STUDIO409 models are now named without their serial-number suffixes (e-STUDIO409CS, e-STUDIO409P), and three retired entries (Generic / Text Only, and Other Devices' Monitor and Pro Dock) were removed since they're no longer in the live catalog. EduPC and EduMiniPC now carry their Eduthing manufacturer.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.14.0</span><h3 class="changelog-title">Other Devices Reordered, Extension Set Per Row</h3></div>
-        <p>Other Devices has moved to the bottom of the side menu (after Servers) &mdash; it's a catch-all bucket and shouldn't be anyone's first choice. Phones &amp; Telephony's optional Extension is no longer a single shared value copied onto every row: it's now a genuine per-device field, just like Serial Number. Set it per line in Bulk Add (<code>Name, Serial, Extension</code>) or edit it per row afterwards in the Rows table.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.13.0</span><h3 class="changelog-title">Servers</h3></div>
-        <p>Servers is now a fully working tab with the standard column set plus Memory(GB) and Disk Space(GB). Only Docking Stations remains "Coming soon."</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.12.0</span><h3 class="changelog-title">Network Switches, Phones &amp; Telephony, Printers &amp; Copiers</h3></div>
-        <p>All three are now fully working tabs with the standard column set (Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, Warranty Expiry Date). Phones &amp; Telephony adds an optional Extension field; Printers &amp; Copiers adds an optional IP Address field &mdash; both skip the usual required-field check. "Computer (Unspecified)" is removed: its six catalogued products were all actually laptops, so they're now part of the Laptop catalog instead of sitting in their own empty bucket.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.11.0</span><h3 class="changelog-title">Other Devices</h3></div>
-        <p>"Hardware (Uncategorised)" is renamed to Other Devices and is now a fully working tab &mdash; Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Warranty (In Months), Cost, Asset State, Acquisition Date, and Warranty Expiry Date.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.10.0</span><h3 class="changelog-title">Wi-Fi Access Points</h3></div>
-        <p>Wi-Fi Access Points is now a fully working tab &mdash; Name, Company, Location, Asset Tag, End of Life, Product, Serial Number, Cost, Warranty (In Months), Asset State, Acquisition Date, and a new Warranty Expiry Date field. Works the same as every other asset type: General/Hardware Specific defaults, Bulk Add, Add Assets of Another Product, and Download CSV.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.6</span><h3 class="changelog-title">Date Field Height Fix</h3></div>
-        <p>Fixing the date field width in 0.9.5 traded it for a height regression &mdash; removing iOS's native chrome also removed padding/height iOS was adding for free, so Acquisition Date and End of Life rendered shorter than every other field. Every field now has an explicit minimum height instead of relying on padding alone, so this can't happen again for any field, of any type.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.5</span><h3 class="changelog-title">Date Field Width Fix, Take Two</h3></div>
-        <p>The 0.9.2 fix wasn't enough on real iOS Safari &mdash; Acquisition Date and End of Life could still render wider than every other field. iOS's native date control apparently ignores min-width/max-width in a grid/flex layout regardless; it now also drops the native chrome (<code>-webkit-appearance: none</code>) in favor of a plainer control that actually respects the page's sizing, while still opening the native date picker when tapped.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.4</span><h3 class="changelog-title">Download CSV Moved Below Rows</h3></div>
-        <p>Moved out of the Rows toolbar to its own full-width button below the table, so it reads as the final step after reviewing your rows rather than one option among several.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.3</span><h3 class="changelog-title">Consistent Button Colours</h3></div>
-        <p>Down to three fills, used consistently everywhere: blue for the default action (Leave Feedback, What's New, Help, Add Assets of Another Product, both CSV imports, Download Template CSV), red for anything destructive (Clear All Rows, deleting a row), and green just for Download CSV &mdash; the one "you're done" button.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.2</span><h3 class="changelog-title">Date Field Width Fix</h3></div>
-        <p>Acquisition Date and End of Life could render wider than every other field on some phones (an iOS Safari quirk where a date field's native control refuses to shrink below its own minimum width). Fixed for every field, everywhere.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.1</span><h3 class="changelog-title">Mobile Table &amp; Bulk Add Fixes</h3></div>
-        <p>Name and Delete now stay pinned to the left/right edges of the Rows table while the rest of a row scrolls underneath, so you never lose track of which row you're on or have to scroll past every field to delete one. A bare-serial line pasted alongside Name,Serial lines &mdash; usually a forgotten comma &mdash; now gets a warning icon instead of silently becoming the Asset Tag. A persistent red count now shows how many rows are missing required fields. Input borders and the required-field marker are also easier to spot.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.9.0</span><h3 class="changelog-title">Release Notes</h3></div>
-        <p>Added this Release Notes popout (also reachable by tapping the version badge), listing every version back to 0.1.0.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.8.2</span><h3 class="changelog-title">Action Button Icons</h3></div>
-        <p>Add Assets of Another Product, Clear All Rows, and Download CSV each got a matching glyph (+, &times;, and a download arrow).</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.8.1</span><h3 class="changelog-title">Add-Another-Product Polish</h3></div>
-        <p>More breathing room above the Add Assets of Another Product button, matched to the same size as the buttons in Rows, with every button's icon and text centred.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.8.0</span><h3 class="changelog-title">Bigger Workflow Cleanup</h3></div>
-        <p>Desktop PC renamed to Desktop; Windows Servers merged into Servers. Removed the Company / Location Preset dropdown &mdash; Location now fills in automatically from a known Company instead. Download Template and Import CSV for Editing renamed for clarity, and Add Rows from Serials became Add Assets of Another Product, split into its own section with a 10-product-per-export limit.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.7.3</span><h3 class="changelog-title">Clearer Type Names</h3></div>
-        <p>Laptop / PC renamed to Laptop; Tablet renamed to iPads / Tablets.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.7.2</span><h3 class="changelog-title">Reliable Deploys</h3></div>
-        <p>New versions now show up immediately after a normal reload instead of needing a manual hard refresh to clear a cached copy.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.7.1</span><h3 class="changelog-title">Mobile Selection Visibility</h3></div>
-        <p>The mobile Asset Type button now shows which type is currently selected, with a chevron that flips when the menu opens.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.7.0</span><h3 class="changelog-title">New Look</h3></div>
-        <p>Logo and title moved into a bordered box centred at the top of the page, with the first letter of each word in the name bolded.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.6.0</span><h3 class="changelog-title">Rebrand &amp; Full CSV Editing</h3></div>
-        <p>Renamed to Freshservice Asset Import Leverage System. Added Import CSV for Editing, loading a full previous export back into the Rows table for tweaking and re-download.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.5.0</span><h3 class="changelog-title">In-App Help Guide</h3></div>
-        <p>Added the Help button and step-by-step guide popout, and moved Leave Feedback up next to it.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.4.1</span><h3 class="changelog-title">More Reliable Suggestions</h3></div>
-        <p>Replaced the browser's native suggestion dropdown (unreliable on mobile Safari) with a custom one, and made Asset State a proper dropdown instead of free text.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.4.0</span><h3 class="changelog-title">Bulk Add Overhaul</h3></div>
-        <p>Made every field required, added a live preview of exactly what would be added, split Defaults into General and Hardware Specific, and removed Add Blank Row.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.3.0</span><h3 class="changelog-title">Simpler Naming</h3></div>
-        <p>Removed the auto-generated Name pattern &mdash; a bare serial number now just defaults Name to the Asset Tag.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.2.3</span><h3 class="changelog-title">Download Template</h3></div>
-        <p>Added a button to download a starter Name/Serial CSV in the exact format Import CSV expects.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.2.2</span><h3 class="changelog-title">Import CSV</h3></div>
-        <p>Added the ability to load a Name/Serial CSV file straight into Bulk Add instead of pasting.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.2.1</span><h3 class="changelog-title">Manual Name, Serial Pairs</h3></div>
-        <p>Bulk Add now accepts a <code>Name, Serial</code> pair per line, for devices named before their serial was recorded.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.2.0</span><h3 class="changelog-title">Brand Colours &amp; Feedback Button</h3></div>
-        <p>Applied the Xavier CET colour palette throughout, added a proper styled Leave Feedback button, and made the selected asset type tab clearly highlighted.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.1.1</span><h3 class="changelog-title">Automatic Asset Tag</h3></div>
-        <p>Asset Tag is generated automatically from each site's short code plus serial number, instead of being typed by hand.</p>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-entry-head"><span class="changelog-version">0.1.0</span><h3 class="changelog-title">Initial Release</h3></div>
-        <p>First version of the tool: Monitor, Interactive Touchscreen, Laptop/PC, Desktop PC, and Tablet templates, with Company/Location and Model presets to speed up bulk asset creation.</p>
-      </div>
-    </div>
-  </dialog>
-
-  <script type="module" src="js/app.js?v=3.5.0"></script>
+  <script>
+    setTimeout(function () {
+      window.location.href = 'https://bart.xcet.uk/';
+    }, 5000);
+  </script>
 </body>
 </html>
